@@ -6,7 +6,7 @@ Cross platform easy-to-use YouTube video download software.
 
 TBD
 
-## Download 
+## Download
 
 TBD
 
@@ -19,13 +19,13 @@ TBD
 #### Build
 
 ```
-./gradlew build
+./gradlew fatJar
 ```
 
-#### Run
+#### Run / Test
 
 ```
-./gradlew jfxRun 
+./gradlew jfxRun
 ```
 
 MORE TBD.. PROJECT IS IN ACTIVE DEVELOPMENT!
