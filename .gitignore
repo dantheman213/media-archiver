@@ -1,0 +1,16 @@
+.DS_Store
+[Tt]humbs.db
+
+.idea/
+*.iml
+
+build/
+out/
+classes/
+
+.gradle/
+gradle/
+gradlew*
+
+
+release/Output
