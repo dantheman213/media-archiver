@@ -48,16 +48,22 @@
           <AnchorPane minHeight="0.0" minWidth="0.0" />
         </content>
          <padding>
-            <Insets right="5.0" />
+            <Insets right="5.0" top="10.0" />
          </padding>
       </TitledPane>
       <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Queue" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
         <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <padding>
+                  <Insets top="10.0" />
+               </padding></AnchorPane>
         </content>
          <GridPane.margin>
             <Insets left="5.0" />
          </GridPane.margin>
+         <padding>
+            <Insets top="10.0" />
+         </padding>
       </TitledPane>
       <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Encoding" GridPane.columnSpan="2147483647" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
         <content>

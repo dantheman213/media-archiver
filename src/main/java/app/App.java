@@ -4,9 +4,11 @@ import app.utilities.Toolbelt;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 
 public class App extends Application {
@@ -19,10 +21,15 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Toolbelt toolbelt = new Toolbelt();
-        Parent root = FXMLLoader.load(toolbelt.getResourceUrlAtPath("views/vwEncoder.fxml"));
+        Parent root = FXMLLoader.load(toolbelt.getResourceUrlAtPath("views/vwSplash.fxml"));
 
         primaryStage.setTitle ("Jack The Video Ripper");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root, 550, 400));
+        primaryStage.getScene().setCursor(Cursor.WAIT);
+        primaryStage.initStyle(StageStyle.UNDECORATED);
+
+        primaryStage.setAlwaysOnTop(true);
+        primaryStage.setResizable(false);
 
         primaryStage.show();
     }
