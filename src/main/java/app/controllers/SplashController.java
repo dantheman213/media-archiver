@@ -1,5 +1,6 @@
 package app.controllers;
 
+import app.models.RectangleModel;
 import app.utilities.Toolbelt;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -21,7 +22,6 @@ public class SplashController implements Initializable  {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // TBD start main window
         new Thread(() -> {
             try {
                 Thread.sleep(5000);
@@ -51,6 +51,10 @@ public class SplashController implements Initializable  {
 
         stage.setTitle ("Jack The Video Ripper");
         stage.setScene(new Scene(root, 800, 600));
+
+        RectangleModel bounds = toolbelt.getCenterForStageInWindow(stage.getScene().getWidth(), stage.getScene().getHeight());
+        stage.setX(bounds.getX());
+        stage.setY(bounds.getY());
 
         stage.show();
     }

@@ -1,5 +1,6 @@
 package app;
 
+import app.models.RectangleModel;
 import app.utilities.Toolbelt;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -30,6 +31,10 @@ public class App extends Application {
 
         primaryStage.setAlwaysOnTop(true);
         primaryStage.setResizable(false);
+
+        RectangleModel bounds = toolbelt.getCenterForStageInWindow(primaryStage.getScene().getWidth(), primaryStage.getScene().getHeight());
+        primaryStage.setX(bounds.getX());
+        primaryStage.setY(bounds.getY());
 
         primaryStage.show();
     }
