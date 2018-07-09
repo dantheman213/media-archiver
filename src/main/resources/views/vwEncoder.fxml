@@ -1,93 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane fx:controller="app.controllers.EncoderController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
-    <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-    </columnConstraints>
-    <rowConstraints>
-      <RowConstraints minHeight="25.0" prefHeight="30.0" valignment="TOP" vgrow="NEVER" />
-        <RowConstraints minHeight="25.0" prefHeight="10.0" valignment="TOP" vgrow="NEVER" />
-        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    </rowConstraints>
-    <children>
-        <MenuBar GridPane.columnSpan="2147483647" GridPane.hgrow="ALWAYS" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
-            <menus>
-                <Menu mnemonicParsing="false" text="File">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handleMenuFileCloseButtonAction" text="Close" />
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handleMenuHelpAboutButtonAction" text="About" />
-                    </items>
-                </Menu>
-            </menus>
-        </MenuBar>
-      <ToolBar prefHeight="40.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
-        <items>
-          <Button mnemonicParsing="false" onAction="#handleToolbarPlayButtonAction" text="Play" />
-          <Button mnemonicParsing="false" onAction="#handleToolbarStopButtonAction" text="Stop" />
-        </items>
-      </ToolBar>
-        <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Queue" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.controllers.EncoderController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="NEVER" minWidth="100.0" prefWidth="200.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" valignment="TOP" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" vgrow="NEVER" />
+  </rowConstraints>
+   <children>
+      <MenuBar GridPane.columnSpan="2147483647">
+          <menus>
+              <Menu mnemonicParsing="false" text="File">
+                  <items>
+                      <MenuItem mnemonicParsing="false" onAction="#handleMenuFileCloseButtonAction" text="Close" />
+                  </items>
+              </Menu>
+              <Menu mnemonicParsing="false" text="Help">
+                  <items>
+                      <MenuItem mnemonicParsing="false" onAction="#handleMenuHelpAboutButtonAction" text="About" />
+                  </items>
+              </Menu>
+          </menus>
+      </MenuBar>
+       <ToolBar GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+           <items>
+               <Button mnemonicParsing="false" onAction="#handleToolbarPlayButtonAction" text="Play" />
+               <Button mnemonicParsing="false" onAction="#handleToolbarStopButtonAction" text="Stop" />
+           </items>
+       </ToolBar>
+      <TreeView GridPane.rowIndex="2" />
+      <TableView prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+        <columns>
+          <TableColumn prefWidth="75.0" text="C1" />
+          <TableColumn prefWidth="75.0" text="C2" />
+        </columns>
+      </TableView>
+      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
+        <tabs>
+          <Tab text="Status">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                    <padding>
-                        <Insets top="10.0" />
-                    </padding>
-                </AnchorPane>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>
-            <GridPane.margin>
-                <Insets right="5.0" top="10.0" />
-            </GridPane.margin>
-            <padding>
-                <Insets top="10.0" />
-            </padding>
-        </TitledPane>
-        <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="100.0" text="Properties" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+          </Tab>
+          <Tab text="Options">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>
-            <padding>
-                <Insets left="5.0" top="10.0" />
-            </padding>
-         <GridPane.margin>
-            <Insets top="10.0" />
-         </GridPane.margin>
-        </TitledPane>
-        <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Encoding" GridPane.columnSpan="2147483647" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS">
-            <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
-            <GridPane.margin>
-                <Insets />
-            </GridPane.margin>
-            <padding>
-                <Insets top="10.0" />
-            </padding>
-        </TitledPane>
-        <BorderPane prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
-            <left>
-                <Label text="Status: Inactive" BorderPane.alignment="CENTER" />
-            </left>
-        </BorderPane>
-    </children>
+          </Tab>
+        </tabs>
+      </TabPane>
+       <BorderPane GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
+           <left>
+               <Label text="Status: Inactive" BorderPane.alignment="CENTER" />
+           </left>
+       </BorderPane>
+   </children>
 </GridPane>
