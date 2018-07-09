@@ -50,7 +50,7 @@ public class SplashController implements Initializable  {
         Stage stage = new Stage();
 
         stage.setTitle ("Jack The Video Ripper");
-        stage.setScene(new Scene(root, 1000, 700));
+        stage.setScene(new Scene(root, 1024, 768));
 
         RectangleModel bounds = toolbelt.getCenterForStageInWindow(stage.getScene().getWidth(), stage.getScene().getHeight());
         stage.setX(bounds.getX());
