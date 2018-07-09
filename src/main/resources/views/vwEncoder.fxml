@@ -25,8 +25,8 @@
   <rowConstraints>
     <RowConstraints minHeight="10.0" valignment="TOP" vgrow="NEVER" />
     <RowConstraints minHeight="10.0" vgrow="NEVER" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" vgrow="ALWAYS" />
+      <RowConstraints maxHeight="400.0" minHeight="10.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" vgrow="NEVER" />
   </rowConstraints>
    <children>
@@ -53,8 +53,12 @@
       <TreeView GridPane.rowIndex="2" />
       <TableView prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
         <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
+          <TableColumn prefWidth="150.0" text="Name" />
+          <TableColumn prefWidth="75.0" text="Size" />
+            <TableColumn prefWidth="200.0" text="Progress" />
+            <TableColumn prefWidth="150.0" text="Download Speed" />
+            <TableColumn prefWidth="75.0" text="ETA" />
+            <TableColumn prefWidth="200.0" text="Options" />
         </columns>
       </TableView>
       <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
