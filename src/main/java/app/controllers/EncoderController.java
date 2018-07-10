@@ -10,7 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.event.ActionEvent;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -18,13 +18,32 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class EncoderController implements Initializable {
+    @FXML
+    TreeView treeMenu;
+
+    @FXML
+    TableView tableEncodeList;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        buildTreeMenu();
+    }
 
+    private void buildTreeMenu() {
+        TreeItem<String> item1 = new TreeItem<String>("All (0)");
+        TreeItem<String> item2 = new TreeItem<String>("Completed (0)");
+        TreeItem<String> item3 = new TreeItem<String>("Error (0)");
+
+        TreeItem<String> root = new TreeItem<>("");
+        root.getChildren().addAll(item1, item2, item3);
+
+        treeMenu.setShowRoot(false);
+        treeMenu.setRoot(root);
+        treeMenu.getSelectionModel().select(treeMenu.getRow(item1));
     }
 
     @FXML
-    public void handleMenuFileCloseButtonAction(ActionEvent event) throws Exception {
+    public void handleMenuFileExitButtonAction(ActionEvent event) throws Exception {
         App.exitApplication();
     }
 
@@ -47,14 +66,14 @@ public class EncoderController implements Initializable {
     }
 
     @FXML
-    public void handleToolbarPlayButtonAction(ActionEvent event) throws Exception {
+    public void handleToolbarStartQueueButtonAction(ActionEvent event) throws Exception {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText("This feature will be implemented soon!");
         alert.showAndWait();
     }
 
     @FXML
-    public void handleToolbarStopButtonAction(ActionEvent event) throws Exception {
+    public void handleToolbarStopQueueButtonAction(ActionEvent event) throws Exception {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText("This feature will be implemented soon!");
         alert.showAndWait();
