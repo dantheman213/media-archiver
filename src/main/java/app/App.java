@@ -32,7 +32,7 @@ public class App extends Application {
         primaryStage.setAlwaysOnTop(true);
         primaryStage.setResizable(false);
 
-        RectangleModel bounds = toolbelt.getCenterForStageInWindow(primaryStage.getScene().getWidth(), primaryStage.getScene().getHeight());
+        RectangleModel bounds = toolbelt.getScreenCenterForStage(primaryStage.getScene().getWidth(), primaryStage.getScene().getHeight());
         primaryStage.setX(bounds.getX());
         primaryStage.setY(bounds.getY());
 

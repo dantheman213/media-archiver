@@ -3,7 +3,6 @@ package app.controllers;
 import app.models.RectangleModel;
 import app.utilities.Toolbelt;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -52,7 +50,7 @@ public class SplashController implements Initializable  {
         stage.setTitle ("Jack The Video Ripper");
         stage.setScene(new Scene(root, 1024, 768));
 
-        RectangleModel bounds = toolbelt.getCenterForStageInWindow(stage.getScene().getWidth(), stage.getScene().getHeight());
+        RectangleModel bounds = toolbelt.getScreenCenterForStage(stage.getScene().getWidth(), stage.getScene().getHeight());
         stage.setX(bounds.getX());
         stage.setY(bounds.getY());
 

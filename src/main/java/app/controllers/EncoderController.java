@@ -31,11 +31,13 @@ public class EncoderController implements Initializable {
 
     private void buildTreeMenu() {
         TreeItem<String> item1 = new TreeItem<String>("All (0)");
-        TreeItem<String> item2 = new TreeItem<String>("Completed (0)");
-        TreeItem<String> item3 = new TreeItem<String>("Error (0)");
+        TreeItem<String> item2 = new TreeItem<String>("Pending (0)");
+        TreeItem<String> item3 = new TreeItem<String>("In Progress (0)");
+        TreeItem<String> item4 = new TreeItem<String>("Completed (0)");
+        TreeItem<String> item5 = new TreeItem<String>("Error (0)");
 
         TreeItem<String> root = new TreeItem<>("");
-        root.getChildren().addAll(item1, item2, item3);
+        root.getChildren().addAll(item1, item2, item3, item4, item5);
 
         treeMenu.setShowRoot(false);
         treeMenu.setRoot(root);
@@ -58,7 +60,7 @@ public class EncoderController implements Initializable {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
 
-        RectangleModel bounds = toolbelt.getCenterForStageInWindow(stage.getScene().getWidth(), stage.getScene().getHeight());
+        RectangleModel bounds = toolbelt.getScreenCenterForStage(stage.getScene().getWidth(), stage.getScene().getHeight());
         stage.setX(bounds.getX());
         stage.setY(bounds.getY());
 
@@ -66,14 +68,24 @@ public class EncoderController implements Initializable {
     }
 
     @FXML
-    public void handleToolbarStartQueueButtonAction(ActionEvent event) throws Exception {
+    public void handleAddVideoButtonAction(ActionEvent event) throws Exception {
+
+    }
+
+    @FXML
+    public void handleRemoveVideoButtonAction(ActionEvent event) throws Exception {
+
+    }
+
+    @FXML
+    public void handleStartQueueButtonAction(ActionEvent event) throws Exception {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText("This feature will be implemented soon!");
         alert.showAndWait();
     }
 
     @FXML
-    public void handleToolbarStopQueueButtonAction(ActionEvent event) throws Exception {
+    public void handleStopQueueButtonAction(ActionEvent event) throws Exception {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText("This feature will be implemented soon!");
         alert.showAndWait();

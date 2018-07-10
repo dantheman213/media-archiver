@@ -46,11 +46,11 @@
 
                 <Menu mnemonicParsing="false" text="Media">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Add Item" />
-                        <MenuItem mnemonicParsing="false" text="Remove Item" />
+                        <MenuItem mnemonicParsing="false" text="Add Video" />
+                        <MenuItem mnemonicParsing="false" text="Remove Video" />
                         <SeparatorMenuItem />
-                        <MenuItem mnemonicParsing="false" text="Start Queue" />
-                        <MenuItem mnemonicParsing="false" text="Stop Queue" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleStartQueueButtonAction" text="Start Queue" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleStopQueueButtonAction" text="Stop Queue" />
                         <SeparatorMenuItem />
                         <MenuItem mnemonicParsing="false" text="Queue Video Up" />
                         <MenuItem mnemonicParsing="false" text="Queue Video Down" />
@@ -66,13 +66,13 @@
         </MenuBar>
         <ToolBar GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
             <items>
-                <Button mnemonicParsing="false" text="Add Item"/>
-                <Button mnemonicParsing="false" text="Remove Item"/>
+                <Button mnemonicParsing="false" onAction="#handleAddVideoButtonAction" text="Add Video"/>
+                <Button mnemonicParsing="false" onAction="#handleRemoveVideoButtonAction" text="Remove Video"/>
 
                 <Separator />
 
-                <Button mnemonicParsing="false" onAction="#handleToolbarStartQueueButtonAction" text="Start Queue"/>
-                <Button mnemonicParsing="false" onAction="#handleToolbarStopQueueButtonAction" text="Stop Queue"/>
+                <Button mnemonicParsing="false" onAction="#handleStartQueueButtonAction" text="Start Queue"/>
+                <Button mnemonicParsing="false" onAction="#handleStopQueueButtonAction" text="Stop Queue"/>
 
                 <Separator />
 
@@ -105,11 +105,11 @@
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
                     </content>
                 </Tab>
-                <!--<Tab text="Options">-->
-                    <!--<content>-->
-                        <!--<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>-->
-                    <!--</content>-->
-                <!--</Tab>-->
+                <Tab text="Options">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+                    </content>
+                </Tab>
             </tabs>
         </TabPane>
         <BorderPane GridPane.columnSpan="2147483647" GridPane.rowIndex="4">

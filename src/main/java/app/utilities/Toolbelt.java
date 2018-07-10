@@ -13,7 +13,7 @@ public class Toolbelt {
         return Toolbelt.class.getClassLoader().getResource(path);
     }
 
-    public RectangleModel getCenterForStageInWindow(double stageWidth, double stageHeight) {
+    public RectangleModel getScreenCenterForStage(double stageWidth, double stageHeight) {
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
 
         int stageX = (int)Math.floor((screen.getWidth() - stageWidth) / 2);
