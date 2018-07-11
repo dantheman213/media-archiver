@@ -1,8 +1,7 @@
-package app.utilities;
+package app.library;
 
 import app.models.RectangleModel;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 
 import java.net.URL;

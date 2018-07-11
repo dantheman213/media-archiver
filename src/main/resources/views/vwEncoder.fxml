@@ -19,6 +19,7 @@
 
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0"
           prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
           fx:controller="app.controllers.EncoderController">
@@ -88,13 +89,46 @@
             </placeholder>
 
             <columns>
-                <TableColumn prefWidth="150.0" text="Name" style="-fx-font-weight: normal;"/>
-                <TableColumn prefWidth="75.0" text="Size" style="-fx-font-weight: normal;"/>
-                <TableColumn prefWidth="200.0" text="Progress" style="-fx-font-weight: normal;"/>
-                <TableColumn prefWidth="150.0" text="Download Speed" style="-fx-font-weight: normal;"/>
-                <TableColumn prefWidth="75.0" text="ETA" style="-fx-font-weight: normal;"/>
-                <TableColumn prefWidth="200.0" text="Options" style="-fx-font-weight: normal;"/>
-                <TableColumn prefWidth="200.0" text="Output Path" style="-fx-font-weight: normal;"/>
+                <TableColumn prefWidth="150.0" text="Name" style="-fx-font-weight: normal;">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="name" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="75.0" text="Size" style="-fx-font-weight: normal;">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="totalSizePretty" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="200.0" text="Progress" style="-fx-font-weight: normal;">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="currentProgress" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="150.0" text="Download Speed" style="-fx-font-weight: normal;">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="currentDownloadSpeed" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="75.0" text="ETA" style="-fx-font-weight: normal;">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="estimatedTimeToComplete" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="200.0" text="Options" style="-fx-font-weight: normal;">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="options" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="200.0" text="URL" style="-fx-font-weight: normal;">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="url" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn prefWidth="200.0" text="Output Path" style="-fx-font-weight: normal;">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="outputPath" />
+                    </cellValueFactory>
+                </TableColumn>
             </columns>
         </TableView>
         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2147483647"

@@ -1,8 +1,9 @@
 package app.controllers;
 
 import app.App;
+import app.models.DownloadMediaModel;
 import app.models.RectangleModel;
-import app.utilities.Toolbelt;
+import app.library.Toolbelt;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -15,6 +16,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class EncoderController implements Initializable {
@@ -24,8 +28,11 @@ public class EncoderController implements Initializable {
     @FXML
     TableView tableEncodeList;
 
+    List<DownloadMediaModel> mediaList;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        mediaList = new ArrayList<DownloadMediaModel>();
         buildTreeMenu();
     }
 
@@ -42,6 +49,11 @@ public class EncoderController implements Initializable {
         treeMenu.setShowRoot(false);
         treeMenu.setRoot(root);
         treeMenu.getSelectionModel().select(treeMenu.getRow(item1));
+    }
+
+    private void updateEncodeListWidgetItems() {
+        // TBD provide a real solution.
+        tableEncodeList.getItems().add(mediaList.get(mediaList.size()-1));
     }
 
     @FXML
@@ -69,7 +81,18 @@ public class EncoderController implements Initializable {
 
     @FXML
     public void handleAddVideoButtonAction(ActionEvent event) throws Exception {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Add Video");
+        dialog.setHeaderText("What Video URL would you like to add?");
 
+        Optional<String> result = dialog.showAndWait();
+        if(result.isPresent()) {
+            DownloadMediaModel model = new DownloadMediaModel();
+            model.setUrl(result.get());
+
+            mediaList.add(model);
+            updateEncodeListWidgetItems();
+        }
     }
 
     @FXML

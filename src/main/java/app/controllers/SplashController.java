@@ -1,7 +1,7 @@
 package app.controllers;
 
 import app.models.RectangleModel;
-import app.utilities.Toolbelt;
+import app.library.Toolbelt;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
