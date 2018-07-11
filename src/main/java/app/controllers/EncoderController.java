@@ -1,6 +1,7 @@
 package app.controllers;
 
 import app.App;
+import app.models.DownloadMediaModel;
 import app.models.DownloadMediaViewModel;
 import app.models.RectangleModel;
 import app.library.Toolbelt;
@@ -87,12 +88,25 @@ public class EncoderController implements Initializable {
 
         Optional<String> result = dialog.showAndWait();
         if(result.isPresent()) {
-            DownloadMediaViewModel model = new DownloadMediaViewModel();
-            model.setUrl(result.get());
+            String url = result.get();
+
+            // Check url for basic validity
+
+            DownloadMediaViewModel model = new DownloadMediaViewModel(downloadVideoMetaData(url));
 
             mediaList.add(model);
             updateEncodeListWidgetItems();
         }
+    }
+
+    public DownloadMediaModel downloadVideoMetaData(String url) {
+        DownloadMediaModel model = new DownloadMediaModel();
+        model.url = url;
+
+        // TBD
+        model.name = "this is a test";
+
+        return model;
     }
 
     @FXML

@@ -1,23 +1,18 @@
 package app.models;
 
 public class DownloadMediaViewModel {
-    private String name;
-    private int totalSizeInBytes;
-    private int currentDownloadSizeInBytes;
-    private String options;
-    private String url;
-    private String outputPath;
+    private DownloadMediaModel media;
 
-    public DownloadMediaViewModel() {
-        name = "This is a test";
+    public DownloadMediaViewModel(DownloadMediaModel obj) {
+        this.media = obj;
+    }
+
+    public DownloadMediaModel getMedia() {
+        return media;
     }
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return media.name;
     }
 
     public String getTotalSizePretty() {
@@ -37,18 +32,14 @@ public class DownloadMediaViewModel {
     }
 
     public String getOptions() {
-        return options;
+        return "N/A";
     }
 
     public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+        return media.url;
     }
 
     public String getOutputPath() {
-        return outputPath;
+        return media.outputPath;
     }
 }
