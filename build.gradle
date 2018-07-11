@@ -3,7 +3,7 @@ apply plugin: 'javafx-gradle-plugin'
 
 archivesBaseName = "JackTheVideoRipper"
 
-if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+if (JavaVersion.current() < JavaVersion.VERSION_1_8) {
     throw new GradleException("Must Build with Java 1.8")
 }
 
