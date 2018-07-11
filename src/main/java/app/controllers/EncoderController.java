@@ -1,7 +1,7 @@
 package app.controllers;
 
 import app.App;
-import app.models.DownloadMediaModel;
+import app.models.DownloadMediaViewModel;
 import app.models.RectangleModel;
 import app.library.Toolbelt;
 import javafx.fxml.FXML;
@@ -28,11 +28,11 @@ public class EncoderController implements Initializable {
     @FXML
     TableView tableEncodeList;
 
-    List<DownloadMediaModel> mediaList;
+    List<DownloadMediaViewModel> mediaList;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        mediaList = new ArrayList<DownloadMediaModel>();
+        mediaList = new ArrayList<DownloadMediaViewModel>();
         buildTreeMenu();
     }
 
@@ -87,7 +87,7 @@ public class EncoderController implements Initializable {
 
         Optional<String> result = dialog.showAndWait();
         if(result.isPresent()) {
-            DownloadMediaModel model = new DownloadMediaModel();
+            DownloadMediaViewModel model = new DownloadMediaViewModel();
             model.setUrl(result.get());
 
             mediaList.add(model);
