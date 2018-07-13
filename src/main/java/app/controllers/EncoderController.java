@@ -17,6 +17,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +34,10 @@ public class EncoderController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        mediaList = new ArrayList<DownloadMediaViewModel>();
         buildTreeMenu();
+
+        mediaList = new ArrayList<DownloadMediaViewModel>();
+        tableEncodeList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     private void buildTreeMenu() {
@@ -92,19 +95,19 @@ public class EncoderController implements Initializable {
 
             // Check url for basic validity
 
-            DownloadMediaViewModel model = new DownloadMediaViewModel(downloadVideoMetaData(url));
+            DownloadMediaViewModel model = new DownloadMediaViewModel(generateMediaData(url));
 
             mediaList.add(model);
             updateEncodeListWidgetItems();
         }
     }
 
-    public DownloadMediaModel downloadVideoMetaData(String url) {
+    public DownloadMediaModel generateMediaData(String url) {
         DownloadMediaModel model = new DownloadMediaModel();
         model.url = url;
 
         // TBD
-        model.name = "this is a test";
+        model.name = "this is a test " + LocalDateTime.now().getMinute() + LocalDateTime.now().getSecond();
 
         return model;
     }

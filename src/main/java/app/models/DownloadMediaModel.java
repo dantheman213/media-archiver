@@ -7,4 +7,5 @@ public class DownloadMediaModel {
     public String options;
     public String url;
     public String outputPath;
+    public String fileName;
 }
