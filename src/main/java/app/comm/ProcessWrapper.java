@@ -14,14 +14,16 @@ public class ProcessWrapper {
     private String workingDirectory;
     private String consoleBuffer;
 
-    public ProcessWrapper(String workingDirectory) {
+    public ProcessWrapper() {
         args = new ArrayList<String>();
-        this.workingDirectory = workingDirectory;
-
     }
 
     public void setCommand(String command) {
         this.command = command;
+    }
+
+    public void setWorkingDirectory(String workingDirectory) {
+        this.workingDirectory = workingDirectory;
     }
 
     public void addArgument(String arg) {
