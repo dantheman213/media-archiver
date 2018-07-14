@@ -1,14 +1,20 @@
 # Jack The Video Ripper
 
-Cross platform easy-to-use YouTube video download software.
+Cross platform easy-to-use video download software for free streaming platforms such as YouTube and [many more](https://rg3.github.io/youtube-dl/supportedsites.html).
 
 ## How It Works
 
-TBD
+Jack The Video Ripper is a complete installation package that contains the following:
+
+* An advanced GUI (this app)
+* [youtube-dl](https://github.com/rg3/youtube-dl), a command-line utility for ripping videos from free streaming platforms
+* [FFmpeg](https://github.com/FFmpeg/FFmpeg), a command-line utility for video/audio media transcoding
+
+MORE TBD
 
 ## Download
 
-TBD
+A release will be posted as soon as the code releases an `alpha` release status.
 
 ## Development / Getting Started
 
