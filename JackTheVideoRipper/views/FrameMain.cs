@@ -4,13 +4,14 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using JackTheVideoRipper.src.models;
 using Microsoft.VisualBasic;
 
 namespace JackTheVideoRipper
 {
     public partial class FrameMain : Form
     {
-        private static List<Tuple<string, Process>> processes = new List<Tuple<string, Process>>();
+        private static Dictionary<string, ProcessUpdateRow> dict = new Dictionary<string, ProcessUpdateRow>();
         private static System.Threading.Timer listItemRowsUpdateTimer;
 
         public FrameMain()
@@ -28,9 +29,10 @@ namespace JackTheVideoRipper
                 listItems.Items.Add(li);
 
                 Process p = YouTubeDL.downloadVideo(videoUrl);
-                processes.Add(new Tuple<string, Process>(li.Tag.ToString(), p));
-
-               
+                ProcessUpdateRow pur = new ProcessUpdateRow();
+                pur.proc = p;
+                pur.item = listItems.Items[listItems.Items.Count - 1];
+                dict.Add(li.Tag.ToString(), pur);
             }
         }
 
@@ -50,48 +52,53 @@ namespace JackTheVideoRipper
             }
             locked = true;
 
-         
-            BeginInvoke(new Action(() =>
+            foreach (ProcessUpdateRow pur in dict.Values)
             {
-                foreach (ListViewItem item in listItems.Items)
+                if (pur.proc.HasExited)
                 {
-                    foreach (Tuple<string, Process> t in processes)
+                    // TODO: optimize
+                   BeginInvoke(new Action(() =>
                     {
-                        if (item.Tag.ToString() == t.Item1)
+                        pur.item.SubItems[1].Text = "Complete";
+                        listItems.Invalidate();
+                        listItems.Update();
+                        listItems.Refresh();
+                        Application.DoEvents();
+                    }), null);
+                    break;
+                }
+                string line = pur.proc.StandardOutput.ReadLine();
+                if (!String.IsNullOrEmpty(line))
+                {
+                    // Console.WriteLine(line);
+                    string l = Regex.Replace(line, @"\s+", " ");
+                    if (l.IndexOf("[youtube]") > -1)
+                    {
+                        BeginInvoke(new Action(() =>
                         {
-                            Process p = t.Item2;
-                            if (p.HasExited)
-                            {
-                                // TODO: optimize
-                                item.SubItems[1].Text = "Complete";
-                                break;
-                            }
-                            string line = p.StandardOutput.ReadLine();
-                            if (!String.IsNullOrEmpty(line))
-                            {
-                                // Console.WriteLine(line);
-                                string l = Regex.Replace(line, @"\s+", " ");
-                                if (l.IndexOf("[youtube]") > -1)
-                                {
-                                    item.SubItems[1].Text = "Reading Metadata";
-                                    listItems.Invalidate();
-                                    listItems.Update();
-                                    listItems.Refresh();
-                                    Application.DoEvents();
-                                }
-                                else if(l.IndexOf("[download]") > -1)
-                                {
-                                    item.SubItems[1].Text = "Downloading";
-                                    listItems.Invalidate();
-                                    listItems.Update();
-                                    listItems.Refresh();
-                                    Application.DoEvents();
-                                }
-                            }
-                        }
+                            pur.item.SubItems[1].Text = "Reading Metadata";
+                            listItems.Invalidate();
+                            listItems.Update();
+                            listItems.Refresh();
+                            Application.DoEvents();
+                        }), null);
+                   
+                    }
+                    else if (l.IndexOf("[download]") > -1)
+                    {
+                        BeginInvoke(new Action(() =>
+                        {
+                            pur.item.SubItems[1].Text = "Downloading";
+                            listItems.Invalidate();
+                            listItems.Update();
+                            listItems.Refresh();
+                            Application.DoEvents();
+                        }), null);
                     }
                 }
-            }), null);
+            }
+         
+           
             locked = false;
         }
 
