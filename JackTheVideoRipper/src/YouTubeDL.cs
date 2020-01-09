@@ -37,12 +37,12 @@ namespace JackTheVideoRipper
 
         public static void downloadVideo(string url)
         {
-            CLI.runCommand(binName + " -f \"best[ext = mp4]\" --no-check-certificate -o " + defaultDownloadPath + "\\%(title)s.%(ext)s " + url);
+            CLI.runCommand(binName + " -f (\"bestvideo[width >= 1920]\"/bestvideo)+bestaudio/best --no-check-certificate -o " + defaultDownloadPath + "\\%(title)s.%(ext)s " + url);
         }
 
         public static void downloadAudio(string url)
         {
-            CLI.runCommand(binName + " -x --audio-format mp3 --no-check-certificate -o " + defaultDownloadPath + "\\%(title)s.%(ext)s " + url);
+            CLI.runCommand(binName + " -f bestaudio -x --audio-format mp3 --no-check-certificate -o " + defaultDownloadPath + "\\%(title)s.%(ext)s " + url);
         }
     }
 }

@@ -65,5 +65,13 @@ namespace JackTheVideoRipper
                 f.ShowDialog();
             }
         }
+
+        private void convertMediaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (Form f = new FrameConvert())
+            {
+                f.ShowDialog();
+            }
+        }
     }
 }
