@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 
@@ -36,9 +37,9 @@ namespace JackTheVideoRipper
             }
         }
 
-        public static void downloadVideo(string url)
+        public static Process downloadVideo(string url)
         {
-            CLI.runCommand(binName + " -f best --no-check-certificate -o " + defaultDownloadPath + "\\" + titleFormat + " " + url);
+            return CLI.runCommand(binName + " -f best --no-check-certificate -o " + defaultDownloadPath + "\\" + titleFormat + " " + url);
         }
 
         public static void downloadAudio(string url)

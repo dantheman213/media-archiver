@@ -48,9 +48,10 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuListItems = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.openFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.convertMediaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.openFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip1.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.SuspendLayout();
@@ -60,6 +61,7 @@
             this.listItems.BackColor = System.Drawing.SystemColors.Window;
             this.listItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.cTitle,
+            this.cStatus,
             this.cType,
             this.cSize,
             this.cProgress,
@@ -191,26 +193,31 @@
             this.toolStripMenuItem1,
             this.openFolderToolStripMenuItem});
             this.contextMenuListItems.Name = "contextMenuListItems";
-            this.contextMenuListItems.Size = new System.Drawing.Size(241, 103);
-            // 
-            // openFolderToolStripMenuItem
-            // 
-            this.openFolderToolStripMenuItem.Name = "openFolderToolStripMenuItem";
-            this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(240, 30);
-            this.openFolderToolStripMenuItem.Text = "Open Folder";
-            this.openFolderToolStripMenuItem.Click += new System.EventHandler(this.openFolderToolStripMenuItem_Click);
+            this.contextMenuListItems.Size = new System.Drawing.Size(201, 70);
             // 
             // convertMediaToolStripMenuItem
             // 
             this.convertMediaToolStripMenuItem.Name = "convertMediaToolStripMenuItem";
-            this.convertMediaToolStripMenuItem.Size = new System.Drawing.Size(240, 30);
+            this.convertMediaToolStripMenuItem.Size = new System.Drawing.Size(200, 30);
             this.convertMediaToolStripMenuItem.Text = "Convert Media";
             this.convertMediaToolStripMenuItem.Click += new System.EventHandler(this.convertMediaToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(237, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(197, 6);
+            // 
+            // openFolderToolStripMenuItem
+            // 
+            this.openFolderToolStripMenuItem.Name = "openFolderToolStripMenuItem";
+            this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(200, 30);
+            this.openFolderToolStripMenuItem.Text = "Open Folder";
+            this.openFolderToolStripMenuItem.Click += new System.EventHandler(this.openFolderToolStripMenuItem_Click);
+            // 
+            // cStatus
+            // 
+            this.cStatus.Text = "Status";
+            this.cStatus.Width = 140;
             // 
             // FrameMain
             // 
@@ -256,6 +263,7 @@
         private System.Windows.Forms.ToolStripMenuItem openFolderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem convertMediaToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.ColumnHeader cStatus;
     }
 }
 
