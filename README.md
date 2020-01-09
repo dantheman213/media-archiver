@@ -1,37 +1,11 @@
 # Jack The Video Ripper
 
-Cross platform easy-to-use video download software for free streaming platforms such as YouTube and [many more](https://rg3.github.io/youtube-dl/supportedsites.html).
+Download YouTube videos easily with a few point and clicks. Designed and developed for Windows 10.
 
-## How It Works
+## How Does It Work?
 
-Jack The Video Ripper is a complete installation package that contains the following:
+Jack is a graphical interface that sits on top of another popular tool called [youtube-dl](https://github.com/ytdl-org/youtube-dl). This tool allows for easy and powerful access to YouTube media through the command-line.
 
-* An advanced GUI (this app)
-* [youtube-dl](https://github.com/rg3/youtube-dl), a command-line utility for ripping videos from free streaming platforms
-* [FFmpeg](https://github.com/FFmpeg/FFmpeg), a command-line utility for video/audio media transcoding
+## Getting Started
 
-MORE TBD
-
-## Download
-
-A release will be posted as soon as the code releases an `alpha` release status.
-
-## Development / Getting Started
-
-TBD
-
-### Building and running with Gradle
-
-#### Build
-
-```
-./gradlew fatJar
-```
-
-#### Run / Test
-
-```
-./gradlew jfxRun
-```
-
-MORE TBD.. PROJECT IS IN ACTIVE DEVELOPMENT!
+TODO

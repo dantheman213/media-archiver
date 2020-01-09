@@ -1,16 +1,9 @@
 .DS_Store
 [Tt]humbs.db
 
-.idea/
-*.iml
+.vs/
 
-build/
-out/
-classes/
+bin/
+obj/
 
-.gradle/
-gradle/
-gradlew*
-
-
-release/Output
+*.log
