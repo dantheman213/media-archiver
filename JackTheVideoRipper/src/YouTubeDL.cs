@@ -6,10 +6,11 @@ namespace JackTheVideoRipper
 {
     class YouTubeDL
     {
+        public static string defaultDownloadPath = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Downloads");
         private static string binName = "youtube-dl.exe";
         private static string binPath = Common.AppPath + "\\" + binName;
         private static string downloadURL = "https://yt-dl.org/downloads/latest/youtube-dl.exe";
-        public static string defaultDownloadPath = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Downloads");
+        private static string titleFormat = "%(title)s.%(ext)s";
 
         private static bool exists()
         {
@@ -37,12 +38,12 @@ namespace JackTheVideoRipper
 
         public static void downloadVideo(string url)
         {
-            CLI.runCommand(binName + " -f bestvideo[ext!=webm]‌​+bestaudio[ext!=webm]‌​/best[ext!=webm] --merge-output-format mp4 --no-check-certificate -o " + defaultDownloadPath + "\\%(title)s.%(ext)s " + url);
+            CLI.runCommand(binName + " -f best --no-check-certificate -o " + defaultDownloadPath + "\\" + titleFormat + " " + url);
         }
 
         public static void downloadAudio(string url)
         {
-            CLI.runCommand(binName + " -f bestaudio -x --audio-format mp3 --no-check-certificate -o " + defaultDownloadPath + "\\%(title)s.%(ext)s " + url);
+            CLI.runCommand(binName + " -f bestaudio -x --audio-format mp3 --no-check-certificate -o " + defaultDownloadPath + "\\" + titleFormat + " " + url);
         }
     }
 }
