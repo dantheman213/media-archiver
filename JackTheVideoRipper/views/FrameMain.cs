@@ -24,12 +24,13 @@ namespace JackTheVideoRipper
             string videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Video", "", -1, -1);
             if (videoUrl != "")
             {
-                var li = new ListViewItem(new string[] { "TODO", "Waiting", "Video", "TODO", "TODO", "TODO", "TODO", videoUrl, YouTubeDL.defaultDownloadPath });
+                var li = new ListViewItem(new string[] { "", "Waiting", "Video", "-", "", "0%", "0.0 KB/s", videoUrl, "" });
                 li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
                 listItems.Items.Add(li);
 
                 Process p = YouTubeDL.downloadVideo(videoUrl);
                 ProcessUpdateRow pur = new ProcessUpdateRow();
+                pur.paint = true;
                 pur.proc = p;
                 pur.item = listItems.Items[listItems.Items.Count - 1];
                 dict.Add(li.Tag.ToString(), pur);
@@ -54,46 +55,82 @@ namespace JackTheVideoRipper
 
             foreach (ProcessUpdateRow pur in dict.Values)
             {
-                if (pur.proc.HasExited)
+                if (pur.paint && pur.proc.HasExited)
                 {
                     // TODO: optimize
-                   BeginInvoke(new Action(() =>
+                    pur.paint = false;
+                    BeginInvoke(new Action(() =>
                     {
                         pur.item.SubItems[1].Text = "Complete";
+                        pur.item.SubItems[4].Text = "100%"; // Progress
+                        pur.item.SubItems[5].Text = ""; // Download Speed
+                        pur.item.SubItems[6].Text = "0:00"; // ETA
                         listItems.Invalidate();
                         listItems.Update();
                         listItems.Refresh();
                         Application.DoEvents();
                     }), null);
-                    break;
                 }
+                if (pur.proc.HasExited)
+                {
+                    continue;
+                }
+
                 string line = pur.proc.StandardOutput.ReadLine();
                 if (!String.IsNullOrEmpty(line))
                 {
                     // Console.WriteLine(line);
                     string l = Regex.Replace(line, @"\s+", " ");
+                    string[] parts = l.Split(' ');
                     if (l.IndexOf("[youtube]") > -1)
                     {
                         BeginInvoke(new Action(() =>
                         {
                             pur.item.SubItems[1].Text = "Reading Metadata";
+                            
                             listItems.Invalidate();
                             listItems.Update();
                             listItems.Refresh();
                             Application.DoEvents();
                         }), null);
-                   
                     }
                     else if (l.IndexOf("[download]") > -1)
                     {
-                        BeginInvoke(new Action(() =>
+                       if (l.IndexOf("%") > -1 && parts.Length >= 8)
                         {
-                            pur.item.SubItems[1].Text = "Downloading";
-                            listItems.Invalidate();
-                            listItems.Update();
-                            listItems.Refresh();
-                            Application.DoEvents();
-                        }), null);
+                            BeginInvoke(new Action(() =>
+                            {
+                                pur.item.SubItems[1].Text = "Downloading";
+                                pur.item.SubItems[3].Text = parts[3]; // Size
+                                pur.item.SubItems[4].Text = parts[1]; // Progress
+                                pur.item.SubItems[5].Text = parts[5]; // Download Speed
+                                pur.item.SubItems[6].Text = parts[7]; // ETA
+                                listItems.Invalidate();
+                                listItems.Update();
+                                listItems.Refresh();
+                                Application.DoEvents();
+                            }), null);
+                        } else if (l.IndexOf("Destination") > -1)
+                        {
+                            int start = l.IndexOf(": ") + 2;
+                            string filePath = l.Substring(start, l.Length - start);
+                            string fileName = filePath.Substring(filePath.LastIndexOf('\\') + 1);
+                            fileName = fileName.Substring(0, fileName.LastIndexOf("."));
+                            BeginInvoke(new Action(() =>
+                            {
+                                pur.item.SubItems[0].Text = fileName; // Title
+                                pur.item.SubItems[8].Text = filePath; // Path
+                                listItems.Invalidate();
+                                listItems.Update();
+                                listItems.Refresh();
+                                Application.DoEvents();
+                            }), null);
+                        }
+                    }
+                    else if (l.IndexOf("error") > -1)
+                    {
+                        // TODO
+                        Console.WriteLine("error " + l);
                     }
                 }
             }
@@ -101,7 +138,7 @@ namespace JackTheVideoRipper
            
             locked = false;
         }
-
+        
         private void downloadAsAudioToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Audio", "", -1, -1);
@@ -114,7 +151,7 @@ namespace JackTheVideoRipper
 
         private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Common.openFolder(YouTubeDL.defaultDownloadPath);
+            Common.openFolderWithFileSelect(listItems.SelectedItems[0].SubItems[8].Text);
         }
 
         private void listItems_MouseClick(object sender, MouseEventArgs e)

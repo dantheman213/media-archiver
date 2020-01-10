@@ -13,6 +13,11 @@ namespace JackTheVideoRipper
     {
         public static string AppPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 
+        public static void openFolderWithFileSelect(string filePath)
+        {
+            Process.Start("explorer.exe", @String.Format("/select, \"{0}\"", filePath));
+        }
+
         public static void openFolder(string folderPath)
         {
             if (Directory.Exists(folderPath))

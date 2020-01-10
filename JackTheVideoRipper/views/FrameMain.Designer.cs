@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrameMain));
             this.listItems = new System.Windows.Forms.ListView();
             this.cTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cProgress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -51,7 +52,6 @@
             this.convertMediaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.openFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip1.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.SuspendLayout();
@@ -70,9 +70,11 @@
             this.cURL,
             this.cPath});
             this.listItems.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listItems.Font = new System.Drawing.Font("Arial", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listItems.FullRowSelect = true;
             this.listItems.HideSelection = false;
             this.listItems.Location = new System.Drawing.Point(0, 33);
+            this.listItems.MultiSelect = false;
             this.listItems.Name = "listItems";
             this.listItems.Size = new System.Drawing.Size(1600, 1035);
             this.listItems.TabIndex = 0;
@@ -84,6 +86,11 @@
             // 
             this.cTitle.Text = "Title";
             this.cTitle.Width = 400;
+            // 
+            // cStatus
+            // 
+            this.cStatus.Text = "Status";
+            this.cStatus.Width = 140;
             // 
             // cType
             // 
@@ -97,7 +104,7 @@
             // cProgress
             // 
             this.cProgress.Text = "Progress";
-            this.cProgress.Width = 223;
+            this.cProgress.Width = 165;
             // 
             // cDownloadSpeed
             // 
@@ -213,11 +220,6 @@
             this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(200, 30);
             this.openFolderToolStripMenuItem.Text = "Open Folder";
             this.openFolderToolStripMenuItem.Click += new System.EventHandler(this.openFolderToolStripMenuItem_Click);
-            // 
-            // cStatus
-            // 
-            this.cStatus.Text = "Status";
-            this.cStatus.Width = 140;
             // 
             // FrameMain
             // 
