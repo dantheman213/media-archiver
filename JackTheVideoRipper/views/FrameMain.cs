@@ -126,41 +126,55 @@ namespace JackTheVideoRipper
         private void downloadAsVideoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Video", "", -1, -1);
-            if (videoUrl != "")
+            if (String.IsNullOrEmpty(videoUrl))
             {
-                var li = new ListViewItem(new string[] { "", "Waiting", "Video", "-", "", "0%", "0.0 KB/s", videoUrl, "" });
-                li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
-                listItems.Items.Add(li);
-
-                Process p = YouTubeDL.downloadVideo(videoUrl);
-                ProcessUpdateRow pur = new ProcessUpdateRow();
-                pur.paint = true;
-                pur.proc = p;
-                pur.item = listItems.Items[listItems.Items.Count - 1];
-                dict.Add(li.Tag.ToString(), pur);
-
-                pur.item.ImageIndex = 0;
+                return;
             }
+            if (!Common.isValidYouTubeURL(videoUrl))
+            {
+                MessageBox.Show("Invalid YouTube URL!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+           
+            var li = new ListViewItem(new string[] { "", "Waiting", "Video", "-", "", "0%", "0.0 KB/s", videoUrl, "" });
+            li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
+            listItems.Items.Add(li);
+
+            Process p = YouTubeDL.downloadVideo(videoUrl);
+            ProcessUpdateRow pur = new ProcessUpdateRow();
+            pur.paint = true;
+            pur.proc = p;
+            pur.item = listItems.Items[listItems.Items.Count - 1];
+            dict.Add(li.Tag.ToString(), pur);
+
+            pur.item.ImageIndex = 0;
         }
 
         private void downloadAsAudioToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Audio", "", -1, -1);
-            if (videoUrl != "")
+            if (String.IsNullOrEmpty(videoUrl))
             {
-                var li = new ListViewItem(new string[] { "", "Waiting", "Audio", "-", "", "0%", "0.0 KB/s", videoUrl, "" });
-                li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
-                listItems.Items.Add(li);
-
-                Process p = YouTubeDL.downloadAudio(videoUrl);
-                ProcessUpdateRow pur = new ProcessUpdateRow();
-                pur.paint = true;
-                pur.proc = p;
-                pur.item = listItems.Items[listItems.Items.Count - 1];
-                dict.Add(li.Tag.ToString(), pur);
-
-                pur.item.ImageIndex = 1;
+                return;
             }
+            if (!Common.isValidYouTubeURL(videoUrl))
+            {
+                MessageBox.Show("Invalid YouTube URL!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+          
+            var li = new ListViewItem(new string[] { "", "Waiting", "Audio", "-", "", "0%", "0.0 KB/s", videoUrl, "" });
+            li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
+            listItems.Items.Add(li);
+
+            Process p = YouTubeDL.downloadAudio(videoUrl);
+            ProcessUpdateRow pur = new ProcessUpdateRow();
+            pur.paint = true;
+            pur.proc = p;
+            pur.item = listItems.Items[listItems.Items.Count - 1];
+            dict.Add(li.Tag.ToString(), pur);
+
+            pur.item.ImageIndex = 1;
         }
 
         private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -219,21 +233,30 @@ namespace JackTheVideoRipper
 
         private void openURLInBrowserToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string url = listItems.SelectedItems[0].SubItems[7].Text;
-            if (!String.IsNullOrEmpty(url))
+            if (listItems.SelectedItems.Count > 0)
             {
-                Process.Start(url);
+                string url = listItems.SelectedItems[0].SubItems[7].Text;
+                if (!String.IsNullOrEmpty(url))
+                {
+                    Process.Start(url);
+                }
             }
         }
 
         private void openMediaInPlayerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (listItems.SelectedItems[0].SubItems[1].Text == "Complete")
+            if (listItems.SelectedItems.Count > 0)
             {
-                string filePath = listItems.SelectedItems[0].SubItems[8].Text;
-                if (!String.IsNullOrEmpty(filePath))
+                if (listItems.SelectedItems[0].SubItems[1].Text == "Complete")
                 {
-                    Process.Start(filePath);
+                    string filePath = listItems.SelectedItems[0].SubItems[8].Text;
+                    if (!String.IsNullOrEmpty(filePath))
+                    {
+                        if (File.Exists(filePath))
+                        {
+                            Process.Start(filePath);
+                        }
+                    }
                 }
             }
         }

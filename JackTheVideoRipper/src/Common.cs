@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -42,6 +43,24 @@ namespace JackTheVideoRipper
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             string version = fvi.FileVersion;
             return String.Format("v{0}", version.Substring(0, version.LastIndexOf(".")));
+        }
+
+        public static bool isValidURL(string URL)
+        {
+            string Pattern = @"^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$";
+            Regex Rgx = new Regex(Pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            return Rgx.IsMatch(URL);
+        }
+
+        public static bool isValidYouTubeURL(string s)
+        {
+            if (isValidURL(s))
+            {
+                Uri uri = new Uri(s);
+                return uri.Host == "youtube.com";
+            }
+
+            return false;
         }
     }
 }
