@@ -41,7 +41,7 @@
             this.cURL = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imgList = new System.Windows.Forms.ImageList(this.components);
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.youTubeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,7 +58,7 @@
             this.toolBar = new System.Windows.Forms.ToolStrip();
             this.toolStripButtonDownloadVideo = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonDownloadAudio = new System.Windows.Forms.ToolStripButton();
-            this.menuStrip1.SuspendLayout();
+            this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
             this.SuspendLayout();
@@ -80,10 +80,10 @@
             this.listItems.Font = new System.Drawing.Font("Arial", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listItems.FullRowSelect = true;
             this.listItems.HideSelection = false;
-            this.listItems.Location = new System.Drawing.Point(0, 88);
+            this.listItems.Location = new System.Drawing.Point(0, 72);
             this.listItems.MultiSelect = false;
             this.listItems.Name = "listItems";
-            this.listItems.Size = new System.Drawing.Size(2175, 1200);
+            this.listItems.Size = new System.Drawing.Size(2175, 1216);
             this.listItems.SmallImageList = this.imgList;
             this.listItems.TabIndex = 0;
             this.listItems.UseCompatibleStateImageBehavior = false;
@@ -142,18 +142,18 @@
             this.imgList.Images.SetKeyName(0, "movie.ico");
             this.imgList.Images.SetKeyName(1, "song.ico");
             // 
-            // menuStrip1
+            // menuStrip
             // 
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.youTubeToolStripMenuItem,
             this.helpToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(2175, 33);
-            this.menuStrip1.TabIndex = 1;
-            this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(2175, 33);
+            this.menuStrip.TabIndex = 1;
+            this.menuStrip.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
@@ -261,7 +261,7 @@
             this.toolStripButtonDownloadAudio});
             this.toolBar.Location = new System.Drawing.Point(0, 33);
             this.toolBar.Name = "toolBar";
-            this.toolBar.Size = new System.Drawing.Size(2175, 55);
+            this.toolBar.Size = new System.Drawing.Size(2175, 39);
             this.toolBar.TabIndex = 2;
             this.toolBar.Text = "toolStrip1";
             // 
@@ -271,8 +271,8 @@
             this.toolStripButtonDownloadVideo.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonDownloadVideo.Image")));
             this.toolStripButtonDownloadVideo.ImageTransparentColor = System.Drawing.Color.Black;
             this.toolStripButtonDownloadVideo.Name = "toolStripButtonDownloadVideo";
-            this.toolStripButtonDownloadVideo.Size = new System.Drawing.Size(52, 52);
-            this.toolStripButtonDownloadVideo.Text = "toolStripButton1";
+            this.toolStripButtonDownloadVideo.Size = new System.Drawing.Size(36, 36);
+            this.toolStripButtonDownloadVideo.ToolTipText = "Download Video";
             this.toolStripButtonDownloadVideo.Click += new System.EventHandler(this.toolStripButtonDownloadVideo_Click);
             // 
             // toolStripButtonDownloadAudio
@@ -281,8 +281,8 @@
             this.toolStripButtonDownloadAudio.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonDownloadAudio.Image")));
             this.toolStripButtonDownloadAudio.ImageTransparentColor = System.Drawing.Color.Black;
             this.toolStripButtonDownloadAudio.Name = "toolStripButtonDownloadAudio";
-            this.toolStripButtonDownloadAudio.Size = new System.Drawing.Size(52, 52);
-            this.toolStripButtonDownloadAudio.Text = "toolStripButton2";
+            this.toolStripButtonDownloadAudio.Size = new System.Drawing.Size(36, 36);
+            this.toolStripButtonDownloadAudio.ToolTipText = "Download Audio";
             this.toolStripButtonDownloadAudio.Click += new System.EventHandler(this.toolStripButtonDownloadAudio_Click);
             // 
             // FrameMain
@@ -292,16 +292,16 @@
             this.ClientSize = new System.Drawing.Size(2175, 1288);
             this.Controls.Add(this.listItems);
             this.Controls.Add(this.toolBar);
-            this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MainMenuStrip = this.menuStrip1;
+            this.MainMenuStrip = this.menuStrip;
             this.Name = "FrameMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "JackTheVideoRipper";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrameMain_FormClosing);
             this.Load += new System.EventHandler(this.FrameMain_Load);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            this.menuStrip.ResumeLayout(false);
+            this.menuStrip.PerformLayout();
             this.contextMenuListItems.ResumeLayout(false);
             this.toolBar.ResumeLayout(false);
             this.toolBar.PerformLayout();
@@ -318,7 +318,7 @@
         private System.Windows.Forms.ColumnHeader cProgress;
         private System.Windows.Forms.ColumnHeader cDownloadSpeed;
         private System.Windows.Forms.ColumnHeader cETA;
-        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.MenuStrip menuStrip;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem youTubeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;

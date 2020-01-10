@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,9 +15,20 @@ namespace JackTheVideoRipper
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FrameMain());
+            bool firstRun = false;
+            using (Mutex mtex = new Mutex(true, "JackTheVideoRipper", out firstRun))
+            {
+                if (firstRun)
+                {
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new FrameMain());
+                } else
+                {
+                    MessageBox.Show("Already running!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+              
         }
     }
 }
