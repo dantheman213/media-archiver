@@ -56,8 +56,13 @@ namespace JackTheVideoRipper
         {
             if (isValidURL(s))
             {
+                // TODO: add support for other websites that youtube-dl supports
+
                 Uri uri = new Uri(s);
-                return uri.Host == "youtube.com";
+                if (uri.Host == "youtube.com" || uri.Host == "www.youtube.com")
+                {
+                    return true;
+                }
             }
 
             return false;
