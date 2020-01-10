@@ -42,9 +42,9 @@ namespace JackTheVideoRipper
             return CLI.runCommand(binName + " -f best --no-check-certificate -o " + defaultDownloadPath + "\\" + titleFormat + " " + url);
         }
 
-        public static void downloadAudio(string url)
+        public static Process downloadAudio(string url)
         {
-            CLI.runCommand(binName + " -f bestaudio -x --audio-format mp3 --no-check-certificate -o " + defaultDownloadPath + "\\" + titleFormat + " " + url);
+            return CLI.runCommand(binName + " -f bestaudio -x --audio-format mp3 --no-check-certificate -o " + defaultDownloadPath + "\\" + titleFormat + " " + url);
         }
     }
 }

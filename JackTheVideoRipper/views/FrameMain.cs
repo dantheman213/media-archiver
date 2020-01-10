@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -18,25 +19,7 @@ namespace JackTheVideoRipper
         {
             InitializeComponent();
         }
-
-        private void downloadAsVideoToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            string videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Video", "", -1, -1);
-            if (videoUrl != "")
-            {
-                var li = new ListViewItem(new string[] { "", "Waiting", "Video", "-", "", "0%", "0.0 KB/s", videoUrl, "" });
-                li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
-                listItems.Items.Add(li);
-
-                Process p = YouTubeDL.downloadVideo(videoUrl);
-                ProcessUpdateRow pur = new ProcessUpdateRow();
-                pur.paint = true;
-                pur.proc = p;
-                pur.item = listItems.Items[listItems.Items.Count - 1];
-                dict.Add(li.Tag.ToString(), pur);
-            }
-        }
-
+        
         private void FrameMain_Load(object sender, EventArgs e)
         {
             YouTubeDL.checkDownload();
@@ -138,20 +121,63 @@ namespace JackTheVideoRipper
            
             locked = false;
         }
-        
+
+        private void downloadAsVideoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Video", "", -1, -1);
+            if (videoUrl != "")
+            {
+                var li = new ListViewItem(new string[] { "", "Waiting", "Video", "-", "", "0%", "0.0 KB/s", videoUrl, "" });
+                li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
+                listItems.Items.Add(li);
+
+                Process p = YouTubeDL.downloadVideo(videoUrl);
+                ProcessUpdateRow pur = new ProcessUpdateRow();
+                pur.paint = true;
+                pur.proc = p;
+                pur.item = listItems.Items[listItems.Items.Count - 1];
+                dict.Add(li.Tag.ToString(), pur);
+            }
+        }
+
         private void downloadAsAudioToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Audio", "", -1, -1);
             if (videoUrl != "")
             {
-                listItems.Items.Add(new ListViewItem(new string[] { "TODO", "Waiting", "Audio", "TODO", "TODO", "TODO", "TODO", videoUrl, YouTubeDL.defaultDownloadPath }));
-                YouTubeDL.downloadAudio(videoUrl);
+                var li = new ListViewItem(new string[] { "", "Waiting", "Audio", "-", "", "0%", "0.0 KB/s", videoUrl, "" });
+                li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
+                listItems.Items.Add(li);
+
+                Process p = YouTubeDL.downloadAudio(videoUrl);
+                ProcessUpdateRow pur = new ProcessUpdateRow();
+                pur.paint = true;
+                pur.proc = p;
+                pur.item = listItems.Items[listItems.Items.Count - 1];
+                dict.Add(li.Tag.ToString(), pur);
             }
         }
 
         private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Common.openFolderWithFileSelect(listItems.SelectedItems[0].SubItems[8].Text);
+            string filePath = listItems.SelectedItems[0].SubItems[8].Text;
+            if (String.IsNullOrEmpty(filePath))
+            {
+                Console.WriteLine("file does not exist to open in explorer");
+                Common.openFolder(YouTubeDL.defaultDownloadPath);
+            }
+            if (!File.Exists(filePath))
+            {
+                filePath = filePath + ".part";
+                if (!File.Exists(filePath))
+                {
+                    // MessageBox.Show("Unable to find file", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Console.WriteLine(String.Format("couldn't find file to open at {0}", filePath));
+                    Common.openFolder(YouTubeDL.defaultDownloadPath);
+                    return;
+                }
+            }
+            Common.openFolderWithFileSelect(filePath);
         }
 
         private void listItems_MouseClick(object sender, MouseEventArgs e)

@@ -76,7 +76,7 @@
             this.listItems.Location = new System.Drawing.Point(0, 33);
             this.listItems.MultiSelect = false;
             this.listItems.Name = "listItems";
-            this.listItems.Size = new System.Drawing.Size(1600, 1035);
+            this.listItems.Size = new System.Drawing.Size(2175, 1255);
             this.listItems.TabIndex = 0;
             this.listItems.UseCompatibleStateImageBehavior = false;
             this.listItems.View = System.Windows.Forms.View.Details;
@@ -104,7 +104,7 @@
             // cProgress
             // 
             this.cProgress.Text = "Progress";
-            this.cProgress.Width = 165;
+            this.cProgress.Width = 120;
             // 
             // cDownloadSpeed
             // 
@@ -135,7 +135,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1600, 33);
+            this.menuStrip1.Size = new System.Drawing.Size(2175, 33);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -225,7 +225,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1600, 1068);
+            this.ClientSize = new System.Drawing.Size(2175, 1288);
             this.Controls.Add(this.listItems);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
