@@ -138,6 +138,8 @@ namespace JackTheVideoRipper
                 pur.proc = p;
                 pur.item = listItems.Items[listItems.Items.Count - 1];
                 dict.Add(li.Tag.ToString(), pur);
+
+                pur.item.ImageIndex = 0;
             }
         }
 
@@ -156,6 +158,8 @@ namespace JackTheVideoRipper
                 pur.proc = p;
                 pur.item = listItems.Items[listItems.Items.Count - 1];
                 dict.Add(li.Tag.ToString(), pur);
+
+                pur.item.ImageIndex = 1;
             }
         }
 
@@ -211,6 +215,64 @@ namespace JackTheVideoRipper
             {
                 f.ShowDialog();
             }
+        }
+
+        private void openURLInBrowserToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string url = listItems.SelectedItems[0].SubItems[7].Text;
+            if (!String.IsNullOrEmpty(url))
+            {
+                Process.Start(url);
+            }
+        }
+
+        private void openMediaInPlayerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listItems.SelectedItems[0].SubItems[1].Text == "Complete")
+            {
+                string filePath = listItems.SelectedItems[0].SubItems[8].Text;
+                if (!String.IsNullOrEmpty(filePath))
+                {
+                    Process.Start(filePath);
+                }
+            }
+        }
+
+        private void listItems_DoubleClick(object sender, EventArgs e)
+        {
+            if (listItems.SelectedItems.Count > 0)
+            {
+                openMediaInPlayerToolStripMenuItem_Click(sender, e);
+            }
+        }
+
+        private void FrameMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            foreach (ListViewItem item in listItems.Items)
+            {
+                if (item.SubItems[1].Text != "Complete")
+                {
+                    if (MessageBox.Show("You have pending downloads, are you sure you want to exit?", "Verify Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                    {
+                        e.Cancel = false;                        
+                    }
+                    else
+                    {
+                        e.Cancel = true;
+                    }
+                    return;
+                }
+            }
+        }
+
+        private void toolStripButtonDownloadVideo_Click(object sender, EventArgs e)
+        {
+            downloadAsVideoToolStripMenuItem_Click(sender, e);
+        }
+
+        private void toolStripButtonDownloadAudio_Click(object sender, EventArgs e)
+        {
+            downloadAsAudioToolStripMenuItem_Click(sender, e);
         }
     }
 }

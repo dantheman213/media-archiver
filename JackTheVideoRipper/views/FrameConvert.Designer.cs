@@ -50,6 +50,8 @@
             this.ClientSize = new System.Drawing.Size(643, 232);
             this.Controls.Add(this.linkLabel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "FrameConvert";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
