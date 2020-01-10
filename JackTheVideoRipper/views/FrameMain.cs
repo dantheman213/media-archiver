@@ -24,6 +24,7 @@ namespace JackTheVideoRipper
         {
             YouTubeDL.checkDownload();
             YouTubeDL.checkForUpdates();
+            this.Text = String.Format("JackTheVideoRipper {0}", Common.getAppVersion());
             listItemRowsUpdateTimer = new System.Threading.Timer(updateListItemRows, null, 0, 250);
         }
 

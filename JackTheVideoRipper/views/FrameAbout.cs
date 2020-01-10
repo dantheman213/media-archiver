@@ -25,5 +25,10 @@ namespace JackTheVideoRipper
             ProcessStartInfo sInfo = new ProcessStartInfo(projectUrl);
             Process.Start(sInfo);
         }
+
+        private void FrameAbout_Load(object sender, EventArgs e)
+        {
+            labelVersion.Text = Common.getAppVersion();
+        }
     }
 }

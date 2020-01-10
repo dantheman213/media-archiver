@@ -35,5 +35,13 @@ namespace JackTheVideoRipper
                 MessageBox.Show(string.Format("{0} Directory does not exist!", folderPath));
             }
         }
+
+        public static string getAppVersion()
+        {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string version = fvi.FileVersion;
+            return String.Format("v{0}", version.Substring(0, version.LastIndexOf(".")));
+        }
     }
 }
