@@ -36,135 +36,143 @@ namespace JackTheVideoRipper
         private static bool locked = false;
         private void updateListItemRows(object state)
         {
-            if (locked)
+            try
             {
-                return;
-            }
-            locked = true;
-
-            foreach (ProcessUpdateRow pur in dict.Values)
-            {
-                if (pur.proc == null)
+                if (locked)
                 {
-                    continue;
+                    return;
                 }
-                if (pur.proc.HasExited)
+                locked = true;
+
+                foreach (ProcessUpdateRow pur in dict.Values)
                 {
-                    // TODO: optimize
-                    BeginInvoke(new Action(() =>
+                    if (pur.proc == null)
                     {
-                        if (pur.item.SubItems[1].Text != "Complete")
-                        {
-                            pur.item.SubItems[1].Text = "Complete";
-                            pur.item.SubItems[4].Text = "100%"; // Progress
-                            pur.item.SubItems[5].Text = ""; // Download Speed
-                            pur.item.SubItems[6].Text = "00:00"; // ETA
-                            updateListUI();
-                        }
-                    }), null);
-                    continue;
-                }
-
-                if (pur.results == null || pur.results.Count < 1)
-                {
-                    break;
-                }
-
-                string line = pur.results[pur.results.Count - 1];
-                if (!String.IsNullOrEmpty(line))
-                {
-                    string l = Regex.Replace(line, @"\s+", " ");
-                    string[] parts = l.Split(' ');
-                    if (l.IndexOf("[youtube]") > -1)
+                        continue;
+                    }
+                    if (pur.proc.HasExited)
                     {
+                        // TODO: optimize
                         BeginInvoke(new Action(() =>
                         {
-                            if (pur.item.SubItems[1].Text != "Reading Metadata")
+                            if (pur.item.SubItems[1].Text != "Complete")
                             {
-                                pur.item.SubItems[1].Text = "Reading Metadata";
-                                updateListUI();
-                            }
-                        }), null);
-                    }
-                    else if (l.IndexOf("[ffmpeg]") > -1)
-                    {
-                        BeginInvoke(new Action(() =>
-                        {
-                            if (pur.item.SubItems[1].Text != "Transcoding")
-                            {
-                                pur.item.SubItems[1].Text = "Transcoding";
-                                pur.item.SubItems[4].Text = "99%"; // Progress
-                                pur.item.SubItems[5].Text = ""; // Download Speed
-                                pur.item.SubItems[6].Text = "0:01"; // ETA
-                                updateListUI();
-                            }
-                        }), null);
-                    }
-                    else if (l.IndexOf("[download]") > -1)
-                    {
-                       if (l.IndexOf("%") > -1 && parts.Length >= 8)
-                        {
-                            BeginInvoke(new Action(() =>
-                            {
-                                if (pur.item.SubItems[1].Text != "Downloading")
-                                {
-                                    pur.item.SubItems[1].Text = "Downloading";
-                                }
-                                if (pur.item.SubItems[3].Text == "" || pur.item.SubItems[3].Text == "-")
-                                {
-                                    pur.item.SubItems[3].Text = parts[3]; // Size
-                                }
-                                if (parts[1].Trim() != "100%")
-                                {
-                                    pur.item.SubItems[4].Text = parts[1]; // Progress
-                                }
-                                pur.item.SubItems[5].Text = parts[5]; // Download Speed
-                                if (parts[7].Trim() != "00:00")
-                                {
-                                    pur.item.SubItems[6].Text = parts[7]; // ETA
-                                }
-                                updateListUI();
-                            }), null);
-                        }
-                        else if (l.IndexOf("Destination") > -1)
-                        {
-                            int start = l.IndexOf(": ") + 2;
-                            string filePath = l.Substring(start, l.Length - start);
-                            string fileName = filePath.Substring(filePath.LastIndexOf('\\') + 1);
-                            fileName = fileName.Substring(0, fileName.LastIndexOf("."));
-                            BeginInvoke(new Action(() =>
-                            {
-                                if (pur.item.SubItems[0].Text == "")
-                                {
-                                    pur.item.SubItems[0].Text = fileName; // Title
-                                }
-                                if (pur.item.SubItems[8].Text == "")
-                                {
-                                    pur.item.SubItems[8].Text = filePath; // Path
-                                }
-                                updateListUI();
-                            }), null);
-                        }
-                    }
-                    else if (l.IndexOf("error", StringComparison.CurrentCultureIgnoreCase) > -1)
-                    {
-                        Console.WriteLine("error " + l);
-                        BeginInvoke(new Action(() =>
-                        {
-                            if (pur.item.SubItems[1].Text != "Error")
-                            {
-                                pur.item.SubItems[1].Text = "Error";
+                                pur.item.SubItems[1].Text = "Complete";
+                                pur.item.SubItems[4].Text = "100%"; // Progress
                                 pur.item.SubItems[5].Text = ""; // Download Speed
                                 pur.item.SubItems[6].Text = "00:00"; // ETA
                                 updateListUI();
                             }
                         }), null);
-                        pur.proc = null;
+                        continue;
+                    }
+
+                    if (pur.results == null || pur.results.Count < 1)
+                    {
+                        break;
+                    }
+
+                    string line = pur.results[pur.results.Count - 1];
+                    if (!String.IsNullOrEmpty(line))
+                    {
+                        string l = Regex.Replace(line, @"\s+", " ");
+                        string[] parts = l.Split(' ');
+                        if (l.IndexOf("[youtube]") > -1)
+                        {
+                            BeginInvoke(new Action(() =>
+                            {
+                                if (pur.item.SubItems[1].Text != "Reading Metadata")
+                                {
+                                    pur.item.SubItems[1].Text = "Reading Metadata";
+                                    updateListUI();
+                                }
+                            }), null);
+                        }
+                        else if (l.IndexOf("[ffmpeg]") > -1)
+                        {
+                            BeginInvoke(new Action(() =>
+                            {
+                                if (pur.item.SubItems[1].Text != "Transcoding")
+                                {
+                                    pur.item.SubItems[1].Text = "Transcoding";
+                                    pur.item.SubItems[4].Text = "99%"; // Progress
+                                    pur.item.SubItems[5].Text = ""; // Download Speed
+                                    pur.item.SubItems[6].Text = "0:01"; // ETA
+                                    updateListUI();
+                                }
+                            }), null);
+                        }
+                        else if (l.IndexOf("[download]") > -1)
+                        {
+                            if (l.IndexOf("%") > -1 && parts.Length >= 8)
+                            {
+                                BeginInvoke(new Action(() =>
+                                {
+                                    if (pur.item.SubItems[1].Text != "Downloading")
+                                    {
+                                        pur.item.SubItems[1].Text = "Downloading";
+                                    }
+                                    if (pur.item.SubItems[3].Text == "" || pur.item.SubItems[3].Text == "-")
+                                    {
+                                        pur.item.SubItems[3].Text = parts[3]; // Size
+                                    }
+                                    if (parts[1].Trim() != "100%")
+                                    {
+                                        pur.item.SubItems[4].Text = parts[1]; // Progress
+                                    }
+                                    pur.item.SubItems[5].Text = parts[5]; // Download Speed
+                                    if (parts[7].Trim() != "00:00")
+                                    {
+                                        pur.item.SubItems[6].Text = parts[7]; // ETA
+                                    }
+                                    updateListUI();
+                                }), null);
+                            }
+                            else if (l.IndexOf("Destination") > -1)
+                            {
+                                int start = l.IndexOf(": ") + 2;
+                                string filePath = l.Substring(start, l.Length - start);
+                                string fileName = filePath.Substring(filePath.LastIndexOf('\\') + 1);
+                                fileName = fileName.Substring(0, fileName.LastIndexOf("."));
+                                BeginInvoke(new Action(() =>
+                                {
+                                    if (pur.item.SubItems[0].Text == "")
+                                    {
+                                        pur.item.SubItems[0].Text = fileName; // Title
+                                    }
+                                    if (pur.item.SubItems[8].Text == "")
+                                    {
+                                        pur.item.SubItems[8].Text = filePath; // Path
+                                    }
+                                    updateListUI();
+                                }), null);
+                            }
+                        }
+                        else if (l.IndexOf("error", StringComparison.CurrentCultureIgnoreCase) > -1)
+                        {
+                            Console.WriteLine("error " + l);
+                            BeginInvoke(new Action(() =>
+                            {
+                                if (pur.item.SubItems[1].Text != "Error")
+                                {
+                                    pur.item.SubItems[1].Text = "Error";
+                                    pur.item.SubItems[5].Text = ""; // Download Speed
+                                    pur.item.SubItems[6].Text = "00:00"; // ETA
+                                    updateListUI();
+                                }
+                            }), null);
+                            pur.proc = null;
+                        }
                     }
                 }
+
+                locked = false;
             }
-           
-            locked = false;
+            catch(Exception ex)
+            {
+                // TODO?
+                Console.WriteLine(ex);
+            }
         }
 
         private void updateListUI()
@@ -220,11 +228,11 @@ namespace JackTheVideoRipper
             Process p = null;
             if (type == "video")
             {
-                p = YouTubeDL.downloadVideo(videoUrl);
+                p = YouTubeDL.downloadVideo(videoUrl, Common.formatTitleForFileName(title));
             }
             else if (type == "audio")
             {
-                p = YouTubeDL.downloadAudio(videoUrl);
+                p = YouTubeDL.downloadAudio(videoUrl, Common.formatTitleForFileName(title));
             }
 
             ProcessUpdateRow pur = new ProcessUpdateRow();

@@ -84,6 +84,7 @@ namespace JackTheVideoRipper
 
         public static string getYouTubeVideoTitle(string url)
         {
+            // TODO: Replace unicode chars like \\u0026 with their real char &
             HttpClient client = new HttpClient();
             using (HttpResponseMessage response = client.GetAsync(url).Result)
             {
@@ -104,6 +105,17 @@ namespace JackTheVideoRipper
             }
 
             return null;
+        }
+
+        public static string formatTitleForFileName(string title)
+        {
+            if (String.IsNullOrEmpty(title))
+            {
+                return "";
+            }
+
+            Regex rgx = new Regex("[^a-zA-Z0-9]");
+            return rgx.Replace(title, "").Trim();
         }
     }
 }
