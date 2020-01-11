@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using JackTheVideoRipper.src.models;
 using Microsoft.VisualBasic;
@@ -58,14 +59,19 @@ namespace JackTheVideoRipper
                             pur.item.SubItems[1].Text = "Complete";
                             pur.item.SubItems[4].Text = "100%"; // Progress
                             pur.item.SubItems[5].Text = ""; // Download Speed
-                            pur.item.SubItems[6].Text = "0:00"; // ETA
+                            pur.item.SubItems[6].Text = "00:00"; // ETA
                             updateListUI();
                         }
                     }), null);
                     continue;
                 }
 
-                string line = pur.proc.StandardOutput.ReadLine();
+                if (pur.results == null || pur.results.Count < 1)
+                {
+                    break;
+                }
+
+                string line = pur.results[pur.results.Count - 1];
                 if (!String.IsNullOrEmpty(line))
                 {
                     string l = Regex.Replace(line, @"\s+", " ");
@@ -187,7 +193,16 @@ namespace JackTheVideoRipper
             ProcessUpdateRow pur = new ProcessUpdateRow();
             pur.proc = p;
             pur.item = listItems.Items[listItems.Items.Count - 1];
+            pur.results = new List<string>();
+            pur.results.Add(""); // intentional
             dict.Add(li.Tag.ToString(), pur);
+            Task.Run(() =>
+            {
+                while (pur.proc.HasExited == false)
+                {
+                    pur.results.Add(pur.proc.StandardOutput.ReadLine());
+                }
+            });
 
             pur.item.ImageIndex = 0;
         }
@@ -212,9 +227,6 @@ namespace JackTheVideoRipper
             Process p = YouTubeDL.downloadAudio(videoUrl);
             ProcessUpdateRow pur = new ProcessUpdateRow();
             pur.proc = p;
-            pur.item = listItems.Items[listItems.Items.Count - 1];
-            dict.Add(li.Tag.ToString(), pur);
-
             pur.item.ImageIndex = 1;
         }
 
