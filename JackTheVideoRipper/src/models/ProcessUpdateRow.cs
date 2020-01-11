@@ -12,6 +12,5 @@ namespace JackTheVideoRipper.src.models
     {
         public Process proc { get; set; }
         public ListViewItem item { get; set; }
-        public bool paint { get; set; }
     }
 }

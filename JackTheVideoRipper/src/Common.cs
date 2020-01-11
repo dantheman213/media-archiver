@@ -67,5 +67,17 @@ namespace JackTheVideoRipper
 
             return false;
         }
+
+        public static bool isFfmpegInstalled()
+        {
+            string result = Environment.GetEnvironmentVariable("PATH");
+
+            if (result.IndexOf("ffmpeg", StringComparison.CurrentCultureIgnoreCase) > -1)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

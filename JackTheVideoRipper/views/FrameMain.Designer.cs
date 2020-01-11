@@ -58,6 +58,10 @@
             this.toolBar = new System.Windows.Forms.ToolStrip();
             this.toolStripButtonDownloadVideo = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonDownloadAudio = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.downloadFFmpegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadHandbrakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadVLCPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -196,7 +200,11 @@
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.aboutToolStripMenuItem});
+            this.aboutToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.downloadFFmpegToolStripMenuItem,
+            this.downloadHandbrakeToolStripMenuItem,
+            this.downloadVLCPlayerToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(61, 29);
             this.helpToolStripMenuItem.Text = "Help";
@@ -204,7 +212,7 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(146, 30);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -285,6 +293,32 @@
             this.toolStripButtonDownloadAudio.ToolTipText = "Download Audio";
             this.toolStripButtonDownloadAudio.Click += new System.EventHandler(this.toolStripButtonDownloadAudio_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(249, 6);
+            // 
+            // downloadFFmpegToolStripMenuItem
+            // 
+            this.downloadFFmpegToolStripMenuItem.Name = "downloadFFmpegToolStripMenuItem";
+            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.downloadFFmpegToolStripMenuItem.Text = "Download FFmpeg";
+            this.downloadFFmpegToolStripMenuItem.Click += new System.EventHandler(this.downloadFFmpegToolStripMenuItem_Click);
+            // 
+            // downloadHandbrakeToolStripMenuItem
+            // 
+            this.downloadHandbrakeToolStripMenuItem.Name = "downloadHandbrakeToolStripMenuItem";
+            this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.downloadHandbrakeToolStripMenuItem.Text = "Download Handbrake";
+            this.downloadHandbrakeToolStripMenuItem.Click += new System.EventHandler(this.downloadHandbrakeToolStripMenuItem_Click);
+            // 
+            // downloadVLCPlayerToolStripMenuItem
+            // 
+            this.downloadVLCPlayerToolStripMenuItem.Name = "downloadVLCPlayerToolStripMenuItem";
+            this.downloadVLCPlayerToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.downloadVLCPlayerToolStripMenuItem.Text = "Download VLC Player";
+            this.downloadVLCPlayerToolStripMenuItem.Click += new System.EventHandler(this.downloadVLCPlayerToolStripMenuItem_Click);
+            // 
             // FrameMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -340,6 +374,10 @@
         private System.Windows.Forms.ToolStrip toolBar;
         private System.Windows.Forms.ToolStripButton toolStripButtonDownloadVideo;
         private System.Windows.Forms.ToolStripButton toolStripButtonDownloadAudio;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem downloadFFmpegToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem downloadHandbrakeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem downloadVLCPlayerToolStripMenuItem;
     }
 }
 

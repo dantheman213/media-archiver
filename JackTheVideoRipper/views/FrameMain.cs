@@ -26,6 +26,11 @@ namespace JackTheVideoRipper
             YouTubeDL.checkForUpdates();
             this.Text = String.Format("JackTheVideoRipper {0}", Common.getAppVersion());
             listItemRowsUpdateTimer = new System.Threading.Timer(updateListItemRows, null, 0, 250);
+
+            if (!Common.isFfmpegInstalled())
+            {
+                MessageBox.Show("Could not find FFmpeg installed! Please install FFmpeg for the best experience while using this app.", "FFmpeg is not installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private static bool locked = false;
@@ -39,43 +44,55 @@ namespace JackTheVideoRipper
 
             foreach (ProcessUpdateRow pur in dict.Values)
             {
-                if (pur.paint && pur.proc.HasExited)
+                if (pur.proc == null)
                 {
-                    // TODO: optimize
-                    pur.paint = false;
-                    BeginInvoke(new Action(() =>
-                    {
-                        pur.item.SubItems[1].Text = "Complete";
-                        pur.item.SubItems[4].Text = "100%"; // Progress
-                        pur.item.SubItems[5].Text = ""; // Download Speed
-                        pur.item.SubItems[6].Text = "0:00"; // ETA
-                        listItems.Invalidate();
-                        listItems.Update();
-                        listItems.Refresh();
-                        Application.DoEvents();
-                    }), null);
+                    continue;
                 }
                 if (pur.proc.HasExited)
                 {
+                    // TODO: optimize
+                    BeginInvoke(new Action(() =>
+                    {
+                        if (pur.item.SubItems[1].Text != "Complete")
+                        {
+                            pur.item.SubItems[1].Text = "Complete";
+                            pur.item.SubItems[4].Text = "100%"; // Progress
+                            pur.item.SubItems[5].Text = ""; // Download Speed
+                            pur.item.SubItems[6].Text = "0:00"; // ETA
+                            updateListUI();
+                        }
+                    }), null);
                     continue;
                 }
 
                 string line = pur.proc.StandardOutput.ReadLine();
                 if (!String.IsNullOrEmpty(line))
                 {
-                    // Console.WriteLine(line);
                     string l = Regex.Replace(line, @"\s+", " ");
                     string[] parts = l.Split(' ');
                     if (l.IndexOf("[youtube]") > -1)
                     {
                         BeginInvoke(new Action(() =>
                         {
-                            pur.item.SubItems[1].Text = "Reading Metadata";
-                            
-                            listItems.Invalidate();
-                            listItems.Update();
-                            listItems.Refresh();
-                            Application.DoEvents();
+                            if (pur.item.SubItems[1].Text != "Reading Metadata")
+                            {
+                                pur.item.SubItems[1].Text = "Reading Metadata";
+                                updateListUI();
+                            }
+                        }), null);
+                    }
+                    else if (l.IndexOf("[ffmpeg]") > -1)
+                    {
+                        BeginInvoke(new Action(() =>
+                        {
+                            if (pur.item.SubItems[1].Text != "Transcoding")
+                            {
+                                pur.item.SubItems[1].Text = "Transcoding";
+                                pur.item.SubItems[4].Text = "99%"; // Progress
+                                pur.item.SubItems[5].Text = ""; // Download Speed
+                                pur.item.SubItems[6].Text = "0:01"; // ETA
+                                updateListUI();
+                            }
                         }), null);
                     }
                     else if (l.IndexOf("[download]") > -1)
@@ -84,15 +101,24 @@ namespace JackTheVideoRipper
                         {
                             BeginInvoke(new Action(() =>
                             {
-                                pur.item.SubItems[1].Text = "Downloading";
-                                pur.item.SubItems[3].Text = parts[3]; // Size
-                                pur.item.SubItems[4].Text = parts[1]; // Progress
+                                if (pur.item.SubItems[1].Text != "Downloading")
+                                {
+                                    pur.item.SubItems[1].Text = "Downloading";
+                                }
+                                if (pur.item.SubItems[3].Text == "" || pur.item.SubItems[3].Text == "-")
+                                {
+                                    pur.item.SubItems[3].Text = parts[3]; // Size
+                                }
+                                if (parts[1].Trim() != "100%")
+                                {
+                                    pur.item.SubItems[4].Text = parts[1]; // Progress
+                                }
                                 pur.item.SubItems[5].Text = parts[5]; // Download Speed
-                                pur.item.SubItems[6].Text = parts[7]; // ETA
-                                listItems.Invalidate();
-                                listItems.Update();
-                                listItems.Refresh();
-                                Application.DoEvents();
+                                if (parts[7].Trim() != "00:00")
+                                {
+                                    pur.item.SubItems[6].Text = parts[7]; // ETA
+                                }
+                                updateListUI();
                             }), null);
                         } else if (l.IndexOf("Destination") > -1)
                         {
@@ -102,25 +128,42 @@ namespace JackTheVideoRipper
                             fileName = fileName.Substring(0, fileName.LastIndexOf("."));
                             BeginInvoke(new Action(() =>
                             {
-                                pur.item.SubItems[0].Text = fileName; // Title
-                                pur.item.SubItems[8].Text = filePath; // Path
-                                listItems.Invalidate();
-                                listItems.Update();
-                                listItems.Refresh();
-                                Application.DoEvents();
+                                if (pur.item.SubItems[0].Text == "" || pur.item.SubItems[8].Text == "")
+                                {
+                                    pur.item.SubItems[0].Text = fileName; // Title
+                                    pur.item.SubItems[8].Text = filePath; // Path
+                                    updateListUI();
+                                }
                             }), null);
                         }
                     }
-                    else if (l.IndexOf("error") > -1)
+                    else if (l.IndexOf("error", StringComparison.CurrentCultureIgnoreCase) > -1)
                     {
-                        // TODO
                         Console.WriteLine("error " + l);
+                        BeginInvoke(new Action(() =>
+                        {
+                            if (pur.item.SubItems[1].Text != "Error")
+                            {
+                                pur.item.SubItems[1].Text = "Error";
+                                pur.item.SubItems[5].Text = ""; // Download Speed
+                                pur.item.SubItems[6].Text = "00:00"; // ETA
+                                updateListUI();
+                            }
+                        }), null);
+                        pur.proc = null;
                     }
                 }
             }
-         
            
             locked = false;
+        }
+
+        private void updateListUI()
+        {
+            listItems.Invalidate();
+            listItems.Update();
+            listItems.Refresh();
+            Application.DoEvents();
         }
 
         private void downloadAsVideoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -142,7 +185,6 @@ namespace JackTheVideoRipper
 
             Process p = YouTubeDL.downloadVideo(videoUrl);
             ProcessUpdateRow pur = new ProcessUpdateRow();
-            pur.paint = true;
             pur.proc = p;
             pur.item = listItems.Items[listItems.Items.Count - 1];
             dict.Add(li.Tag.ToString(), pur);
@@ -169,7 +211,6 @@ namespace JackTheVideoRipper
 
             Process p = YouTubeDL.downloadAudio(videoUrl);
             ProcessUpdateRow pur = new ProcessUpdateRow();
-            pur.paint = true;
             pur.proc = p;
             pur.item = listItems.Items[listItems.Items.Count - 1];
             dict.Add(li.Tag.ToString(), pur);
@@ -296,6 +337,21 @@ namespace JackTheVideoRipper
         private void toolStripButtonDownloadAudio_Click(object sender, EventArgs e)
         {
             downloadAsAudioToolStripMenuItem_Click(sender, e);
+        }
+        
+        private void downloadFFmpegToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://www.ffmpeg.org/download.html");
+        }
+
+        private void downloadHandbrakeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://handbrake.fr/downloads.php");
+        }
+
+        private void downloadVLCPlayerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://www.videolan.org/vlc/");
         }
     }
 }
