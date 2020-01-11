@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -78,6 +80,30 @@ namespace JackTheVideoRipper
             }
 
             return false;
+        }
+
+        public static string getYouTubeVideoTitle(string url)
+        {
+            HttpClient client = new HttpClient();
+            using (HttpResponseMessage response = client.GetAsync(url).Result)
+            {
+                using (HttpContent content = response.Content)
+                {
+                    string result = content.ReadAsStringAsync().Result;
+                    int i = result.IndexOf("\\\"title\\\":\\\"");
+                    if (i > -1)
+                    {
+                        i += 12;
+                        int k = result.IndexOf("\\\"", i);
+                        if (k > -1)
+                        {
+                            return result.Substring(i, (k - i));
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

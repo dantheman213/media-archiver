@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using JackTheVideoRipper.src.models;
@@ -126,7 +125,8 @@ namespace JackTheVideoRipper
                                 }
                                 updateListUI();
                             }), null);
-                        } else if (l.IndexOf("Destination") > -1)
+                        }
+                        else if (l.IndexOf("Destination") > -1)
                         {
                             int start = l.IndexOf(": ") + 2;
                             string filePath = l.Substring(start, l.Length - start);
@@ -134,12 +134,15 @@ namespace JackTheVideoRipper
                             fileName = fileName.Substring(0, fileName.LastIndexOf("."));
                             BeginInvoke(new Action(() =>
                             {
-                                if (pur.item.SubItems[0].Text == "" || pur.item.SubItems[8].Text == "")
+                                if (pur.item.SubItems[0].Text == "")
                                 {
                                     pur.item.SubItems[0].Text = fileName; // Title
-                                    pur.item.SubItems[8].Text = filePath; // Path
-                                    updateListUI();
                                 }
+                                if (pur.item.SubItems[8].Text == "")
+                                {
+                                    pur.item.SubItems[8].Text = filePath; // Path
+                                }
+                                updateListUI();
                             }), null);
                         }
                     }
@@ -174,60 +177,82 @@ namespace JackTheVideoRipper
 
         private void downloadAsVideoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Video", "", -1, -1);
-            if (String.IsNullOrEmpty(videoUrl))
-            {
-                return;
-            }
-            if (!Common.isValidYouTubeURL(videoUrl))
-            {
-                MessageBox.Show("Invalid YouTube URL!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-           
-            var li = new ListViewItem(new string[] { "", "Waiting", "Video", "-", "", "0%", "0.0 KB/s", videoUrl, "" });
-            li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
-            listItems.Items.Add(li);
-
-            Process p = YouTubeDL.downloadVideo(videoUrl);
-            ProcessUpdateRow pur = new ProcessUpdateRow();
-            pur.proc = p;
-            pur.item = listItems.Items[listItems.Items.Count - 1];
-            pur.results = new List<string>();
-            pur.results.Add(""); // intentional
-            dict.Add(li.Tag.ToString(), pur);
-            Task.Run(() =>
-            {
-                while (pur.proc.HasExited == false)
-                {
-                    pur.results.Add(pur.proc.StandardOutput.ReadLine());
-                }
-            });
-
-            pur.item.ImageIndex = 0;
+            downloadMediaDialog("video");
         }
 
         private void downloadAsAudioToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Audio", "", -1, -1);
+            downloadMediaDialog("audio");
+        }
+
+        private void downloadMediaDialog(string type)
+        {
+            string videoUrl = null;
+            if (type == "video")
+            {
+                videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Video", "", -1, -1);
+            }
+            else if (type == "audio")
+            {
+                videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Audio", "", -1, -1);
+            }
+       
             if (String.IsNullOrEmpty(videoUrl))
             {
                 return;
             }
+            // TODO: Support all services that youtube-dl supports
             if (!Common.isValidYouTubeURL(videoUrl))
             {
                 MessageBox.Show("Invalid YouTube URL!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-          
-            var li = new ListViewItem(new string[] { "", "Waiting", "Audio", "-", "", "0%", "0.0 KB/s", videoUrl, "" });
+
+            string title = "";
+            if (Common.isValidYouTubeURL(videoUrl))
+            {
+                title = Common.getYouTubeVideoTitle(videoUrl);
+            }
+            var li = new ListViewItem(new string[] { title, "Waiting", String.Format("{0}{1}", type.Substring(0, 1).ToUpper(), type.Substring(1)), "-", "", "0%", "0.0 KB/s", videoUrl, "" });
             li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
             listItems.Items.Add(li);
 
-            Process p = YouTubeDL.downloadAudio(videoUrl);
+            Process p = null;
+            if (type == "video")
+            {
+                p = YouTubeDL.downloadVideo(videoUrl);
+            }
+            else if (type == "audio")
+            {
+                p = YouTubeDL.downloadAudio(videoUrl);
+            }
+
             ProcessUpdateRow pur = new ProcessUpdateRow();
             pur.proc = p;
-            pur.item.ImageIndex = 1;
+            pur.item = listItems.Items[listItems.Items.Count - 1];
+            pur.results = new List<string>
+            {
+                "" // intentional
+            };
+            Task.Run(() =>
+            {
+                while (!pur.proc.HasExited)
+                {
+                    pur.results.Add(pur.proc.StandardOutput.ReadLine());
+                }
+            });
+            dict.Add(li.Tag.ToString(), pur);
+
+            int index = -1;
+            if (type == "video")
+            {
+                index = 0;
+            }
+            else if (type == "audio")
+            {
+                index = 1;
+            }
+            pur.item.ImageIndex = index;
         }
 
         private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
