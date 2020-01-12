@@ -117,5 +117,25 @@ namespace JackTheVideoRipper
             Regex rgx = new Regex("[^a-zA-Z0-9]");
             return rgx.Replace(title, "").Trim();
         }
+
+        private static PerformanceCounter cpuCounter;
+        public static string getCpuUsagePercentage()
+        {
+            if (cpuCounter == null)
+            {
+                cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+            }
+            return cpuCounter.NextValue().ToString("0.00") + "%";
+        }
+
+        private static PerformanceCounter ramCounter;
+        public static string getAvailableMemory()
+        {
+            if (ramCounter == null)
+            {
+                ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+            }
+            return ramCounter.NextValue() + "MB";
+        }
     }
 }

@@ -49,6 +49,10 @@
             this.downloadAsAudioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.downloadFFmpegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadHandbrakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadVLCPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuListItems = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.convertMediaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
@@ -58,13 +62,15 @@
             this.toolBar = new System.Windows.Forms.ToolStrip();
             this.toolStripButtonDownloadVideo = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonDownloadAudio = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.downloadFFmpegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadHandbrakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadVLCPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusBar = new System.Windows.Forms.StatusStrip();
+            this.toolbarLabelStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolBarLabelCpu = new System.Windows.Forms.ToolStripStatusLabel();
+            this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
+            this.toolBarLabelMemory = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
+            this.statusBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // listItems
@@ -212,9 +218,35 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(267, 6);
+            // 
+            // downloadFFmpegToolStripMenuItem
+            // 
+            this.downloadFFmpegToolStripMenuItem.Name = "downloadFFmpegToolStripMenuItem";
+            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.downloadFFmpegToolStripMenuItem.Text = "Download FFmpeg";
+            this.downloadFFmpegToolStripMenuItem.Click += new System.EventHandler(this.downloadFFmpegToolStripMenuItem_Click);
+            // 
+            // downloadHandbrakeToolStripMenuItem
+            // 
+            this.downloadHandbrakeToolStripMenuItem.Name = "downloadHandbrakeToolStripMenuItem";
+            this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.downloadHandbrakeToolStripMenuItem.Text = "Download Handbrake";
+            this.downloadHandbrakeToolStripMenuItem.Click += new System.EventHandler(this.downloadHandbrakeToolStripMenuItem_Click);
+            // 
+            // downloadVLCPlayerToolStripMenuItem
+            // 
+            this.downloadVLCPlayerToolStripMenuItem.Name = "downloadVLCPlayerToolStripMenuItem";
+            this.downloadVLCPlayerToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.downloadVLCPlayerToolStripMenuItem.Text = "Download VLC Player";
+            this.downloadVLCPlayerToolStripMenuItem.Click += new System.EventHandler(this.downloadVLCPlayerToolStripMenuItem_Click);
             // 
             // contextMenuListItems
             // 
@@ -293,37 +325,48 @@
             this.toolStripButtonDownloadAudio.ToolTipText = "Download Audio";
             this.toolStripButtonDownloadAudio.Click += new System.EventHandler(this.toolStripButtonDownloadAudio_Click);
             // 
-            // toolStripSeparator1
+            // statusBar
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(249, 6);
+            this.statusBar.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolbarLabelStatus,
+            this.toolBarLabelCpu,
+            this.toolBarLabelMemory});
+            this.statusBar.Location = new System.Drawing.Point(0, 1258);
+            this.statusBar.Name = "statusBar";
+            this.statusBar.Size = new System.Drawing.Size(2175, 30);
+            this.statusBar.TabIndex = 3;
+            this.statusBar.Text = "statusStrip1";
             // 
-            // downloadFFmpegToolStripMenuItem
+            // toolbarLabelStatus
             // 
-            this.downloadFFmpegToolStripMenuItem.Name = "downloadFFmpegToolStripMenuItem";
-            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
-            this.downloadFFmpegToolStripMenuItem.Text = "Download FFmpeg";
-            this.downloadFFmpegToolStripMenuItem.Click += new System.EventHandler(this.downloadFFmpegToolStripMenuItem_Click);
+            this.toolbarLabelStatus.Name = "toolbarLabelStatus";
+            this.toolbarLabelStatus.Size = new System.Drawing.Size(72, 25);
+            this.toolbarLabelStatus.Text = "Waiting";
             // 
-            // downloadHandbrakeToolStripMenuItem
+            // toolBarLabelCpu
             // 
-            this.downloadHandbrakeToolStripMenuItem.Name = "downloadHandbrakeToolStripMenuItem";
-            this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
-            this.downloadHandbrakeToolStripMenuItem.Text = "Download Handbrake";
-            this.downloadHandbrakeToolStripMenuItem.Click += new System.EventHandler(this.downloadHandbrakeToolStripMenuItem_Click);
+            this.toolBarLabelCpu.Name = "toolBarLabelCpu";
+            this.toolBarLabelCpu.Size = new System.Drawing.Size(86, 25);
+            this.toolBarLabelCpu.Text = "CPU: N/A";
             // 
-            // downloadVLCPlayerToolStripMenuItem
+            // timerStatusBar
             // 
-            this.downloadVLCPlayerToolStripMenuItem.Name = "downloadVLCPlayerToolStripMenuItem";
-            this.downloadVLCPlayerToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
-            this.downloadVLCPlayerToolStripMenuItem.Text = "Download VLC Player";
-            this.downloadVLCPlayerToolStripMenuItem.Click += new System.EventHandler(this.downloadVLCPlayerToolStripMenuItem_Click);
+            this.timerStatusBar.Interval = 2500;
+            this.timerStatusBar.Tick += new System.EventHandler(this.timerStatusBar_Tick);
+            // 
+            // toolBarLabelMemory
+            // 
+            this.toolBarLabelMemory.Name = "toolBarLabelMemory";
+            this.toolBarLabelMemory.Size = new System.Drawing.Size(120, 25);
+            this.toolBarLabelMemory.Text = "Memory: N/A";
             // 
             // FrameMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2175, 1288);
+            this.Controls.Add(this.statusBar);
             this.Controls.Add(this.listItems);
             this.Controls.Add(this.toolBar);
             this.Controls.Add(this.menuStrip);
@@ -339,6 +382,8 @@
             this.contextMenuListItems.ResumeLayout(false);
             this.toolBar.ResumeLayout(false);
             this.toolBar.PerformLayout();
+            this.statusBar.ResumeLayout(false);
+            this.statusBar.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -378,6 +423,11 @@
         private System.Windows.Forms.ToolStripMenuItem downloadFFmpegToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem downloadHandbrakeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem downloadVLCPlayerToolStripMenuItem;
+        private System.Windows.Forms.StatusStrip statusBar;
+        private System.Windows.Forms.ToolStripStatusLabel toolbarLabelStatus;
+        private System.Windows.Forms.ToolStripStatusLabel toolBarLabelCpu;
+        private System.Windows.Forms.ToolStripStatusLabel toolBarLabelMemory;
+        private System.Windows.Forms.Timer timerStatusBar;
     }
 }
 

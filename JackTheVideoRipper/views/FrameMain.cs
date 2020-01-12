@@ -31,6 +31,9 @@ namespace JackTheVideoRipper
             {
                 MessageBox.Show("Could not find FFmpeg installed! Please install FFmpeg for the best experience while using this app.", "FFmpeg is not installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+
+            timerStatusBar_Tick(sender, e);
+            timerStatusBar.Enabled = true;
         }
 
         private static bool locked = false;
@@ -398,6 +401,13 @@ namespace JackTheVideoRipper
         private void downloadVLCPlayerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("https://www.videolan.org/vlc/");
+        }
+
+        private void timerStatusBar_Tick(object sender, EventArgs e)
+        {
+            toolBarLabelCpu.Text = String.Format("CPU: {0}", Common.getCpuUsagePercentage());
+            toolBarLabelMemory.Text = String.Format("Availble Memory: {0}", Common.getAvailableMemory());
+         
         }
     }
 }
