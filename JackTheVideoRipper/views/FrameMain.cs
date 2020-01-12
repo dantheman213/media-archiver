@@ -84,7 +84,6 @@ namespace JackTheVideoRipper
                                 if (pur.item.SubItems[1].Text != "Reading Metadata")
                                 {
                                     pur.item.SubItems[1].Text = "Reading Metadata";
-                                    updateListUI();
                                 }
                             }), null);
                         }
@@ -125,7 +124,6 @@ namespace JackTheVideoRipper
                                     {
                                         pur.item.SubItems[6].Text = parts[7]; // ETA
                                     }
-                                    updateListUI();
                                 }), null);
                             }
                             else if (l.IndexOf("Destination") > -1)
@@ -144,7 +142,6 @@ namespace JackTheVideoRipper
                                     {
                                         pur.item.SubItems[8].Text = filePath; // Path
                                     }
-                                    updateListUI();
                                 }), null);
                             }
                         }
@@ -158,11 +155,15 @@ namespace JackTheVideoRipper
                                     pur.item.SubItems[1].Text = "Error";
                                     pur.item.SubItems[5].Text = ""; // Download Speed
                                     pur.item.SubItems[6].Text = "00:00"; // ETA
-                                    updateListUI();
                                 }
                             }), null);
                             pur.proc = null;
                         }
+
+                        BeginInvoke(new Action(() =>
+                        {
+                            updateListUI();
+                        }), null);
                     }
                 }
 
