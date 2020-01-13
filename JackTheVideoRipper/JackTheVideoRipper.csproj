@@ -77,6 +77,12 @@
     <Compile Include="views\FrameConvert.Designer.cs">
       <DependentUpon>FrameConvert.cs</DependentUpon>
     </Compile>
+    <Compile Include="views\FrameDependencyInstall.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="views\FrameDependencyInstall.Designer.cs">
+      <DependentUpon>FrameDependencyInstall.cs</DependentUpon>
+    </Compile>
     <Compile Include="views\FrameMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -97,6 +103,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="views\FrameConvert.resx">
       <DependentUpon>FrameConvert.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\FrameDependencyInstall.resx">
+      <DependentUpon>FrameDependencyInstall.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="views\FrameMain.resx">
       <DependentUpon>FrameMain.cs</DependentUpon>

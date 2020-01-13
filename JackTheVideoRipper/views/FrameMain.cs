@@ -37,6 +37,9 @@ namespace JackTheVideoRipper
 
                 if (result == DialogResult.Yes)
                 {
+                    var f = new FrameDependencyInstall();
+                    f.ShowDialog();
+
                     if (!Common.IsAdministrator())
                     {
                         var p = CLI.runElevatedSystemCommand(String.Format("{0}\\{1} --install-deps", Common.AppPath, Process.GetCurrentProcess().ProcessName));
@@ -49,6 +52,7 @@ namespace JackTheVideoRipper
                     }
 
                     MessageBox.Show("Components have been installed successfully! Please reboot your computer for changes to take effect.", "Required Components Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    f.Close();
                 }
                 else
                 {

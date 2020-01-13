@@ -10,8 +10,6 @@ namespace JackTheVideoRipper
     {
         private static string downloadURL = "https://github.com/dantheman213/JackTheVideoRipper/raw/master/install/ffmpeg.zip";
         private static string binName = "ffmpeg.exe";
-        private static string zipName = "ffmpeg.zip";
-        private static string zipPath = Common.AppPath + "\\" + zipName;
         private static string installPath = "C:\\Program Files\\ffmpeg\\bin";
 
         public static bool isInstalled()
@@ -36,6 +34,10 @@ namespace JackTheVideoRipper
 
         public static void downloadAndInstall()
         {
+            string tmpDir = Path.GetTempPath();
+            string tmpFileName = String.Format("ffmpeg_{0}.zip", DateTime.Now.ToString("yyyyMMddhmmsstt"));
+            string zipPath = String.Format("{0}\\{1}", tmpDir, tmpFileName);
+
             using (WebClient c = new WebClient())
             {
                 if (File.Exists(zipPath))
@@ -65,7 +67,7 @@ namespace JackTheVideoRipper
                 }
             }
 
-            string srcFilePath = String.Format("{0}\\{1}", Common.AppPath, binName);
+            string srcFilePath = String.Format("{0}\\{1}", tmpDir, binName);
             string destFilePath = String.Format("{0}\\{1}", installPath, binName);
             
             if (File.Exists(srcFilePath))
@@ -77,6 +79,8 @@ namespace JackTheVideoRipper
                     File.Delete(destFilePath);
                 }
                 File.Copy(srcFilePath, destFilePath, true);
+                File.Delete(zipPath);
+                File.Delete(srcFilePath);
             }
 
             CLI.addToPathEnv(installPath);
