@@ -12,7 +12,7 @@ namespace JackTheVideoRipper
         private static string binName = "ffmpeg.exe";
         private static string zipName = "ffmpeg.zip";
         private static string zipPath = Common.AppPath + "\\" + zipName;
-        private static string installPath = @"C:\Program Files\ffmpeg\bin";
+        private static string installPath = "C:\\Program Files\\ffmpeg\\bin";
 
         public static bool isInstalled()
         {
@@ -38,14 +38,24 @@ namespace JackTheVideoRipper
         {
             using (WebClient c = new WebClient())
             {
+                if (File.Exists(zipPath))
+                {
+                    File.Delete(zipPath);
+                }
                 c.DownloadFile(downloadURL, zipPath);
+
                 using (ZipArchive archive = ZipFile.OpenRead(zipPath))
                 {
                     foreach (ZipArchiveEntry entry in archive.Entries)
                     {
                         try
                         {
-                            entry.ExtractToFile(Path.Combine(Common.AppPath, entry.FullName));
+                            string filePath = Path.Combine(Common.AppPath, entry.FullName);
+                            if (File.Exists(filePath))
+                            {
+                                File.Delete(filePath);
+                            }
+                            entry.ExtractToFile(filePath);
                         }
                         catch (Exception ex)
                         {
@@ -57,22 +67,19 @@ namespace JackTheVideoRipper
 
             string srcFilePath = String.Format("{0}\\{1}", Common.AppPath, binName);
             string destFilePath = String.Format("{0}\\{1}", installPath, binName);
+            
             if (File.Exists(srcFilePath))
             {
                 Directory.CreateDirectory(installPath);
-                File.Copy(srcFilePath, destFilePath, true);
 
-                addInstallToPath();
+                if (File.Exists(destFilePath))
+                {
+                    File.Delete(destFilePath);
+                }
+                File.Copy(srcFilePath, destFilePath, true);
             }
-        }
-        
-        private static void addInstallToPath()
-        {
-            const string name = "PATH";
-            string pathvar = System.Environment.GetEnvironmentVariable(name);
-            var value = String.Format("{0};{1}", pathvar, installPath);
-            var target = EnvironmentVariableTarget.Machine;
-            System.Environment.SetEnvironmentVariable(name, value, target);
+
+            CLI.addToPathEnv(installPath);
         }
     }
 }

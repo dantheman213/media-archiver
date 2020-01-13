@@ -21,48 +21,42 @@ namespace JackTheVideoRipper
             InitializeComponent();
         }
         
-        private void checkDependencyFfmpeg()
+        private void checkDependencies()
         {
-            if (!FFmpeg.isInstalled())
+            if (!FFmpeg.isInstalled() || !YouTubeDL.isInstalled())
             {
-                var result = MessageBox.Show("A required dependency FFmpeg could not be found on your system. Install FFmpeg for you?", "FFmpeg is not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                DialogResult result = DialogResult.No;
+                if (!YouTubeDL.isInstalled())
+                {
+                    result = MessageBox.Show("Could not find youtube-dl on your system. Other components may also be missing. Install all required missing components?", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                }
+                else if (!FFmpeg.isInstalled())
+                {
+                    result = MessageBox.Show("Could not find FFmpeg on your system. Other components may also be missing. Install required missing components?", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                }
+
                 if (result == DialogResult.Yes)
                 {
                     if (!Common.IsAdministrator())
                     {
-                        var p = CLI.runElevatedSystemCommand(String.Format("{0}\\{1} --install-ffmpeg", Common.AppPath, Process.GetCurrentProcess().ProcessName));
+                        var p = CLI.runElevatedSystemCommand(String.Format("{0}\\{1} --install-deps", Common.AppPath, Process.GetCurrentProcess().ProcessName));
                         p.WaitForExit();
-                    } else
+                    }
+                    else
                     {
+                        YouTubeDL.checkDownload();
                         FFmpeg.checkDownload();
                     }
 
-                    MessageBox.Show("FFmpeg has been installed successfully!", "FFmpeg Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Components have been installed successfully! Please reboot your computer for changes to take effect.", "Required Components Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    MessageBox.Show("FFmpeg not installed! This app will NOT behave correctly because its dependency is missing.", "Application Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Required components not installed! This app will NOT behave correctly because its critical dependencies are missing.", "Application Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
         
-        private void checkDependencyYoutubeDl()
-        {
-            if (!YouTubeDL.isInstalled())
-            {
-                var result = MessageBox.Show("A required dependency youtube-dl could not be found on your system. Install youtube-dl for you?", "youtube-dl is not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                if (result == DialogResult.Yes)
-                {
-                    YouTubeDL.checkDownload();
-                }
-                else
-                {
-                    MessageBox.Show("youtube-dl not installed! This app will NOT WORK AT ALL because a critical dependency is missing.", "Application Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Application.Exit(new CancelEventArgs(false));
-                }
-            }
-        }
-
         private void FrameMain_Load(object sender, EventArgs e)
         {
             this.Text = String.Format("JackTheVideoRipper {0}", Common.getAppVersion());
@@ -449,9 +443,8 @@ namespace JackTheVideoRipper
         private void timerPostLoad_Tick(object sender, EventArgs e)
         {
             timerPostLoad.Enabled = false;
-            checkDependencyYoutubeDl();
+            checkDependencies();
             YouTubeDL.checkForUpdates();
-            checkDependencyFfmpeg();
         }
     }
 }

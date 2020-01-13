@@ -9,25 +9,44 @@ namespace JackTheVideoRipper
     {
         public static string defaultDownloadPath = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Downloads");
         private static string binName = "youtube-dl.exe";
-        private static string binPath = Common.AppPath + "\\" + binName;
+        private static string installPath = "C:\\Program Files\\youtube-dl\\bin";
+        private static string binPath = String.Format("{0}\\{1}", installPath, binName);
         private static string downloadURL = "https://yt-dl.org/downloads/latest/youtube-dl.exe";
         private static string titleFormat = "%(title)s";
         private static string extFormat = ".%(ext)s";
 
         public static bool isInstalled()
         {
-            return File.Exists(binPath);
+            string result = Environment.GetEnvironmentVariable("PATH");
+
+            if (result.IndexOf("youtube-dl", StringComparison.CurrentCultureIgnoreCase) > -1)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static void checkDownload()
         {
             if (!isInstalled())
             {
+                downloadAndInstall();
+            }
+        }
+
+        public static void downloadAndInstall()
+        {
+            if (!File.Exists(binPath))
+            {
+                Directory.CreateDirectory(installPath);
                 using (WebClient c = new WebClient())
                 {
                     c.DownloadFile(downloadURL, binPath);
                 }
             }
+
+            CLI.addToPathEnv(installPath);
         }
 
         public static void checkForUpdates()

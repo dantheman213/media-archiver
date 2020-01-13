@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace JackTheVideoRipper
 {
@@ -37,6 +38,13 @@ namespace JackTheVideoRipper
             process.Start();
 
             return process;
+        }
+
+        public static void addToPathEnv(string pathElement)
+        {
+            string currentPath = System.Environment.GetEnvironmentVariable("PATH");
+            string newPath = String.Format("{0};{1}", currentPath, pathElement);
+            Environment.SetEnvironmentVariable("PATH", newPath, EnvironmentVariableTarget.Machine);
         }
     }
 }

@@ -17,8 +17,9 @@ namespace JackTheVideoRipper
         {
             if (args != null && args.Length > 0)
             {
-                if (args[0] == "--install-ffmpeg")
+                if (args[0] == "--install-deps")
                 {
+                    YouTubeDL.downloadAndInstall();
                     FFmpeg.downloadAndInstall();
                     return;
                 }
