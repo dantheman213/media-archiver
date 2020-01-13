@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="src\FFmpeg.cs" />
     <Compile Include="src\models\ProcessUpdateRow.cs" />
+    <Compile Include="src\AppUpdate.cs" />
     <Compile Include="views\FrameAbout.cs">
       <SubType>Form</SubType>
     </Compile>

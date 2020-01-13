@@ -68,6 +68,8 @@
             this.toolBarLabelMemory = new System.Windows.Forms.ToolStripStatusLabel();
             this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
             this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
+            this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -209,6 +211,8 @@
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem,
             this.toolStripSeparator1,
+            this.checkForUpdatesToolStripMenuItem,
+            this.toolStripSeparator2,
             this.downloadFFmpegToolStripMenuItem,
             this.downloadHandbrakeToolStripMenuItem,
             this.downloadVLCPlayerToolStripMenuItem});
@@ -368,6 +372,18 @@
             this.timerPostLoad.Interval = 1500;
             this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
             // 
+            // checkForUpdatesToolStripMenuItem
+            // 
+            this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
+            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.checkForUpdatesToolStripMenuItem.Text = "Check For Updates";
+            this.checkForUpdatesToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdatesToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(267, 6);
+            // 
             // FrameMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -436,6 +452,8 @@
         private System.Windows.Forms.ToolStripStatusLabel toolBarLabelMemory;
         private System.Windows.Forms.Timer timerStatusBar;
         private System.Windows.Forms.Timer timerPostLoad;
+        private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }
 

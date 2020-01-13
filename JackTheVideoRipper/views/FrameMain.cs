@@ -440,7 +440,6 @@ namespace JackTheVideoRipper
         {
             toolBarLabelCpu.Text = String.Format("CPU: {0}", Common.getCpuUsagePercentage());
             toolBarLabelMemory.Text = String.Format("Availble Memory: {0}", Common.getAvailableMemory());
-         
         }
 
         private void timerPostLoad_Tick(object sender, EventArgs e)
@@ -448,6 +447,30 @@ namespace JackTheVideoRipper
             timerPostLoad.Enabled = false;
             checkDependencies();
             YouTubeDL.checkForUpdates();
+
+            checkForUpdatesToolStripMenuItem_Click(false, e);
+        }
+
+        private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string versionResult = AppUpdate.checkForNewAppVersion();
+            if (!String.IsNullOrEmpty(versionResult))
+            {
+                var result = MessageBox.Show(String.Format("New Version JackTheVideoRipper {0} Available! View Download Page?", versionResult), "New Version Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if (result == DialogResult.Yes)
+                {
+                    Process.Start("https://github.com/dantheman213/JackTheVideoRipper/releases");
+                }
+            }
+            else if (versionResult == "" && !sender.GetType().Equals(typeof(bool)))
+            {
+                // if object sender is bool then it's silent
+                MessageBox.Show("App is currently up to date!", "Version Current", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (versionResult == null)
+            {
+                MessageBox.Show("Unable to communicate with Github!", "Can't download version manifest", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
