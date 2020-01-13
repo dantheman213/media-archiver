@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Security.AccessControl;
 
 namespace JackTheVideoRipper
 {
@@ -40,6 +41,18 @@ namespace JackTheVideoRipper
             if (!File.Exists(binPath))
             {
                 Directory.CreateDirectory(installPath);
+
+                // change perms
+                var directory = new DirectoryInfo(installPath);
+                var security = directory.GetAccessControl();
+
+                security.AddAccessRule(
+                    new FileSystemAccessRule(Environment.UserDomainName + "\\" + Environment.UserName,
+                    FileSystemRights.Modify,
+                    AccessControlType.Deny));
+                directory.SetAccessControl(security);
+
+                // Download binary to directory
                 using (WebClient c = new WebClient())
                 {
                     c.DownloadFile(downloadURL, binPath);
@@ -80,8 +93,35 @@ namespace JackTheVideoRipper
             {
                 f = fileName + extFormat;
             }
-            string opts = "-f bestaudio -x --audio-format mp3 -i --no-check-certificate --add-metadata --embed-thumbnail -o " + defaultDownloadPath + "\\" + f + " " + url;
+            string opts = "-f bestaudio -x --audio-format mp3 -i --no-check-certificate --no-warnings --add-metadata --embed-thumbnail -o " + defaultDownloadPath + "\\" + f + " " + url;
             return CLI.runYouTubeCommand(opts);
+        }
+
+        public static string downloadThumbnail(string url)
+        {
+            string opts = "-s --no-warnings --get-thumbnail --skip-download " + url;
+            var p = CLI.runYouTubeCommand(opts);
+
+            string possibleThumbnailUrl = p.StandardOutput.ReadToEnd().Trim();
+            if (Common.isValidURL(possibleThumbnailUrl))
+            {
+                string tmpDir = Path.GetTempPath();
+                string tmpFileName = String.Format("jtvr_thumbnail_{0}.jpg", DateTime.Now.ToString("yyyyMMddhmmsstt"));
+
+                if (File.Exists(tmpFileName))
+                {
+                    File.Delete(tmpFileName);
+                }
+
+                using (WebClient c = new WebClient())
+                {
+                    c.DownloadFile(possibleThumbnailUrl, tmpFileName);
+                }
+
+                return tmpFileName;
+            }
+
+            return null;
         }
     }
 }

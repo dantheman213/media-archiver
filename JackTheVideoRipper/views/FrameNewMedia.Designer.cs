@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.label1 = new System.Windows.Forms.Label();
             this.textUrl = new System.Windows.Forms.TextBox();
             this.pbPreview = new System.Windows.Forms.PictureBox();
@@ -43,6 +44,7 @@
             this.cbFormat = new System.Windows.Forms.ComboBox();
             this.chkBoxWriteMetadata = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.tabImportType.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -61,15 +63,17 @@
             // 
             this.textUrl.Location = new System.Drawing.Point(118, 16);
             this.textUrl.Name = "textUrl";
-            this.textUrl.Size = new System.Drawing.Size(621, 26);
+            this.textUrl.Size = new System.Drawing.Size(556, 26);
             this.textUrl.TabIndex = 1;
+            this.textUrl.TextChanged += new System.EventHandler(this.textUrl_TextChanged);
             // 
             // pbPreview
             // 
             this.pbPreview.BackColor = System.Drawing.Color.Black;
-            this.pbPreview.Location = new System.Drawing.Point(745, 12);
+            this.pbPreview.Location = new System.Drawing.Point(684, 12);
             this.pbPreview.Name = "pbPreview";
-            this.pbPreview.Size = new System.Drawing.Size(431, 277);
+            this.pbPreview.Size = new System.Drawing.Size(492, 277);
+            this.pbPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pbPreview.TabIndex = 2;
             this.pbPreview.TabStop = false;
             // 
@@ -136,7 +140,7 @@
             this.tabPageAudio.Location = new System.Drawing.Point(4, 29);
             this.tabPageAudio.Name = "tabPageAudio";
             this.tabPageAudio.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageAudio.Size = new System.Drawing.Size(715, 333);
+            this.tabPageAudio.Size = new System.Drawing.Size(654, 252);
             this.tabPageAudio.TabIndex = 1;
             this.tabPageAudio.Text = "Audio";
             this.tabPageAudio.UseVisualStyleBackColor = true;
@@ -164,7 +168,7 @@
             this.cbFormat.FormattingEnabled = true;
             this.cbFormat.Location = new System.Drawing.Point(118, 48);
             this.cbFormat.Name = "cbFormat";
-            this.cbFormat.Size = new System.Drawing.Size(621, 28);
+            this.cbFormat.Size = new System.Drawing.Size(556, 28);
             this.cbFormat.TabIndex = 10;
             // 
             // chkBoxWriteMetadata
@@ -186,6 +190,12 @@
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Additional Options";
+            // 
+            // timerPostLoad
+            // 
+            this.timerPostLoad.Enabled = true;
+            this.timerPostLoad.Interval = 1010;
+            this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
             // 
             // FrameNewMedia
             // 
@@ -212,6 +222,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "New Media";
+            this.Load += new System.EventHandler(this.FrameNewMedia_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).EndInit();
             this.tabImportType.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
@@ -238,5 +249,6 @@
         private System.Windows.Forms.ComboBox cbFormat;
         private System.Windows.Forms.CheckBox chkBoxWriteMetadata;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Timer timerPostLoad;
     }
 }
