@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Security.AccessControl;
+using System.Text.RegularExpressions;
 
 namespace JackTheVideoRipper
 {
@@ -147,6 +149,32 @@ namespace JackTheVideoRipper
             if (!String.IsNullOrEmpty(possibleDesc))
             {
                 return possibleDesc;
+            }
+
+            return null;
+        }
+
+        public static List<string> getFormats(string url)
+        {
+            string opts = "--list-formats " + url;
+            var p = CLI.runYouTubeCommand(opts);
+
+            string formats = p.StandardOutput.ReadToEnd().Trim();
+            if (!String.IsNullOrEmpty(formats))
+            {
+                var result = new List<string>();
+
+                var lines = formats.Split('\n');
+                foreach(var line in lines)
+                {
+                    if (Regex.IsMatch(line.Substring(0, 1), @"^\d+$"))
+                    {
+                        // is a number
+                        result.Add(line);
+                    }
+                }
+
+                return result;
             }
 
             return null;

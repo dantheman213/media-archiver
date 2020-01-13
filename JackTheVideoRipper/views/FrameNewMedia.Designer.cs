@@ -165,6 +165,7 @@
             // 
             // cbFormat
             // 
+            this.cbFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbFormat.FormattingEnabled = true;
             this.cbFormat.Location = new System.Drawing.Point(118, 48);
             this.cbFormat.Name = "cbFormat";
@@ -174,6 +175,8 @@
             // chkBoxWriteMetadata
             // 
             this.chkBoxWriteMetadata.AutoSize = true;
+            this.chkBoxWriteMetadata.Checked = true;
+            this.chkBoxWriteMetadata.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkBoxWriteMetadata.Location = new System.Drawing.Point(15, 42);
             this.chkBoxWriteMetadata.Name = "chkBoxWriteMetadata";
             this.chkBoxWriteMetadata.Size = new System.Drawing.Size(144, 24);

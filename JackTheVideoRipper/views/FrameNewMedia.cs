@@ -39,6 +39,18 @@ namespace JackTheVideoRipper
 
                 string description = YouTubeDL.getDescription(url);
                 labelDescription.Text = description;
+
+                var formats = YouTubeDL.getFormats(url);
+                if (formats != null && formats.Count > 0)
+                {
+                    cbFormat.Items.Clear();
+                    cbFormat.Items.Add("bestvideo+bestaudio/best");
+                    foreach (var format in formats)
+                    {
+                        cbFormat.Items.Add(format);
+                    }
+                    cbFormat.SelectedIndex = 0;
+                }
             }
         }
 
