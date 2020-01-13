@@ -23,6 +23,23 @@ namespace JackTheVideoRipper
             return process;
         }
 
+        public static Process runYouTubeCommand(string opts)
+        {
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            startInfo.FileName = "youtube-dl.exe";
+            startInfo.Arguments = opts;
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.CreateNoWindow = true;
+            process.StartInfo = startInfo;
+            process.Start();
+
+            return process;
+        }
+
         public static Process runElevatedSystemCommand(string command, string workingDir = "")
         {
             Process process = new Process();

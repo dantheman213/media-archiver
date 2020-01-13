@@ -365,7 +365,7 @@
             // timerPostLoad
             // 
             this.timerPostLoad.Enabled = true;
-            this.timerPostLoad.Interval = 1000;
+            this.timerPostLoad.Interval = 1500;
             this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
             // 
             // FrameMain

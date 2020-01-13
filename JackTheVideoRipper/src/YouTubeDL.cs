@@ -69,8 +69,8 @@ namespace JackTheVideoRipper
             {
                 f = fileName + extFormat;
             }
-            string cmd = binName + " " + qualityOpts + " --no-check-certificate --add-metadata -o " + defaultDownloadPath + "\\" + f + " " + url;
-            return CLI.runCommand(cmd);
+            string opts = qualityOpts + " --no-check-certificate --add-metadata -o " + defaultDownloadPath + "\\" + f + " " + url;
+            return CLI.runYouTubeCommand(opts);
         }
 
         public static Process downloadAudio(string url, string fileName = "")
@@ -80,8 +80,8 @@ namespace JackTheVideoRipper
             {
                 f = fileName + extFormat;
             }
-            string cmd = binName + " -f bestaudio -x --audio-format mp3 --no-check-certificate --add-metadata --embed-thumbnail -o " + defaultDownloadPath + "\\" + f + " " + url;
-            return CLI.runCommand(cmd);
+            string opts = "-f bestaudio -x --audio-format mp3 --no-check-certificate --add-metadata --embed-thumbnail -o " + defaultDownloadPath + "\\" + f + " " + url;
+            return CLI.runYouTubeCommand(opts);
         }
     }
 }

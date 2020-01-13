@@ -300,23 +300,22 @@ namespace JackTheVideoRipper
         private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string filePath = listItems.SelectedItems[0].SubItems[8].Text;
-            if (String.IsNullOrEmpty(filePath))
+            if (!String.IsNullOrEmpty(filePath))
             {
-                Console.WriteLine("file does not exist to open in explorer");
-                Common.openFolder(YouTubeDL.defaultDownloadPath);
-            }
-            if (!File.Exists(filePath))
-            {
-                filePath = filePath + ".part";
-                if (!File.Exists(filePath))
+                if (File.Exists(filePath))
                 {
-                    // MessageBox.Show("Unable to find file", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    Console.WriteLine(String.Format("couldn't find file to open at {0}", filePath));
-                    Common.openFolder(YouTubeDL.defaultDownloadPath);
-                    return;
+                    Common.openFolderWithFileSelect(filePath);
                 }
+                else if (File.Exists(filePath + ".part"))
+                {
+                    Common.openFolderWithFileSelect(filePath + ".part");
+                }
+                return;
             }
-            Common.openFolderWithFileSelect(filePath);
+
+            // couldn't find folder, rolling back to just the folder with no select
+            Console.WriteLine(String.Format("couldn't find file to open at {0}", filePath));
+            Common.openFolder(YouTubeDL.defaultDownloadPath);
         }
 
         private void listItems_MouseClick(object sender, MouseEventArgs e)
@@ -332,7 +331,7 @@ namespace JackTheVideoRipper
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            this.Close();
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
