@@ -65,8 +65,9 @@
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.toolbarLabelStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolBarLabelCpu = new System.Windows.Forms.ToolStripStatusLabel();
-            this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
             this.toolBarLabelMemory = new System.Windows.Forms.ToolStripStatusLabel();
+            this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
+            this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -350,16 +351,22 @@
             this.toolBarLabelCpu.Size = new System.Drawing.Size(86, 25);
             this.toolBarLabelCpu.Text = "CPU: N/A";
             // 
-            // timerStatusBar
-            // 
-            this.timerStatusBar.Interval = 2500;
-            this.timerStatusBar.Tick += new System.EventHandler(this.timerStatusBar_Tick);
-            // 
             // toolBarLabelMemory
             // 
             this.toolBarLabelMemory.Name = "toolBarLabelMemory";
             this.toolBarLabelMemory.Size = new System.Drawing.Size(120, 25);
             this.toolBarLabelMemory.Text = "Memory: N/A";
+            // 
+            // timerStatusBar
+            // 
+            this.timerStatusBar.Interval = 2500;
+            this.timerStatusBar.Tick += new System.EventHandler(this.timerStatusBar_Tick);
+            // 
+            // timerPostLoad
+            // 
+            this.timerPostLoad.Enabled = true;
+            this.timerPostLoad.Interval = 1000;
+            this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
             // 
             // FrameMain
             // 
@@ -428,6 +435,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolBarLabelCpu;
         private System.Windows.Forms.ToolStripStatusLabel toolBarLabelMemory;
         private System.Windows.Forms.Timer timerStatusBar;
+        private System.Windows.Forms.Timer timerPostLoad;
     }
 }
 

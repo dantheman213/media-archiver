@@ -21,5 +21,22 @@ namespace JackTheVideoRipper
 
             return process;
         }
+
+        public static Process runElevatedSystemCommand(string command, string workingDir = "")
+        {
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = "/C " + command;
+            startInfo.WorkingDirectory = ((workingDir != "") ? workingDir : Common.AppPath);
+            startInfo.UseShellExecute = true;
+            startInfo.CreateNoWindow = true;
+            startInfo.Verb = "runas";
+            process.StartInfo = startInfo;
+            process.Start();
+
+            return process;
+        }
     }
 }

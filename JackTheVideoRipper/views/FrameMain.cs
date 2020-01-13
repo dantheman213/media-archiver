@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -20,18 +21,53 @@ namespace JackTheVideoRipper
             InitializeComponent();
         }
         
+        private void checkDependencyFfmpeg()
+        {
+            if (!FFmpeg.isInstalled())
+            {
+                var result = MessageBox.Show("A required dependency FFmpeg could not be found on your system. Install FFmpeg for you?", "FFmpeg is not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result == DialogResult.Yes)
+                {
+                    if (!Common.IsAdministrator())
+                    {
+                        var p = CLI.runElevatedSystemCommand(String.Format("{0}\\{1} --install-ffmpeg", Common.AppPath, Process.GetCurrentProcess().ProcessName));
+                        p.WaitForExit();
+                    } else
+                    {
+                        FFmpeg.checkDownload();
+                    }
+
+                    MessageBox.Show("FFmpeg has been installed successfully!", "FFmpeg Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("FFmpeg not installed! This app will NOT behave correctly because its dependency is missing.", "Application Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+        
+        private void checkDependencyYoutubeDl()
+        {
+            if (!YouTubeDL.isInstalled())
+            {
+                var result = MessageBox.Show("A required dependency youtube-dl could not be found on your system. Install youtube-dl for you?", "youtube-dl is not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result == DialogResult.Yes)
+                {
+                    YouTubeDL.checkDownload();
+                }
+                else
+                {
+                    MessageBox.Show("youtube-dl not installed! This app will NOT WORK AT ALL because a critical dependency is missing.", "Application Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Application.Exit(new CancelEventArgs(false));
+                }
+            }
+        }
+
         private void FrameMain_Load(object sender, EventArgs e)
         {
-            YouTubeDL.checkDownload();
-            YouTubeDL.checkForUpdates();
             this.Text = String.Format("JackTheVideoRipper {0}", Common.getAppVersion());
             listItemRowsUpdateTimer = new System.Threading.Timer(updateListItemRows, null, 0, 250);
-
-            if (!Common.isFfmpegInstalled())
-            {
-                MessageBox.Show("Could not find FFmpeg installed! Please install FFmpeg for the best experience while using this app.", "FFmpeg is not installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-
+            
             timerStatusBar_Tick(sender, e);
             timerStatusBar.Enabled = true;
         }
@@ -408,6 +444,14 @@ namespace JackTheVideoRipper
             toolBarLabelCpu.Text = String.Format("CPU: {0}", Common.getCpuUsagePercentage());
             toolBarLabelMemory.Text = String.Format("Availble Memory: {0}", Common.getAvailableMemory());
          
+        }
+
+        private void timerPostLoad_Tick(object sender, EventArgs e)
+        {
+            timerPostLoad.Enabled = false;
+            checkDependencyYoutubeDl();
+            YouTubeDL.checkForUpdates();
+            checkDependencyFfmpeg();
         }
     }
 }

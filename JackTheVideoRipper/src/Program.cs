@@ -13,8 +13,17 @@ namespace JackTheVideoRipper
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
+            if (args != null && args.Length > 0)
+            {
+                if (args[0] == "--install-ffmpeg")
+                {
+                    FFmpeg.downloadAndInstall();
+                    return;
+                }
+            }
+
             bool firstRun = false;
             using (Mutex mtex = new Mutex(true, "JackTheVideoRipper", out firstRun))
             {
@@ -28,7 +37,6 @@ namespace JackTheVideoRipper
                     MessageBox.Show("Already running!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-              
         }
     }
 }

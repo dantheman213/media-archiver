@@ -14,14 +14,14 @@ namespace JackTheVideoRipper
         private static string titleFormat = "%(title)s";
         private static string extFormat = ".%(ext)s";
 
-        private static bool exists()
+        public static bool isInstalled()
         {
             return File.Exists(binPath);
         }
 
         public static void checkDownload()
         {
-            if (!exists())
+            if (!isInstalled())
             {
                 using (WebClient c = new WebClient())
                 {
@@ -32,7 +32,7 @@ namespace JackTheVideoRipper
 
         public static void checkForUpdates()
         {
-            if (exists())
+            if (isInstalled())
             {
                 CLI.runCommand(binName + " -U");
             }
@@ -41,7 +41,7 @@ namespace JackTheVideoRipper
         public static Process downloadVideo(string url, string fileName = "")
         {
             string qualityOpts = "-f best";
-            if (Common.isFfmpegInstalled())
+            if (FFmpeg.isInstalled())
             {
                 qualityOpts = "-f bestvideo+bestaudio --recode-video mp4";
             }

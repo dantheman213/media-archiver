@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -70,18 +71,6 @@ namespace JackTheVideoRipper
             return false;
         }
 
-        public static bool isFfmpegInstalled()
-        {
-            string result = Environment.GetEnvironmentVariable("PATH");
-
-            if (result.IndexOf("ffmpeg", StringComparison.CurrentCultureIgnoreCase) > -1)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         public static string getYouTubeVideoTitle(string url)
         {
             // TODO: Replace unicode chars like \\u0026 with their real char &
@@ -136,6 +125,13 @@ namespace JackTheVideoRipper
                 ramCounter = new PerformanceCounter("Memory", "Available MBytes");
             }
             return ramCounter.NextValue() + "MB";
+        }
+
+        public static bool IsAdministrator()
+        {
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
     }
 }
