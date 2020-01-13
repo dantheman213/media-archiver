@@ -69,7 +69,7 @@ namespace JackTheVideoRipper
             {
                 f = fileName + extFormat;
             }
-            string opts = qualityOpts + " --no-check-certificate --add-metadata -o " + defaultDownloadPath + "\\" + f + " " + url;
+            string opts = qualityOpts + " -i --no-check-certificate --add-metadata -o " + defaultDownloadPath + "\\" + f + " " + url;
             return CLI.runYouTubeCommand(opts);
         }
 
@@ -80,7 +80,7 @@ namespace JackTheVideoRipper
             {
                 f = fileName + extFormat;
             }
-            string opts = "-f bestaudio -x --audio-format mp3 --no-check-certificate --add-metadata --embed-thumbnail -o " + defaultDownloadPath + "\\" + f + " " + url;
+            string opts = "-f bestaudio -x --audio-format mp3 -i --no-check-certificate --add-metadata --embed-thumbnail -o " + defaultDownloadPath + "\\" + f + " " + url;
             return CLI.runYouTubeCommand(opts);
         }
     }

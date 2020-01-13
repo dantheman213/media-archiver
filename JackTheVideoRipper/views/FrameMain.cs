@@ -400,6 +400,15 @@ namespace JackTheVideoRipper
                 {
                     if (MessageBox.Show("You have pending downloads, are you sure you want to exit?", "Verify Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                     {
+                        // kill all processes
+                        foreach(var pur in dict.Values)
+                        {
+                            if (!pur.proc.HasExited)
+                            {
+                                Common.KillProcessAndChildren(pur.proc.Id);
+                            }
+                        }
+
                         e.Cancel = false;                        
                     }
                     else
