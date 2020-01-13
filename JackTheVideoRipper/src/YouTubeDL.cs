@@ -62,7 +62,7 @@ namespace JackTheVideoRipper
             string qualityOpts = "-f best";
             if (FFmpeg.isInstalled())
             {
-                qualityOpts = "-f bestvideo+bestaudio --recode-video mp4";
+                qualityOpts = "-f bestvideo+bestaudio/best --recode-video mp4";
             }
             string f = titleFormat + extFormat;
             if (!String.IsNullOrEmpty(fileName))
