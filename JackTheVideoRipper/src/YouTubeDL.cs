@@ -123,5 +123,33 @@ namespace JackTheVideoRipper
 
             return null;
         }
+
+        public static string getTitle(string url)
+        {
+            string opts = "-e --no-warnings " + url;
+            var p = CLI.runYouTubeCommand(opts);
+
+            string possibleTitle = p.StandardOutput.ReadToEnd().Trim();
+            if (!String.IsNullOrEmpty(possibleTitle))
+            {
+                return possibleTitle;
+            }
+
+            return null;
+        }
+
+        public static string getDescription(string url)
+        {
+            string opts = "--get-description --no-warnings " + url;
+            var p = CLI.runYouTubeCommand(opts);
+
+            string possibleDesc = p.StandardOutput.ReadToEnd().Trim();
+            if (!String.IsNullOrEmpty(possibleDesc))
+            {
+                return possibleDesc;
+            }
+
+            return null;
+        }
     }
 }

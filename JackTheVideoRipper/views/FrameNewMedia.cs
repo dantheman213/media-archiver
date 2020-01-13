@@ -33,6 +33,12 @@ namespace JackTheVideoRipper
 
                 string thumbnailFilePath = YouTubeDL.downloadThumbnail(url);
                 pbPreview.ImageLocation = thumbnailFilePath;
+
+                string title = YouTubeDL.getTitle(url);
+                labelTitle.Text = title;
+
+                string description = YouTubeDL.getDescription(url);
+                labelDescription.Text = description;
             }
         }
 

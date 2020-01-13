@@ -34,7 +34,7 @@
             this.pbPreview = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
             this.labelTitle = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.labelDescription = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.tabImportType = new System.Windows.Forms.TabControl();
             this.tabPageVideo = new System.Windows.Forms.TabPage();
@@ -88,23 +88,23 @@
             // 
             // labelTitle
             // 
-            this.labelTitle.AutoSize = true;
+            this.labelTitle.AutoEllipsis = true;
             this.labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelTitle.Location = new System.Drawing.Point(111, 92);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(72, 37);
+            this.labelTitle.Size = new System.Drawing.Size(563, 37);
             this.labelTitle.TabIndex = 4;
             this.labelTitle.Text = "N/A";
             // 
-            // label3
+            // labelDescription
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(113, 146);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(49, 26);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "N/A";
+            this.labelDescription.AutoEllipsis = true;
+            this.labelDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDescription.Location = new System.Drawing.Point(113, 146);
+            this.labelDescription.Name = "labelDescription";
+            this.labelDescription.Size = new System.Drawing.Size(565, 143);
+            this.labelDescription.TabIndex = 6;
+            this.labelDescription.Text = "N/A";
             // 
             // label4
             // 
@@ -207,7 +207,7 @@
             this.Controls.Add(this.label5);
             this.Controls.Add(this.buttonDownload);
             this.Controls.Add(this.tabImportType);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.labelDescription);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.labelTitle);
             this.Controls.Add(this.label2);
@@ -239,7 +239,7 @@
         private System.Windows.Forms.PictureBox pbPreview;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label labelTitle;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label labelDescription;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TabControl tabImportType;
         private System.Windows.Forms.TabPage tabPageVideo;
