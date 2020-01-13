@@ -233,6 +233,10 @@ namespace JackTheVideoRipper
 
         private void downloadMediaDialog(string type)
         {
+            var f = new FrameNewMedia();
+            f.ShowDialog();
+            return;
+
             string videoUrl = null;
             if (type == "video")
             {
