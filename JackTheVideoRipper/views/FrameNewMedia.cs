@@ -66,7 +66,7 @@ namespace JackTheVideoRipper
                             {
                                 if (info.requestedFormats != null && cbVideoFormat.Items.Count == 0)
                                 {
-                                    str += " [BEST]";
+                                    str += " [Recommended]";
                                 }
                                 cbVideoFormat.Items.Add(str);
                             }
@@ -84,7 +84,7 @@ namespace JackTheVideoRipper
                             {
                                 if (info.requestedFormats != null && cbAudioFormat.Items.Count == 0)
                                 {
-                                    str += " [BEST]";
+                                    str += " [Recommended]";
                                 }
                                 cbAudioFormat.Items.Add(str);
                             }
