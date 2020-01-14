@@ -72,7 +72,8 @@ namespace JackTheVideoRipper
                     cbFormat.SelectedIndex = 0;
                     cbVideoFormat.SelectedIndex = 0;
                     cbAudioFormat.SelectedIndex = 0;
-                    cbEncoder.SelectedIndex = 0;
+                    cbVideoEncoder.SelectedIndex = 0;
+                    cbAudioEncoder.SelectedIndex = 0;
                 }
             }
         }
