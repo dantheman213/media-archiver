@@ -126,7 +126,7 @@ namespace JackTheVideoRipper
 
         public static MediaInfoData getMediaData(string url)
         {
-            string opts = "-s --no-warnings --print-json " + url;
+            string opts = "-s --no-warnings --no-cache-dir --print-json " + url;
             var p = CLI.runYouTubeCommand(opts);
             string json = p.StandardOutput.ReadToEnd().Trim();
             return JsonConvert.DeserializeObject<MediaInfoData>(json);
