@@ -28,7 +28,7 @@ namespace JackTheVideoRipper
     class MediaFormatItem
     {
         [JsonProperty("format_id")]
-        public string formateId { get; set; }
+        public string formatId { get; set; }
         public string format { get; set; }
         [JsonProperty("format_note")]
         public string formateNote { get; set; }
@@ -38,5 +38,7 @@ namespace JackTheVideoRipper
         public string filesize { get; set; }
         public string height { get; set; }
         public string width { get; set; }
+        public string abr { get; set; }
+        public string vbr { get; set; }
     }
 }

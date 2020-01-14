@@ -45,15 +45,25 @@
             this.chkBoxWriteMetadata = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
+            this.cbVideoFormat = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.cbAudioFormat = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.chkBoxEmbedThumbnail = new System.Windows.Forms.CheckBox();
+            this.cbEncoder = new System.Windows.Forms.ComboBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.buttonCancel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.tabImportType.SuspendLayout();
+            this.tabPageVideo.SuspendLayout();
+            this.tabPageAudio.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(56, 22);
+            this.label1.Location = new System.Drawing.Point(74, 19);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(46, 20);
             this.label1.TabIndex = 0;
@@ -61,9 +71,9 @@
             // 
             // textUrl
             // 
-            this.textUrl.Location = new System.Drawing.Point(118, 16);
+            this.textUrl.Location = new System.Drawing.Point(127, 16);
             this.textUrl.Name = "textUrl";
-            this.textUrl.Size = new System.Drawing.Size(556, 26);
+            this.textUrl.Size = new System.Drawing.Size(547, 26);
             this.textUrl.TabIndex = 1;
             this.textUrl.TextChanged += new System.EventHandler(this.textUrl_TextChanged);
             // 
@@ -80,7 +90,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(60, 105);
+            this.label2.Location = new System.Drawing.Point(72, 105);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(42, 20);
             this.label2.TabIndex = 3;
@@ -90,26 +100,26 @@
             // 
             this.labelTitle.AutoEllipsis = true;
             this.labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTitle.Location = new System.Drawing.Point(111, 92);
+            this.labelTitle.Location = new System.Drawing.Point(120, 92);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(563, 37);
+            this.labelTitle.Size = new System.Drawing.Size(554, 54);
             this.labelTitle.TabIndex = 4;
             this.labelTitle.Text = "N/A";
             // 
             // labelDescription
             // 
             this.labelDescription.AutoEllipsis = true;
-            this.labelDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDescription.Location = new System.Drawing.Point(113, 146);
+            this.labelDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelDescription.Location = new System.Drawing.Point(122, 152);
             this.labelDescription.Name = "labelDescription";
-            this.labelDescription.Size = new System.Drawing.Size(565, 143);
+            this.labelDescription.Size = new System.Drawing.Size(552, 137);
             this.labelDescription.TabIndex = 6;
             this.labelDescription.Text = "N/A";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 152);
+            this.label4.Location = new System.Drawing.Point(21, 156);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(93, 20);
             this.label4.TabIndex = 5;
@@ -127,6 +137,10 @@
             // 
             // tabPageVideo
             // 
+            this.tabPageVideo.Controls.Add(this.cbEncoder);
+            this.tabPageVideo.Controls.Add(this.label7);
+            this.tabPageVideo.Controls.Add(this.cbVideoFormat);
+            this.tabPageVideo.Controls.Add(this.label3);
             this.tabPageVideo.Location = new System.Drawing.Point(4, 29);
             this.tabPageVideo.Name = "tabPageVideo";
             this.tabPageVideo.Padding = new System.Windows.Forms.Padding(3);
@@ -137,6 +151,8 @@
             // 
             // tabPageAudio
             // 
+            this.tabPageAudio.Controls.Add(this.cbAudioFormat);
+            this.tabPageAudio.Controls.Add(this.label6);
             this.tabPageAudio.Location = new System.Drawing.Point(4, 29);
             this.tabPageAudio.Name = "tabPageAudio";
             this.tabPageAudio.Padding = new System.Windows.Forms.Padding(3);
@@ -153,23 +169,24 @@
             this.buttonDownload.TabIndex = 8;
             this.buttonDownload.Text = "Download";
             this.buttonDownload.UseVisualStyleBackColor = true;
+            this.buttonDownload.Click += new System.EventHandler(this.buttonDownload_Click);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(38, 56);
+            this.label5.Location = new System.Drawing.Point(7, 51);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(64, 20);
+            this.label5.Size = new System.Drawing.Size(114, 20);
             this.label5.TabIndex = 9;
-            this.label5.Text = "Format:";
+            this.label5.Text = "Global Format:";
             // 
             // cbFormat
             // 
             this.cbFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbFormat.FormattingEnabled = true;
-            this.cbFormat.Location = new System.Drawing.Point(118, 48);
+            this.cbFormat.Location = new System.Drawing.Point(127, 48);
             this.cbFormat.Name = "cbFormat";
-            this.cbFormat.Size = new System.Drawing.Size(556, 28);
+            this.cbFormat.Size = new System.Drawing.Size(547, 28);
             this.cbFormat.TabIndex = 10;
             // 
             // chkBoxWriteMetadata
@@ -186,6 +203,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.chkBoxEmbedThumbnail);
             this.groupBox1.Controls.Add(this.chkBoxWriteMetadata);
             this.groupBox1.Location = new System.Drawing.Point(684, 324);
             this.groupBox1.Name = "groupBox1";
@@ -197,14 +215,98 @@
             // timerPostLoad
             // 
             this.timerPostLoad.Enabled = true;
-            this.timerPostLoad.Interval = 1010;
+            this.timerPostLoad.Interval = 600;
             this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
+            // 
+            // cbVideoFormat
+            // 
+            this.cbVideoFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbVideoFormat.FormattingEnabled = true;
+            this.cbVideoFormat.Location = new System.Drawing.Point(98, 16);
+            this.cbVideoFormat.Name = "cbVideoFormat";
+            this.cbVideoFormat.Size = new System.Drawing.Size(532, 28);
+            this.cbVideoFormat.TabIndex = 12;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(18, 19);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(64, 20);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Format:";
+            // 
+            // cbAudioFormat
+            // 
+            this.cbAudioFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbAudioFormat.FormattingEnabled = true;
+            this.cbAudioFormat.Location = new System.Drawing.Point(76, 15);
+            this.cbAudioFormat.Name = "cbAudioFormat";
+            this.cbAudioFormat.Size = new System.Drawing.Size(549, 28);
+            this.cbAudioFormat.TabIndex = 14;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 18);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(64, 20);
+            this.label6.TabIndex = 13;
+            this.label6.Text = "Format:";
+            // 
+            // chkBoxEmbedThumbnail
+            // 
+            this.chkBoxEmbedThumbnail.AutoSize = true;
+            this.chkBoxEmbedThumbnail.Checked = true;
+            this.chkBoxEmbedThumbnail.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkBoxEmbedThumbnail.Location = new System.Drawing.Point(15, 72);
+            this.chkBoxEmbedThumbnail.Name = "chkBoxEmbedThumbnail";
+            this.chkBoxEmbedThumbnail.Size = new System.Drawing.Size(172, 24);
+            this.chkBoxEmbedThumbnail.TabIndex = 12;
+            this.chkBoxEmbedThumbnail.Text = "Embded Thumbnail";
+            this.chkBoxEmbedThumbnail.UseVisualStyleBackColor = true;
+            // 
+            // cbEncoder
+            // 
+            this.cbEncoder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbEncoder.FormattingEnabled = true;
+            this.cbEncoder.Items.AddRange(new object[] {
+            "mkv",
+            "mp4",
+            "avi",
+            "webm",
+            "ogg",
+            "flv"});
+            this.cbEncoder.Location = new System.Drawing.Point(98, 50);
+            this.cbEncoder.Name = "cbEncoder";
+            this.cbEncoder.Size = new System.Drawing.Size(532, 28);
+            this.cbEncoder.TabIndex = 14;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(9, 53);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(73, 20);
+            this.label7.TabIndex = 13;
+            this.label7.Text = "Encoder:";
+            // 
+            // buttonCancel
+            // 
+            this.buttonCancel.Location = new System.Drawing.Point(914, 589);
+            this.buttonCancel.Name = "buttonCancel";
+            this.buttonCancel.Size = new System.Drawing.Size(128, 38);
+            this.buttonCancel.TabIndex = 13;
+            this.buttonCancel.Text = "Cancel";
+            this.buttonCancel.UseVisualStyleBackColor = true;
+            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
             // FrameNewMedia
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1188, 639);
+            this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.cbFormat);
             this.Controls.Add(this.label5);
@@ -228,6 +330,10 @@
             this.Load += new System.EventHandler(this.FrameNewMedia_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).EndInit();
             this.tabImportType.ResumeLayout(false);
+            this.tabPageVideo.ResumeLayout(false);
+            this.tabPageVideo.PerformLayout();
+            this.tabPageAudio.ResumeLayout(false);
+            this.tabPageAudio.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -253,5 +359,13 @@
         private System.Windows.Forms.CheckBox chkBoxWriteMetadata;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Timer timerPostLoad;
+        private System.Windows.Forms.ComboBox cbVideoFormat;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox cbAudioFormat;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.CheckBox chkBoxEmbedThumbnail;
+        private System.Windows.Forms.ComboBox cbEncoder;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button buttonCancel;
     }
 }

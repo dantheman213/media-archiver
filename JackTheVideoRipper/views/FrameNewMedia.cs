@@ -41,22 +41,38 @@ namespace JackTheVideoRipper
                 {
                     cbFormat.Items.Clear();
                     cbFormat.Items.Add("bestvideo+bestaudio/best"); // best option for video and audio
-                    //cbFormat.Items.Add(info.format); // 'best' default format
+
+                    cbVideoFormat.Items.Clear();
+                    cbVideoFormat.Items.Add("Use Gobal Format Default For Video");
+
+                    cbAudioFormat.Items.Clear();
+                    cbAudioFormat.Items.Add("Use Gobal Format Default For Audio");
+
                     foreach (var format in info.formats)
                     {
                         string video = "no video";
-                        if (!String.IsNullOrEmpty(format.width) && !String.IsNullOrEmpty(format.height)) {
+                        if (!String.IsNullOrEmpty(format.width) && !String.IsNullOrEmpty(format.height) && !String.IsNullOrEmpty(format.vcodec) && format.vcodec != "none") {
                             video = String.Format("{0} x {1} ({2})", format.width, format.height, format.vcodec);
+                            cbVideoFormat.Items.Add(String.Format("{0} / {1}", format.ext, video));
                         }
                         string audio = "no audio";
-                        if (!String.IsNullOrEmpty(format.acodec))
+                        if (!String.IsNullOrEmpty(format.acodec) && format.acodec != "none")
                         {
-                            audio = String.Format("{0}", format.acodec);
+                            audio = String.Format("{0} kbps / {1}", format.abr, format.acodec);
+                            cbAudioFormat.Items.Add(String.Format("{0} / {1}", format.ext, audio));
                         }
 
-                        cbFormat.Items.Add(String.Format("{0} / {1} / {2} / {3}", format.ext, video, audio, format.formateId));
+                        if (video != "no video" && audio != "no audio")
+                        {
+                            // Add to global format list
+                            cbFormat.Items.Add(String.Format("{0} / {1} / {2}", format.ext, video, audio));
+                        }
                     }
+
                     cbFormat.SelectedIndex = 0;
+                    cbVideoFormat.SelectedIndex = 0;
+                    cbAudioFormat.SelectedIndex = 0;
+                    cbEncoder.SelectedIndex = 0;
                 }
             }
         }
@@ -71,6 +87,16 @@ namespace JackTheVideoRipper
                 textUrl.Text = clipboard;
                 textUrl_TextChanged(sender, e);
             }
+        }
+
+        private void buttonDownload_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
