@@ -55,8 +55,9 @@ namespace JackTheVideoRipper
                    
                     foreach (var format in info.formats)
                     {
-                        if (!String.IsNullOrEmpty(format.width) && !String.IsNullOrEmpty(format.height) && !String.IsNullOrEmpty(format.vcodec) && format.vcodec != "none") {
-                            var str = String.Format("{0} / {1} x {2} ({3})", format.ext, format.width, format.height, format.vcodec);
+                        if (!String.IsNullOrEmpty(format.width) && !String.IsNullOrEmpty(format.height)) {
+                            var codec = ((!String.IsNullOrEmpty(format.vcodec) && format.vcodec != "none") ? format.vcodec : "unknwon codec");
+                            var str = String.Format("{0} / {1} x {2} ({3})", format.ext, format.width, format.height, codec);
                             if (cbVideoFormat.Items.Count > 0 && cbVideoFormat.Items[0].ToString() == str)
                             {
                                 // skip
@@ -90,10 +91,24 @@ namespace JackTheVideoRipper
                         }
                     }
 
+                    if (cbVideoFormat.Items.Count < 1)
+                    {
+                        cbVideoFormat.Items.Add("(no video metadata could be extracted)");
+                    }
                     cbVideoFormat.SelectedIndex = 0;
+                    if (cbAudioFormat.Items.Count < 1)
+                    {
+                        cbAudioFormat.Items.Add("(no audio metadata could be extracted)");
+                    }
                     cbAudioFormat.SelectedIndex = 0;
-                    cbVideoEncoder.SelectedIndex = 0;
-                    cbAudioEncoder.SelectedIndex = 0;
+                    if (cbVideoEncoder.Items.Count > 0)
+                    {
+                        cbVideoEncoder.SelectedIndex = 0;
+                    }
+                    if (cbAudioEncoder.Items.Count > 0)
+                    {
+                        cbAudioEncoder.SelectedIndex = 0;
+                    }
                 }
             }
         }
