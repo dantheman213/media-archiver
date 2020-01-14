@@ -9,9 +9,13 @@ namespace JackTheVideoRipper
 {
     class MediaInfoData
     {
+        [JsonProperty("format_id")]
+        public string formatId { get; set; }
         public string description { get; set; }
         public string thumbnail { get; set; }
         public List<MediaFormatItem> formats { get; set; }
+        [JsonProperty("requested_formats")]
+        public List<MediaFormatItem> requestedFormats { get; set; }
         [JsonProperty("like_count")]
         public string likeCount { get; set; }
         [JsonProperty("upload_date")]

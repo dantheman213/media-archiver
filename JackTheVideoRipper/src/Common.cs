@@ -56,47 +56,6 @@ namespace JackTheVideoRipper
             return Rgx.IsMatch(URL);
         }
 
-        public static bool isValidYouTubeURL(string s)
-        {
-            if (isValidURL(s))
-            {
-                // TODO: add support for other websites that youtube-dl supports
-
-                Uri uri = new Uri(s);
-                if (uri.Host == "youtube.com" || uri.Host == "www.youtube.com")
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public static string getYouTubeVideoTitle(string url)
-        {
-            // TODO: Replace unicode chars like \\u0026 with their real char &
-            HttpClient client = new HttpClient();
-            using (HttpResponseMessage response = client.GetAsync(url).Result)
-            {
-                using (HttpContent content = response.Content)
-                {
-                    string result = content.ReadAsStringAsync().Result;
-                    int i = result.IndexOf("\\\"title\\\":\\\"");
-                    if (i > -1)
-                    {
-                        i += 12;
-                        int k = result.IndexOf("\\\"", i);
-                        if (k > -1)
-                        {
-                            return result.Substring(i, (k - i));
-                        }
-                    }
-                }
-            }
-
-            return null;
-        }
-
         public static string formatTitleForFileName(string title)
         {
             if (String.IsNullOrEmpty(title))

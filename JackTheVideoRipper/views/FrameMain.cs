@@ -237,6 +237,7 @@ namespace JackTheVideoRipper
             f.ShowDialog();
             return;
 
+            // TODO: remove
             string videoUrl = null;
             if (type == "video")
             {
@@ -251,18 +252,14 @@ namespace JackTheVideoRipper
             {
                 return;
             }
-            // TODO: Support all services that youtube-dl supports
-            if (!Common.isValidYouTubeURL(videoUrl))
+
+            if (!Common.isValidURL(videoUrl))
             {
-                MessageBox.Show("Invalid YouTube URL!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Invalid URL!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            string title = "";
-            if (Common.isValidYouTubeURL(videoUrl))
-            {
-                title = Common.getYouTubeVideoTitle(videoUrl);
-            }
+            string title = "TODO";
             var li = new ListViewItem(new string[] { title, "Waiting", String.Format("{0}{1}", type.Substring(0, 1).ToUpper(), type.Substring(1)), "-", "", "0%", "0.0 KB/s", videoUrl, "" });
             li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
             listItems.Items.Add(li);

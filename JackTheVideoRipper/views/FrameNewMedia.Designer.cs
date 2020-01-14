@@ -38,26 +38,25 @@
             this.label4 = new System.Windows.Forms.Label();
             this.tabImportType = new System.Windows.Forms.TabControl();
             this.tabPageVideo = new System.Windows.Forms.TabPage();
-            this.tabPageAudio = new System.Windows.Forms.TabPage();
-            this.buttonDownload = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
-            this.cbFormat = new System.Windows.Forms.ComboBox();
-            this.chkBoxWriteMetadata = new System.Windows.Forms.CheckBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
-            this.cbVideoFormat = new System.Windows.Forms.ComboBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.cbAudioFormat = new System.Windows.Forms.ComboBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.chkBoxEmbedThumbnail = new System.Windows.Forms.CheckBox();
             this.cbVideoEncoder = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.buttonCancel = new System.Windows.Forms.Button();
+            this.cbVideoFormat = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.tabPageAudio = new System.Windows.Forms.TabPage();
             this.cbAudioEncoder = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
-            this.chkEmbedSubs = new System.Windows.Forms.CheckBox();
-            this.chkBoxExportVideo = new System.Windows.Forms.CheckBox();
+            this.cbAudioFormat = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.buttonDownload = new System.Windows.Forms.Button();
+            this.chkBoxWriteMetadata = new System.Windows.Forms.CheckBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.chkBoxExportAudio = new System.Windows.Forms.CheckBox();
+            this.chkBoxExportVideo = new System.Windows.Forms.CheckBox();
+            this.chkEmbedSubs = new System.Windows.Forms.CheckBox();
+            this.chkBoxEmbedThumbnail = new System.Windows.Forms.CheckBox();
+            this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
+            this.buttonCancel = new System.Windows.Forms.Button();
+            this.chkBoxIncludeAds = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.tabImportType.SuspendLayout();
             this.tabPageVideo.SuspendLayout();
@@ -68,7 +67,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(74, 19);
+            this.label1.Location = new System.Drawing.Point(29, 16);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(46, 20);
             this.label1.TabIndex = 0;
@@ -95,7 +94,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(72, 105);
+            this.label2.Location = new System.Drawing.Point(29, 68);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(42, 20);
             this.label2.TabIndex = 3;
@@ -105,9 +104,9 @@
             // 
             this.labelTitle.AutoEllipsis = true;
             this.labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTitle.Location = new System.Drawing.Point(120, 92);
+            this.labelTitle.Location = new System.Drawing.Point(127, 55);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(554, 54);
+            this.labelTitle.Size = new System.Drawing.Size(547, 54);
             this.labelTitle.TabIndex = 4;
             this.labelTitle.Text = "N/A";
             // 
@@ -115,16 +114,16 @@
             // 
             this.labelDescription.AutoEllipsis = true;
             this.labelDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelDescription.Location = new System.Drawing.Point(122, 152);
+            this.labelDescription.Location = new System.Drawing.Point(127, 115);
             this.labelDescription.Name = "labelDescription";
-            this.labelDescription.Size = new System.Drawing.Size(552, 137);
+            this.labelDescription.Size = new System.Drawing.Size(547, 174);
             this.labelDescription.TabIndex = 6;
             this.labelDescription.Text = "N/A";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(21, 156);
+            this.label4.Location = new System.Drawing.Point(16, 119);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(93, 20);
             this.label4.TabIndex = 5;
@@ -154,128 +153,6 @@
             this.tabPageVideo.Text = "Video";
             this.tabPageVideo.UseVisualStyleBackColor = true;
             // 
-            // tabPageAudio
-            // 
-            this.tabPageAudio.Controls.Add(this.cbAudioEncoder);
-            this.tabPageAudio.Controls.Add(this.label8);
-            this.tabPageAudio.Controls.Add(this.cbAudioFormat);
-            this.tabPageAudio.Controls.Add(this.label6);
-            this.tabPageAudio.Location = new System.Drawing.Point(4, 29);
-            this.tabPageAudio.Name = "tabPageAudio";
-            this.tabPageAudio.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageAudio.Size = new System.Drawing.Size(654, 252);
-            this.tabPageAudio.TabIndex = 1;
-            this.tabPageAudio.Text = "Audio";
-            this.tabPageAudio.UseVisualStyleBackColor = true;
-            // 
-            // buttonDownload
-            // 
-            this.buttonDownload.Location = new System.Drawing.Point(1048, 589);
-            this.buttonDownload.Name = "buttonDownload";
-            this.buttonDownload.Size = new System.Drawing.Size(128, 38);
-            this.buttonDownload.TabIndex = 8;
-            this.buttonDownload.Text = "Download";
-            this.buttonDownload.UseVisualStyleBackColor = true;
-            this.buttonDownload.Click += new System.EventHandler(this.buttonDownload_Click);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(7, 51);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(114, 20);
-            this.label5.TabIndex = 9;
-            this.label5.Text = "Global Format:";
-            // 
-            // cbFormat
-            // 
-            this.cbFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbFormat.FormattingEnabled = true;
-            this.cbFormat.Location = new System.Drawing.Point(127, 48);
-            this.cbFormat.Name = "cbFormat";
-            this.cbFormat.Size = new System.Drawing.Size(547, 28);
-            this.cbFormat.TabIndex = 10;
-            // 
-            // chkBoxWriteMetadata
-            // 
-            this.chkBoxWriteMetadata.AutoSize = true;
-            this.chkBoxWriteMetadata.Checked = true;
-            this.chkBoxWriteMetadata.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBoxWriteMetadata.Location = new System.Drawing.Point(15, 140);
-            this.chkBoxWriteMetadata.Name = "chkBoxWriteMetadata";
-            this.chkBoxWriteMetadata.Size = new System.Drawing.Size(144, 24);
-            this.chkBoxWriteMetadata.TabIndex = 11;
-            this.chkBoxWriteMetadata.Text = "Write Metadata";
-            this.chkBoxWriteMetadata.UseVisualStyleBackColor = true;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.chkBoxExportAudio);
-            this.groupBox1.Controls.Add(this.chkBoxExportVideo);
-            this.groupBox1.Controls.Add(this.chkEmbedSubs);
-            this.groupBox1.Controls.Add(this.chkBoxEmbedThumbnail);
-            this.groupBox1.Controls.Add(this.chkBoxWriteMetadata);
-            this.groupBox1.Location = new System.Drawing.Point(684, 324);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(492, 252);
-            this.groupBox1.TabIndex = 12;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Additional Options";
-            // 
-            // timerPostLoad
-            // 
-            this.timerPostLoad.Enabled = true;
-            this.timerPostLoad.Interval = 600;
-            this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
-            // 
-            // cbVideoFormat
-            // 
-            this.cbVideoFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbVideoFormat.FormattingEnabled = true;
-            this.cbVideoFormat.Location = new System.Drawing.Point(98, 16);
-            this.cbVideoFormat.Name = "cbVideoFormat";
-            this.cbVideoFormat.Size = new System.Drawing.Size(532, 28);
-            this.cbVideoFormat.TabIndex = 12;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(18, 19);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(64, 20);
-            this.label3.TabIndex = 11;
-            this.label3.Text = "Format:";
-            // 
-            // cbAudioFormat
-            // 
-            this.cbAudioFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbAudioFormat.FormattingEnabled = true;
-            this.cbAudioFormat.Location = new System.Drawing.Point(98, 16);
-            this.cbAudioFormat.Name = "cbAudioFormat";
-            this.cbAudioFormat.Size = new System.Drawing.Size(532, 28);
-            this.cbAudioFormat.TabIndex = 14;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(18, 19);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(64, 20);
-            this.label6.TabIndex = 13;
-            this.label6.Text = "Format:";
-            // 
-            // chkBoxEmbedThumbnail
-            // 
-            this.chkBoxEmbedThumbnail.AutoSize = true;
-            this.chkBoxEmbedThumbnail.Checked = true;
-            this.chkBoxEmbedThumbnail.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBoxEmbedThumbnail.Location = new System.Drawing.Point(15, 170);
-            this.chkBoxEmbedThumbnail.Name = "chkBoxEmbedThumbnail";
-            this.chkBoxEmbedThumbnail.Size = new System.Drawing.Size(163, 24);
-            this.chkBoxEmbedThumbnail.TabIndex = 12;
-            this.chkBoxEmbedThumbnail.Text = "Embed Thumbnail";
-            this.chkBoxEmbedThumbnail.UseVisualStyleBackColor = true;
-            // 
             // cbVideoEncoder
             // 
             this.cbVideoEncoder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -302,15 +179,37 @@
             this.label7.TabIndex = 13;
             this.label7.Text = "Encoder:";
             // 
-            // buttonCancel
+            // cbVideoFormat
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(914, 589);
-            this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(128, 38);
-            this.buttonCancel.TabIndex = 13;
-            this.buttonCancel.Text = "Cancel";
-            this.buttonCancel.UseVisualStyleBackColor = true;
-            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
+            this.cbVideoFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbVideoFormat.FormattingEnabled = true;
+            this.cbVideoFormat.Location = new System.Drawing.Point(98, 16);
+            this.cbVideoFormat.Name = "cbVideoFormat";
+            this.cbVideoFormat.Size = new System.Drawing.Size(532, 28);
+            this.cbVideoFormat.TabIndex = 12;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(9, 19);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(64, 20);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Format:";
+            // 
+            // tabPageAudio
+            // 
+            this.tabPageAudio.Controls.Add(this.cbAudioEncoder);
+            this.tabPageAudio.Controls.Add(this.label8);
+            this.tabPageAudio.Controls.Add(this.cbAudioFormat);
+            this.tabPageAudio.Controls.Add(this.label6);
+            this.tabPageAudio.Location = new System.Drawing.Point(4, 29);
+            this.tabPageAudio.Name = "tabPageAudio";
+            this.tabPageAudio.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageAudio.Size = new System.Drawing.Size(654, 252);
+            this.tabPageAudio.TabIndex = 1;
+            this.tabPageAudio.Text = "Audio";
+            this.tabPageAudio.UseVisualStyleBackColor = true;
             // 
             // cbAudioEncoder
             // 
@@ -339,29 +238,60 @@
             this.label8.TabIndex = 15;
             this.label8.Text = "Encoder:";
             // 
-            // chkEmbedSubs
+            // cbAudioFormat
             // 
-            this.chkEmbedSubs.AutoSize = true;
-            this.chkEmbedSubs.Checked = true;
-            this.chkEmbedSubs.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkEmbedSubs.Location = new System.Drawing.Point(15, 200);
-            this.chkEmbedSubs.Name = "chkEmbedSubs";
-            this.chkEmbedSubs.Size = new System.Drawing.Size(127, 24);
-            this.chkEmbedSubs.TabIndex = 13;
-            this.chkEmbedSubs.Text = "Embed Subs";
-            this.chkEmbedSubs.UseVisualStyleBackColor = true;
+            this.cbAudioFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbAudioFormat.FormattingEnabled = true;
+            this.cbAudioFormat.Location = new System.Drawing.Point(98, 16);
+            this.cbAudioFormat.Name = "cbAudioFormat";
+            this.cbAudioFormat.Size = new System.Drawing.Size(532, 28);
+            this.cbAudioFormat.TabIndex = 14;
             // 
-            // chkBoxExportVideo
+            // label6
             // 
-            this.chkBoxExportVideo.AutoSize = true;
-            this.chkBoxExportVideo.Checked = true;
-            this.chkBoxExportVideo.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkBoxExportVideo.Location = new System.Drawing.Point(15, 36);
-            this.chkBoxExportVideo.Name = "chkBoxExportVideo";
-            this.chkBoxExportVideo.Size = new System.Drawing.Size(126, 24);
-            this.chkBoxExportVideo.TabIndex = 14;
-            this.chkBoxExportVideo.Text = "Export Video";
-            this.chkBoxExportVideo.UseVisualStyleBackColor = true;
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(9, 19);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(64, 20);
+            this.label6.TabIndex = 13;
+            this.label6.Text = "Format:";
+            // 
+            // buttonDownload
+            // 
+            this.buttonDownload.Location = new System.Drawing.Point(1048, 589);
+            this.buttonDownload.Name = "buttonDownload";
+            this.buttonDownload.Size = new System.Drawing.Size(128, 38);
+            this.buttonDownload.TabIndex = 8;
+            this.buttonDownload.Text = "Download";
+            this.buttonDownload.UseVisualStyleBackColor = true;
+            this.buttonDownload.Click += new System.EventHandler(this.buttonDownload_Click);
+            // 
+            // chkBoxWriteMetadata
+            // 
+            this.chkBoxWriteMetadata.AutoSize = true;
+            this.chkBoxWriteMetadata.Checked = true;
+            this.chkBoxWriteMetadata.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkBoxWriteMetadata.Location = new System.Drawing.Point(15, 140);
+            this.chkBoxWriteMetadata.Name = "chkBoxWriteMetadata";
+            this.chkBoxWriteMetadata.Size = new System.Drawing.Size(144, 24);
+            this.chkBoxWriteMetadata.TabIndex = 11;
+            this.chkBoxWriteMetadata.Text = "Write Metadata";
+            this.chkBoxWriteMetadata.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.chkBoxIncludeAds);
+            this.groupBox1.Controls.Add(this.chkBoxExportAudio);
+            this.groupBox1.Controls.Add(this.chkBoxExportVideo);
+            this.groupBox1.Controls.Add(this.chkEmbedSubs);
+            this.groupBox1.Controls.Add(this.chkBoxEmbedThumbnail);
+            this.groupBox1.Controls.Add(this.chkBoxWriteMetadata);
+            this.groupBox1.Location = new System.Drawing.Point(684, 324);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(492, 252);
+            this.groupBox1.TabIndex = 12;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Additional Options";
             // 
             // chkBoxExportAudio
             // 
@@ -375,6 +305,68 @@
             this.chkBoxExportAudio.Text = "Export Audio";
             this.chkBoxExportAudio.UseVisualStyleBackColor = true;
             // 
+            // chkBoxExportVideo
+            // 
+            this.chkBoxExportVideo.AutoSize = true;
+            this.chkBoxExportVideo.Checked = true;
+            this.chkBoxExportVideo.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkBoxExportVideo.Location = new System.Drawing.Point(15, 36);
+            this.chkBoxExportVideo.Name = "chkBoxExportVideo";
+            this.chkBoxExportVideo.Size = new System.Drawing.Size(126, 24);
+            this.chkBoxExportVideo.TabIndex = 14;
+            this.chkBoxExportVideo.Text = "Export Video";
+            this.chkBoxExportVideo.UseVisualStyleBackColor = true;
+            // 
+            // chkEmbedSubs
+            // 
+            this.chkEmbedSubs.AutoSize = true;
+            this.chkEmbedSubs.Checked = true;
+            this.chkEmbedSubs.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkEmbedSubs.Location = new System.Drawing.Point(15, 200);
+            this.chkEmbedSubs.Name = "chkEmbedSubs";
+            this.chkEmbedSubs.Size = new System.Drawing.Size(127, 24);
+            this.chkEmbedSubs.TabIndex = 13;
+            this.chkEmbedSubs.Text = "Embed Subs";
+            this.chkEmbedSubs.UseVisualStyleBackColor = true;
+            // 
+            // chkBoxEmbedThumbnail
+            // 
+            this.chkBoxEmbedThumbnail.AutoSize = true;
+            this.chkBoxEmbedThumbnail.Checked = true;
+            this.chkBoxEmbedThumbnail.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkBoxEmbedThumbnail.Location = new System.Drawing.Point(15, 170);
+            this.chkBoxEmbedThumbnail.Name = "chkBoxEmbedThumbnail";
+            this.chkBoxEmbedThumbnail.Size = new System.Drawing.Size(163, 24);
+            this.chkBoxEmbedThumbnail.TabIndex = 12;
+            this.chkBoxEmbedThumbnail.Text = "Embed Thumbnail";
+            this.chkBoxEmbedThumbnail.UseVisualStyleBackColor = true;
+            // 
+            // timerPostLoad
+            // 
+            this.timerPostLoad.Enabled = true;
+            this.timerPostLoad.Interval = 600;
+            this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
+            // 
+            // buttonCancel
+            // 
+            this.buttonCancel.Location = new System.Drawing.Point(914, 589);
+            this.buttonCancel.Name = "buttonCancel";
+            this.buttonCancel.Size = new System.Drawing.Size(128, 38);
+            this.buttonCancel.TabIndex = 13;
+            this.buttonCancel.Text = "Cancel";
+            this.buttonCancel.UseVisualStyleBackColor = true;
+            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
+            // 
+            // chkBoxIncludeAds
+            // 
+            this.chkBoxIncludeAds.AutoSize = true;
+            this.chkBoxIncludeAds.Location = new System.Drawing.Point(255, 140);
+            this.chkBoxIncludeAds.Name = "chkBoxIncludeAds";
+            this.chkBoxIncludeAds.Size = new System.Drawing.Size(119, 24);
+            this.chkBoxIncludeAds.TabIndex = 16;
+            this.chkBoxIncludeAds.Text = "Include Ads";
+            this.chkBoxIncludeAds.UseVisualStyleBackColor = true;
+            // 
             // FrameNewMedia
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -382,8 +374,6 @@
             this.ClientSize = new System.Drawing.Size(1188, 639);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.cbFormat);
-            this.Controls.Add(this.label5);
             this.Controls.Add(this.buttonDownload);
             this.Controls.Add(this.tabImportType);
             this.Controls.Add(this.labelDescription);
@@ -428,8 +418,6 @@
         private System.Windows.Forms.TabPage tabPageVideo;
         private System.Windows.Forms.TabPage tabPageAudio;
         private System.Windows.Forms.Button buttonDownload;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.ComboBox cbFormat;
         private System.Windows.Forms.CheckBox chkBoxWriteMetadata;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Timer timerPostLoad;
@@ -446,5 +434,6 @@
         private System.Windows.Forms.CheckBox chkEmbedSubs;
         private System.Windows.Forms.CheckBox chkBoxExportAudio;
         private System.Windows.Forms.CheckBox chkBoxExportVideo;
+        private System.Windows.Forms.CheckBox chkBoxIncludeAds;
     }
 }

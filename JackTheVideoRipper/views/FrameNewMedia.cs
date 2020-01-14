@@ -37,39 +37,54 @@ namespace JackTheVideoRipper
 
                 labelTitle.Text = info.title;
                 labelDescription.Text = info.description;
+
                 if (info.formats != null && info.formats.Count > 0)
                 {
-                    cbFormat.Items.Clear();
-                    cbFormat.Items.Add("bestvideo+bestaudio/best"); // best option for video and audio
-
                     cbVideoFormat.Items.Clear();
-                    cbVideoFormat.Items.Add("Use Gobal Format Default For Video");
-
                     cbAudioFormat.Items.Clear();
-                    cbAudioFormat.Items.Add("Use Gobal Format Default For Audio");
 
+                    info.formats.Insert(0, info.requestedFormats[0]);
+                    if (info.requestedFormats.Count > 1)
+                    {
+                        info.formats.Insert(0, info.requestedFormats[1]);
+                    }
+                
                     foreach (var format in info.formats)
                     {
-                        string video = "no video";
                         if (!String.IsNullOrEmpty(format.width) && !String.IsNullOrEmpty(format.height) && !String.IsNullOrEmpty(format.vcodec) && format.vcodec != "none") {
-                            video = String.Format("{0} x {1} ({2})", format.width, format.height, format.vcodec);
-                            cbVideoFormat.Items.Add(String.Format("{0} / {1}", format.ext, video));
-                        }
-                        string audio = "no audio";
-                        if (!String.IsNullOrEmpty(format.acodec) && format.acodec != "none")
-                        {
-                            audio = String.Format("{0} kbps / {1}", format.abr, format.acodec);
-                            cbAudioFormat.Items.Add(String.Format("{0} / {1}", format.ext, audio));
+                            var str = String.Format("{0} / {1} x {2} ({3})", format.ext, format.width, format.height, format.vcodec);
+                            if (cbVideoFormat.Items.Count > 0 && cbVideoFormat.Items[0].ToString() == str)
+                            {
+
+                            }
+                            else
+                            {
+                                if (cbVideoFormat.Items.Count == 0)
+                                {
+                                    str += " [BEST]";
+                                }
+                                cbVideoFormat.Items.Add(str);
+                            }
                         }
 
-                        if (video != "no video" && audio != "no audio")
+                        if (!String.IsNullOrEmpty(format.acodec) && format.acodec != "none")
                         {
-                            // Add to global format list
-                            cbFormat.Items.Add(String.Format("{0} / {1} / {2}", format.ext, video, audio));
+                            var str = String.Format("{0} / {1} kbps / {2}", format.ext, format.abr, format.acodec);
+                            if (cbAudioFormat.Items.Count > 0 && cbAudioFormat.Items[0].ToString() == str)
+                            {
+                                
+                            }
+                            else
+                            {
+                                if (cbAudioFormat.Items.Count == 0)
+                                {
+                                    str += " [BEST]";
+                                }
+                                cbAudioFormat.Items.Add(str);
+                            }
                         }
                     }
 
-                    cbFormat.SelectedIndex = 0;
                     cbVideoFormat.SelectedIndex = 0;
                     cbAudioFormat.SelectedIndex = 0;
                     cbVideoEncoder.SelectedIndex = 0;
