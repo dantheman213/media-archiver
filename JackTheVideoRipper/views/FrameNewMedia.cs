@@ -31,23 +31,30 @@ namespace JackTheVideoRipper
             {
                 lastValidUrl = url;
 
-                string thumbnailFilePath = YouTubeDL.downloadThumbnail(url);
+                var info = YouTubeDL.getMediaData(url);
+                string thumbnailFilePath = YouTubeDL.downloadThumbnail(info.thumbnail);
                 pbPreview.ImageLocation = thumbnailFilePath;
 
-                string title = YouTubeDL.getTitle(url);
-                labelTitle.Text = title;
-
-                string description = YouTubeDL.getDescription(url);
-                labelDescription.Text = description;
-
-                var formats = YouTubeDL.getFormats(url);
-                if (formats != null && formats.Count > 0)
+                labelTitle.Text = info.title;
+                labelDescription.Text = info.description;
+                if (info.formats != null && info.formats.Count > 0)
                 {
                     cbFormat.Items.Clear();
-                    cbFormat.Items.Add("bestvideo+bestaudio/best");
-                    foreach (var format in formats)
+                    cbFormat.Items.Add("bestvideo+bestaudio/best"); // best option for video and audio
+                    //cbFormat.Items.Add(info.format); // 'best' default format
+                    foreach (var format in info.formats)
                     {
-                        cbFormat.Items.Add(format);
+                        string video = "no video";
+                        if (!String.IsNullOrEmpty(format.width) && !String.IsNullOrEmpty(format.height)) {
+                            video = String.Format("{0} x {1} ({2})", format.width, format.height, format.vcodec);
+                        }
+                        string audio = "no audio";
+                        if (!String.IsNullOrEmpty(format.acodec))
+                        {
+                            audio = String.Format("{0}", format.acodec);
+                        }
+
+                        cbFormat.Items.Add(String.Format("{0} / {1} / {2} / {3}", format.ext, video, audio, format.formateId));
                     }
                     cbFormat.SelectedIndex = 0;
                 }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Security.AccessControl;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace JackTheVideoRipper
 {
@@ -99,85 +100,36 @@ namespace JackTheVideoRipper
             return CLI.runYouTubeCommand(opts);
         }
 
-        public static string downloadThumbnail(string url)
+        public static string downloadThumbnail(string thumbnailUrl)
         {
-            string opts = "-s --no-warnings --get-thumbnail --skip-download " + url;
-            var p = CLI.runYouTubeCommand(opts);
-
-            string possibleThumbnailUrl = p.StandardOutput.ReadToEnd().Trim();
-            if (Common.isValidURL(possibleThumbnailUrl))
+            if (Common.isValidURL(thumbnailUrl))
             {
                 string tmpDir = Path.GetTempPath();
                 string tmpFileName = String.Format("jtvr_thumbnail_{0}.jpg", DateTime.Now.ToString("yyyyMMddhmmsstt"));
+                string tmpFilePath = tmpDir + "\\" + tmpFileName;
 
-                if (File.Exists(tmpFileName))
+                if (File.Exists(tmpFilePath))
                 {
-                    File.Delete(tmpFileName);
+                    File.Delete(tmpFilePath);
                 }
 
                 using (WebClient c = new WebClient())
                 {
-                    c.DownloadFile(possibleThumbnailUrl, tmpFileName);
+                    c.DownloadFile(thumbnailUrl, tmpFilePath);
                 }
 
-                return tmpFileName;
+                return tmpFilePath;
             }
 
             return null;
         }
 
-        public static string getTitle(string url)
+        public static MediaInfoData getMediaData(string url)
         {
-            string opts = "-e --no-warnings " + url;
+            string opts = "-s --no-warnings --print-json " + url;
             var p = CLI.runYouTubeCommand(opts);
-
-            string possibleTitle = p.StandardOutput.ReadToEnd().Trim();
-            if (!String.IsNullOrEmpty(possibleTitle))
-            {
-                return possibleTitle;
-            }
-
-            return null;
-        }
-
-        public static string getDescription(string url)
-        {
-            string opts = "--get-description --no-warnings " + url;
-            var p = CLI.runYouTubeCommand(opts);
-
-            string possibleDesc = p.StandardOutput.ReadToEnd().Trim();
-            if (!String.IsNullOrEmpty(possibleDesc))
-            {
-                return possibleDesc;
-            }
-
-            return null;
-        }
-
-        public static List<string> getFormats(string url)
-        {
-            string opts = "--list-formats " + url;
-            var p = CLI.runYouTubeCommand(opts);
-
-            string formats = p.StandardOutput.ReadToEnd().Trim();
-            if (!String.IsNullOrEmpty(formats))
-            {
-                var result = new List<string>();
-
-                var lines = formats.Split('\n');
-                foreach(var line in lines)
-                {
-                    if (Regex.IsMatch(line.Substring(0, 1), @"^\d+$"))
-                    {
-                        // is a number
-                        result.Add(line);
-                    }
-                }
-
-                return result;
-            }
-
-            return null;
+            string json = p.StandardOutput.ReadToEnd().Trim();
+            return JsonConvert.DeserializeObject<MediaInfoData>(json);
         }
     }
 }

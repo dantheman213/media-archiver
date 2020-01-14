@@ -240,11 +240,11 @@ namespace JackTheVideoRipper
             string videoUrl = null;
             if (type == "video")
             {
-                videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Video", "", -1, -1);
+                //videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Video", "", -1, -1);
             }
             else if (type == "audio")
             {
-                videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Audio", "", -1, -1);
+                //videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Audio", "", -1, -1);
             }
        
             if (String.IsNullOrEmpty(videoUrl))
