@@ -50,13 +50,13 @@
             this.buttonDownload = new System.Windows.Forms.Button();
             this.chkBoxWriteMetadata = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.chkBoxIncludeAds = new System.Windows.Forms.CheckBox();
             this.chkBoxExportAudio = new System.Windows.Forms.CheckBox();
             this.chkBoxExportVideo = new System.Windows.Forms.CheckBox();
             this.chkEmbedSubs = new System.Windows.Forms.CheckBox();
             this.chkBoxEmbedThumbnail = new System.Windows.Forms.CheckBox();
             this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
             this.buttonCancel = new System.Windows.Forms.Button();
-            this.chkBoxIncludeAds = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.tabImportType.SuspendLayout();
             this.tabPageVideo.SuspendLayout();
@@ -293,6 +293,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Additional Options";
             // 
+            // chkBoxIncludeAds
+            // 
+            this.chkBoxIncludeAds.AutoSize = true;
+            this.chkBoxIncludeAds.Location = new System.Drawing.Point(255, 140);
+            this.chkBoxIncludeAds.Name = "chkBoxIncludeAds";
+            this.chkBoxIncludeAds.Size = new System.Drawing.Size(119, 24);
+            this.chkBoxIncludeAds.TabIndex = 16;
+            this.chkBoxIncludeAds.Text = "Include Ads";
+            this.chkBoxIncludeAds.UseVisualStyleBackColor = true;
+            // 
             // chkBoxExportAudio
             // 
             this.chkBoxExportAudio.AutoSize = true;
@@ -320,9 +330,7 @@
             // chkEmbedSubs
             // 
             this.chkEmbedSubs.AutoSize = true;
-            this.chkEmbedSubs.Checked = true;
-            this.chkEmbedSubs.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkEmbedSubs.Location = new System.Drawing.Point(15, 200);
+            this.chkEmbedSubs.Location = new System.Drawing.Point(14, 200);
             this.chkEmbedSubs.Name = "chkEmbedSubs";
             this.chkEmbedSubs.Size = new System.Drawing.Size(127, 24);
             this.chkEmbedSubs.TabIndex = 13;
@@ -356,16 +364,6 @@
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
-            // 
-            // chkBoxIncludeAds
-            // 
-            this.chkBoxIncludeAds.AutoSize = true;
-            this.chkBoxIncludeAds.Location = new System.Drawing.Point(255, 140);
-            this.chkBoxIncludeAds.Name = "chkBoxIncludeAds";
-            this.chkBoxIncludeAds.Size = new System.Drawing.Size(119, 24);
-            this.chkBoxIncludeAds.TabIndex = 16;
-            this.chkBoxIncludeAds.Text = "Include Ads";
-            this.chkBoxIncludeAds.UseVisualStyleBackColor = true;
             // 
             // FrameNewMedia
             // 
