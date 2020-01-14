@@ -42,7 +42,7 @@ namespace JackTheVideoRipper
                 {
                     cbVideoFormat.Items.Clear();
                     cbAudioFormat.Items.Clear();
-
+                    
                     if (info.requestedFormats != null && info.requestedFormats.Count > 0)
                     {
                         info.formats.Insert(0, info.requestedFormats[0]);
@@ -52,45 +52,67 @@ namespace JackTheVideoRipper
                             info.formats.Insert(0, info.requestedFormats[1]);
                         }
                     }
-                   
+
+                    string recommendedVideoFormat = "";
+                    string recommendedAudioFormat = "";
+                    var videoFormatList = new List<string>();
+                    var audioFormatList = new List<string>();
                     foreach (var format in info.formats)
                     {
                         if (!String.IsNullOrEmpty(format.width) && !String.IsNullOrEmpty(format.height)) {
                             var codec = ((!String.IsNullOrEmpty(format.vcodec) && format.vcodec != "none") ? format.vcodec : "unknwon codec");
-                            var str = String.Format("{0} / {1} x {2} ({3})", format.ext, format.width, format.height, codec);
-                            if (cbVideoFormat.Items.Count > 0 && cbVideoFormat.Items[0].ToString() == str)
+                            var str = String.Format("{0} x {1} / {2} ({3})", format.width, format.height, format.ext, codec);
+                          
+                            if (info.requestedFormats != null && String.IsNullOrEmpty(recommendedVideoFormat))
                             {
-                                // skip
+                                str += " [Recommended]";
+                                recommendedVideoFormat = str;
                             }
                             else
                             {
-                                if (info.requestedFormats != null && cbVideoFormat.Items.Count == 0)
-                                {
-                                    str += " [Recommended]";
-                                }
-                                cbVideoFormat.Items.Add(str);
+                                videoFormatList.Add(str);
                             }
                         }
 
                         if (!String.IsNullOrEmpty(format.acodec) && format.acodec != "none")
                         {
                             var bitrate = (String.IsNullOrEmpty(format.abr) ? "unknown bitrate" : format.abr + " kbps");
-                            var str = String.Format("{0} / {1} / {2}", format.ext, bitrate, format.acodec);
-                            if (cbAudioFormat.Items.Count > 0 && cbAudioFormat.Items[0].ToString() == str)
+                            var str = String.Format("{0} / {1} / {2}", bitrate, format.ext, format.acodec);
+                          
+                            if (info.requestedFormats != null && String.IsNullOrEmpty(recommendedAudioFormat))
                             {
-                                // skip
+                                str += " [Recommended]";
+                                recommendedAudioFormat = str;
                             }
                             else
                             {
-                                if (info.requestedFormats != null && cbAudioFormat.Items.Count == 0)
-                                {
-                                    str += " [Recommended]";
-                                }
-                                cbAudioFormat.Items.Add(str);
+                                audioFormatList.Add(str);
                             }
                         }
                     }
 
+                    if (!String.IsNullOrEmpty(recommendedVideoFormat))
+                    {
+                        cbVideoFormat.Items.Add(recommendedVideoFormat);
+                    }
+                    videoFormatList.Sort((x, y) => Int32.Parse(x.Split(' ')[0]).CompareTo(Int32.Parse(y.Split(' ')[0])));
+                    videoFormatList.Reverse(); // TODO: optimze this out
+                    foreach (var item in videoFormatList)
+                    {
+                        cbVideoFormat.Items.Add(item);
+                    }
+
+                    if (!String.IsNullOrEmpty(recommendedAudioFormat))
+                    {
+                        cbAudioFormat.Items.Add(recommendedAudioFormat);
+                    }
+                    audioFormatList.Sort((x, y) => Int32.Parse(x.Split(' ')[0]).CompareTo(Int32.Parse(y.Split(' ')[0])));
+                    audioFormatList.Reverse(); // TODO: optimze this out
+                    foreach (var item in audioFormatList)
+                    {
+                        cbAudioFormat.Items.Add(item);
+                    }
+                    
                     if (cbVideoFormat.Items.Count < 1)
                     {
                         cbVideoFormat.Items.Add("(no video metadata could be extracted)");

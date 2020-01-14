@@ -158,7 +158,7 @@
             this.cbVideoEncoder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbVideoEncoder.FormattingEnabled = true;
             this.cbVideoEncoder.Items.AddRange(new object[] {
-            "(Don\'t Transcode)",
+            "(do not transcode)",
             "mkv",
             "mp4",
             "avi",
@@ -216,7 +216,7 @@
             this.cbAudioEncoder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbAudioEncoder.FormattingEnabled = true;
             this.cbAudioEncoder.Items.AddRange(new object[] {
-            "(Don\'t Transcode)",
+            "(do not transcode)",
             "mp3",
             "aac",
             "flac",
