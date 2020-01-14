@@ -156,6 +156,7 @@
             // cbVideoEncoder
             // 
             this.cbVideoEncoder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbVideoEncoder.Font = new System.Drawing.Font("Courier New", 9F);
             this.cbVideoEncoder.FormattingEnabled = true;
             this.cbVideoEncoder.Items.AddRange(new object[] {
             "(do not transcode)",
@@ -182,6 +183,8 @@
             // cbVideoFormat
             // 
             this.cbVideoFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbVideoFormat.DropDownWidth = 600;
+            this.cbVideoFormat.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbVideoFormat.FormattingEnabled = true;
             this.cbVideoFormat.Location = new System.Drawing.Point(98, 16);
             this.cbVideoFormat.Name = "cbVideoFormat";
@@ -241,6 +244,8 @@
             // cbAudioFormat
             // 
             this.cbAudioFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbAudioFormat.DropDownWidth = 600;
+            this.cbAudioFormat.Font = new System.Drawing.Font("Courier New", 9F);
             this.cbAudioFormat.FormattingEnabled = true;
             this.cbAudioFormat.Location = new System.Drawing.Point(98, 16);
             this.cbAudioFormat.Name = "cbAudioFormat";

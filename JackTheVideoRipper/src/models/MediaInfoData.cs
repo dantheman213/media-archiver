@@ -42,7 +42,9 @@ namespace JackTheVideoRipper
         public string filesize { get; set; }
         public string height { get; set; }
         public string width { get; set; }
-        public string abr { get; set; }
-        public string vbr { get; set; }
+        public string abr { get; set; } // audio bitrate
+        public string vbr { get; set; } // video bitrate
+        public string asr { get; set; } // sampling rate
+        public string tbr { get; set; } 
     }
 }

@@ -26,112 +26,123 @@ namespace JackTheVideoRipper
 
         private void textUrl_TextChanged(object sender, EventArgs e)
         {
-            string url = textUrl.Text.Trim();
-            if (url != lastValidUrl && Common.isValidURL(url))
+            try
             {
-                lastValidUrl = url;
-
-                var info = YouTubeDL.getMediaData(url);
-                string thumbnailFilePath = YouTubeDL.downloadThumbnail(info.thumbnail);
-                pbPreview.ImageLocation = thumbnailFilePath;
-
-                labelTitle.Text = info.title;
-                labelDescription.Text = info.description;
-
-                if (info.formats != null && info.formats.Count > 0)
+                string url = textUrl.Text.Trim();
+                if (url != lastValidUrl && Common.isValidURL(url))
                 {
-                    cbVideoFormat.Items.Clear();
-                    cbAudioFormat.Items.Clear();
-                    
-                    if (info.requestedFormats != null && info.requestedFormats.Count > 0)
-                    {
-                        info.formats.Insert(0, info.requestedFormats[0]);
+                    lastValidUrl = url;
 
-                        if (info.requestedFormats.Count > 1)
+                    var info = YouTubeDL.getMediaData(url);
+                    string thumbnailFilePath = YouTubeDL.downloadThumbnail(info.thumbnail);
+                    pbPreview.ImageLocation = thumbnailFilePath;
+
+                    labelTitle.Text = info.title;
+                    labelDescription.Text = info.description;
+
+                    if (info.formats != null && info.formats.Count > 0)
+                    {
+                        cbVideoFormat.Items.Clear();
+                        cbAudioFormat.Items.Clear();
+
+                        if (info.requestedFormats != null && info.requestedFormats.Count > 0)
                         {
-                            info.formats.Insert(0, info.requestedFormats[1]);
-                        }
-                    }
+                            info.formats.Insert(0, info.requestedFormats[0]);
 
-                    string recommendedVideoFormat = "";
-                    string recommendedAudioFormat = "";
-                    var videoFormatList = new List<string>();
-                    var audioFormatList = new List<string>();
-                    foreach (var format in info.formats)
-                    {
-                        if (!String.IsNullOrEmpty(format.width) && !String.IsNullOrEmpty(format.height)) {
-                            var codec = ((!String.IsNullOrEmpty(format.vcodec) && format.vcodec != "none") ? format.vcodec : "unknwon codec");
-                            var str = String.Format("{0} x {1} / {2} ({3})", format.width, format.height, format.ext, codec);
-                          
-                            if (info.requestedFormats != null && String.IsNullOrEmpty(recommendedVideoFormat))
+                            if (info.requestedFormats.Count > 1)
                             {
-                                str += " [Recommended]";
-                                recommendedVideoFormat = str;
-                            }
-                            else
-                            {
-                                videoFormatList.Add(str);
+                                info.formats.Insert(0, info.requestedFormats[1]);
                             }
                         }
 
-                        if (!String.IsNullOrEmpty(format.acodec) && format.acodec != "none")
+                        string recommendedVideoFormat = "";
+                        string recommendedAudioFormat = "";
+                        var videoFormatList = new List<string>();
+                        var audioFormatList = new List<string>();
+                        foreach (var format in info.formats)
                         {
-                            var bitrate = (String.IsNullOrEmpty(format.abr) ? "unknown bitrate" : format.abr + " kbps");
-                            var str = String.Format("{0} / {1} / {2}", bitrate, format.ext, format.acodec);
-                          
-                            if (info.requestedFormats != null && String.IsNullOrEmpty(recommendedAudioFormat))
+                            if (!String.IsNullOrEmpty(format.width) && !String.IsNullOrEmpty(format.height))
                             {
-                                str += " [Recommended]";
-                                recommendedAudioFormat = str;
+                                string codec = ((!String.IsNullOrEmpty(format.vcodec) && format.vcodec != "none") ? format.vcodec : "unknwon codec");
+                                string tbr = ((!String.IsNullOrEmpty(format.tbr)) ? Math.Floor(Convert.ToDecimal(format.tbr)).ToString() + "k" : "---"); // rounds down
+                                string str = String.Format("{0} x {1} / {2} / {3} / {4} / {5}", format.width.PadLeft(4), format.height.PadRight(4), tbr.PadRight(7), format.ext.PadRight(5), format.formateNote.PadRight(6), codec);
+                                Console.WriteLine(str);
+                                if (info.requestedFormats != null && String.IsNullOrEmpty(recommendedVideoFormat))
+                                {
+                                    str += " [Recommended]";
+                                    recommendedVideoFormat = str;
+                                }
+                                else
+                                {
+                                    videoFormatList.Add(str);
+                                }
                             }
-                            else
+
+                            if (!String.IsNullOrEmpty(format.acodec) && format.acodec != "none")
                             {
-                                audioFormatList.Add(str);
+                                var bitrate = (String.IsNullOrEmpty(format.abr) ? "---" : format.abr + " kbps");
+                                var sampleRate = (String.IsNullOrEmpty(format.asr) ? "---" : format.asr + "Hz");
+                                var str = String.Format("{0} / {1} / {2} / {3}", bitrate.PadLeft(9), sampleRate.PadLeft(8), format.ext.PadRight(5), format.acodec);
+
+                                if (info.requestedFormats != null && String.IsNullOrEmpty(recommendedAudioFormat))
+                                {
+                                    str += " [Recommended]";
+                                    recommendedAudioFormat = str;
+                                }
+                                else
+                                {
+                                    audioFormatList.Add(str);
+                                }
                             }
                         }
-                    }
 
-                    if (!String.IsNullOrEmpty(recommendedVideoFormat))
-                    {
-                        cbVideoFormat.Items.Add(recommendedVideoFormat);
-                    }
-                    videoFormatList.Sort((x, y) => Int32.Parse(x.Split(' ')[0]).CompareTo(Int32.Parse(y.Split(' ')[0])));
-                    videoFormatList.Reverse(); // TODO: optimze this out
-                    foreach (var item in videoFormatList)
-                    {
-                        cbVideoFormat.Items.Add(item);
-                    }
+                        if (!String.IsNullOrEmpty(recommendedVideoFormat))
+                        {
+                            cbVideoFormat.Items.Add(recommendedVideoFormat);
+                        }
+                        videoFormatList.Sort((x, y) => Int32.Parse(x.Trim().Split(' ')[0]).CompareTo(Int32.Parse(y.Trim().Split(' ')[0])));
+                        videoFormatList.Reverse(); // TODO: optimze this out
+                        foreach (var item in videoFormatList)
+                        {
+                            cbVideoFormat.Items.Add(item);
+                        }
 
-                    if (!String.IsNullOrEmpty(recommendedAudioFormat))
-                    {
-                        cbAudioFormat.Items.Add(recommendedAudioFormat);
-                    }
-                    audioFormatList.Sort((x, y) => Int32.Parse(x.Split(' ')[0]).CompareTo(Int32.Parse(y.Split(' ')[0])));
-                    audioFormatList.Reverse(); // TODO: optimze this out
-                    foreach (var item in audioFormatList)
-                    {
-                        cbAudioFormat.Items.Add(item);
-                    }
-                    
-                    if (cbVideoFormat.Items.Count < 1)
-                    {
-                        cbVideoFormat.Items.Add("(no video metadata could be extracted)");
-                    }
-                    cbVideoFormat.SelectedIndex = 0;
-                    if (cbAudioFormat.Items.Count < 1)
-                    {
-                        cbAudioFormat.Items.Add("(no audio metadata could be extracted)");
-                    }
-                    cbAudioFormat.SelectedIndex = 0;
-                    if (cbVideoEncoder.Items.Count > 0)
-                    {
-                        cbVideoEncoder.SelectedIndex = 0;
-                    }
-                    if (cbAudioEncoder.Items.Count > 0)
-                    {
-                        cbAudioEncoder.SelectedIndex = 0;
+                        if (!String.IsNullOrEmpty(recommendedAudioFormat))
+                        {
+                            cbAudioFormat.Items.Add(recommendedAudioFormat);
+                        }
+                        audioFormatList.Sort((x, y) => Int32.Parse(x.Trim().Split(' ')[0]).CompareTo(Int32.Parse(y.Trim().Split(' ')[0])));
+                        audioFormatList.Reverse(); // TODO: optimze this out
+                        foreach (var item in audioFormatList)
+                        {
+                            cbAudioFormat.Items.Add(item);
+                        }
+
+                        if (cbVideoFormat.Items.Count < 1)
+                        {
+                            cbVideoFormat.Items.Add("(no video metadata could be extracted)");
+                        }
+                        cbVideoFormat.SelectedIndex = 0;
+                        if (cbAudioFormat.Items.Count < 1)
+                        {
+                            cbAudioFormat.Items.Add("(no audio metadata could be extracted)");
+                        }
+                        cbAudioFormat.SelectedIndex = 0;
+                        if (cbVideoEncoder.Items.Count > 0)
+                        {
+                            cbVideoEncoder.SelectedIndex = 0;
+                        }
+                        if (cbAudioEncoder.Items.Count > 0)
+                        {
+                            cbAudioEncoder.SelectedIndex = 0;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                MessageBox.Show("Unable to detect metadata!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
