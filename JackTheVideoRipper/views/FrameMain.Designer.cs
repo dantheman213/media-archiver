@@ -69,9 +69,8 @@
             this.toolbarLabelStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolBarLabelCpu = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolBarLabelMemory = new System.Windows.Forms.ToolStripStatusLabel();
-            this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
-            this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
             this.toolBarLabelNetwork = new System.Windows.Forms.ToolStripStatusLabel();
+            this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -384,22 +383,16 @@
             this.toolBarLabelMemory.Size = new System.Drawing.Size(120, 25);
             this.toolBarLabelMemory.Text = "Memory: N/A";
             // 
-            // timerStatusBar
-            // 
-            this.timerStatusBar.Interval = 2500;
-            this.timerStatusBar.Tick += new System.EventHandler(this.timerStatusBar_Tick);
-            // 
-            // timerPostLoad
-            // 
-            this.timerPostLoad.Enabled = true;
-            this.timerPostLoad.Interval = 1500;
-            this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
-            // 
             // toolBarLabelNetwork
             // 
             this.toolBarLabelNetwork.Name = "toolBarLabelNetwork";
             this.toolBarLabelNetwork.Size = new System.Drawing.Size(179, 25);
             this.toolBarLabelNetwork.Text = "toolStripStatusLabel1";
+            // 
+            // timerStatusBar
+            // 
+            this.timerStatusBar.Interval = 2500;
+            this.timerStatusBar.Tick += new System.EventHandler(this.timerStatusBar_Tick);
             // 
             // FrameMain
             // 
@@ -417,6 +410,7 @@
             this.Text = "JackTheVideoRipper";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrameMain_FormClosing);
             this.Load += new System.EventHandler(this.FrameMain_Load);
+            this.Shown += new System.EventHandler(this.FrameMain_Shown);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.contextMenuListItems.ResumeLayout(false);
@@ -468,7 +462,6 @@
         private System.Windows.Forms.ToolStripStatusLabel toolBarLabelCpu;
         private System.Windows.Forms.ToolStripStatusLabel toolBarLabelMemory;
         private System.Windows.Forms.Timer timerStatusBar;
-        private System.Windows.Forms.Timer timerPostLoad;
         private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem downloadAtomicParsleyToolStripMenuItem;

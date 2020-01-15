@@ -425,15 +425,6 @@ namespace JackTheVideoRipper
             toolBarLabelNetwork.Text = String.Format("Network Ingress: {0}", Common.getNetworkTransfer());
         }
 
-        private void timerPostLoad_Tick(object sender, EventArgs e)
-        {
-            timerPostLoad.Enabled = false;
-            checkDependencies();
-            YouTubeDL.checkForUpdates();
-
-            checkForUpdatesToolStripMenuItem_Click(false, e);
-        }
-
         private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string versionResult = AppUpdate.checkForNewAppVersion();
@@ -454,6 +445,14 @@ namespace JackTheVideoRipper
             {
                 MessageBox.Show("Unable to communicate with Github!", "Can't download version manifest", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void FrameMain_Shown(object sender, EventArgs e)
+        {
+            checkDependencies();
+            YouTubeDL.checkForUpdates();
+
+            checkForUpdatesToolStripMenuItem_Click(false, e);
         }
     }
 }
