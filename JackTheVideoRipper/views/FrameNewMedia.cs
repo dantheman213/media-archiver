@@ -15,7 +15,7 @@ namespace JackTheVideoRipper
 
         private void FrameNewMedia_Load(object sender, EventArgs e)
         {
-           
+            textLocation.Text = YouTubeDL.defaultDownloadPath;
         }
 
         private void textUrl_TextChanged(object sender, EventArgs e)
@@ -161,6 +161,17 @@ namespace JackTheVideoRipper
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void buttonLocationBrowse_Click(object sender, EventArgs e)
+        {
+            var d = new FolderBrowserDialog();
+            d.SelectedPath = YouTubeDL.defaultDownloadPath;
+            var result = d.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                textLocation.Text = d.SelectedPath;
+            }
         }
     }
 }

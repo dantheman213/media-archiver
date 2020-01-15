@@ -57,11 +57,15 @@
             this.chkBoxEmbedThumbnail = new System.Windows.Forms.CheckBox();
             this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
             this.buttonCancel = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.textLocation = new System.Windows.Forms.TextBox();
+            this.buttonLocationBrowse = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.tabImportType.SuspendLayout();
             this.tabPageVideo.SuspendLayout();
             this.tabPageAudio.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -133,10 +137,10 @@
             // 
             this.tabImportType.Controls.Add(this.tabPageVideo);
             this.tabImportType.Controls.Add(this.tabPageAudio);
-            this.tabImportType.Location = new System.Drawing.Point(16, 295);
+            this.tabImportType.Location = new System.Drawing.Point(17, 295);
             this.tabImportType.Name = "tabImportType";
             this.tabImportType.SelectedIndex = 0;
-            this.tabImportType.Size = new System.Drawing.Size(662, 285);
+            this.tabImportType.Size = new System.Drawing.Size(662, 391);
             this.tabImportType.TabIndex = 7;
             // 
             // tabPageVideo
@@ -148,7 +152,7 @@
             this.tabPageVideo.Location = new System.Drawing.Point(4, 29);
             this.tabPageVideo.Name = "tabPageVideo";
             this.tabPageVideo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageVideo.Size = new System.Drawing.Size(654, 252);
+            this.tabPageVideo.Size = new System.Drawing.Size(654, 358);
             this.tabPageVideo.TabIndex = 0;
             this.tabPageVideo.Text = "Video";
             this.tabPageVideo.UseVisualStyleBackColor = true;
@@ -166,7 +170,7 @@
             "webm",
             "ogg",
             "flv"});
-            this.cbVideoEncoder.Location = new System.Drawing.Point(98, 50);
+            this.cbVideoEncoder.Location = new System.Drawing.Point(98, 60);
             this.cbVideoEncoder.Name = "cbVideoEncoder";
             this.cbVideoEncoder.Size = new System.Drawing.Size(532, 28);
             this.cbVideoEncoder.TabIndex = 14;
@@ -174,7 +178,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(9, 53);
+            this.label7.Location = new System.Drawing.Point(9, 60);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(73, 20);
             this.label7.TabIndex = 13;
@@ -194,7 +198,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 19);
+            this.label3.Location = new System.Drawing.Point(9, 18);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(64, 20);
             this.label3.TabIndex = 11;
@@ -209,7 +213,7 @@
             this.tabPageAudio.Location = new System.Drawing.Point(4, 29);
             this.tabPageAudio.Name = "tabPageAudio";
             this.tabPageAudio.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageAudio.Size = new System.Drawing.Size(654, 252);
+            this.tabPageAudio.Size = new System.Drawing.Size(654, 358);
             this.tabPageAudio.TabIndex = 1;
             this.tabPageAudio.Text = "Audio";
             this.tabPageAudio.UseVisualStyleBackColor = true;
@@ -217,6 +221,8 @@
             // cbAudioEncoder
             // 
             this.cbAudioEncoder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbAudioEncoder.Enabled = false;
+            this.cbAudioEncoder.Font = new System.Drawing.Font("Courier New", 9F);
             this.cbAudioEncoder.FormattingEnabled = true;
             this.cbAudioEncoder.Items.AddRange(new object[] {
             "(do not transcode)",
@@ -227,7 +233,7 @@
             "opus",
             "vorbis",
             "wav"});
-            this.cbAudioEncoder.Location = new System.Drawing.Point(98, 50);
+            this.cbAudioEncoder.Location = new System.Drawing.Point(98, 60);
             this.cbAudioEncoder.Name = "cbAudioEncoder";
             this.cbAudioEncoder.Size = new System.Drawing.Size(532, 28);
             this.cbAudioEncoder.TabIndex = 16;
@@ -235,7 +241,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(9, 53);
+            this.label8.Location = new System.Drawing.Point(9, 63);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(73, 20);
             this.label8.TabIndex = 15;
@@ -263,7 +269,7 @@
             // 
             // buttonDownload
             // 
-            this.buttonDownload.Location = new System.Drawing.Point(1048, 589);
+            this.buttonDownload.Location = new System.Drawing.Point(1049, 692);
             this.buttonDownload.Name = "buttonDownload";
             this.buttonDownload.Size = new System.Drawing.Size(128, 38);
             this.buttonDownload.TabIndex = 8;
@@ -291,9 +297,9 @@
             this.groupBox1.Controls.Add(this.chkEmbedSubs);
             this.groupBox1.Controls.Add(this.chkBoxEmbedThumbnail);
             this.groupBox1.Controls.Add(this.chkBoxWriteMetadata);
-            this.groupBox1.Location = new System.Drawing.Point(684, 324);
+            this.groupBox1.Location = new System.Drawing.Point(685, 418);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(492, 252);
+            this.groupBox1.Size = new System.Drawing.Size(492, 268);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Additional Options";
@@ -362,7 +368,7 @@
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(914, 589);
+            this.buttonCancel.Location = new System.Drawing.Point(915, 692);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(128, 38);
             this.buttonCancel.TabIndex = 13;
@@ -370,11 +376,41 @@
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.buttonLocationBrowse);
+            this.groupBox2.Controls.Add(this.textLocation);
+            this.groupBox2.Location = new System.Drawing.Point(685, 324);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(492, 88);
+            this.groupBox2.TabIndex = 14;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Location";
+            // 
+            // textLocation
+            // 
+            this.textLocation.Location = new System.Drawing.Point(14, 36);
+            this.textLocation.Name = "textLocation";
+            this.textLocation.ReadOnly = true;
+            this.textLocation.Size = new System.Drawing.Size(378, 26);
+            this.textLocation.TabIndex = 0;
+            // 
+            // buttonLocationBrowse
+            // 
+            this.buttonLocationBrowse.Location = new System.Drawing.Point(398, 31);
+            this.buttonLocationBrowse.Name = "buttonLocationBrowse";
+            this.buttonLocationBrowse.Size = new System.Drawing.Size(88, 37);
+            this.buttonLocationBrowse.TabIndex = 1;
+            this.buttonLocationBrowse.Text = "Browse";
+            this.buttonLocationBrowse.UseVisualStyleBackColor = true;
+            this.buttonLocationBrowse.Click += new System.EventHandler(this.buttonLocationBrowse_Click);
+            // 
             // FrameNewMedia
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1188, 639);
+            this.ClientSize = new System.Drawing.Size(1188, 742);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.buttonDownload);
@@ -403,6 +439,8 @@
             this.tabPageAudio.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -438,5 +476,8 @@
         private System.Windows.Forms.CheckBox chkBoxExportAudio;
         private System.Windows.Forms.CheckBox chkBoxExportVideo;
         private System.Windows.Forms.CheckBox chkBoxIncludeAds;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button buttonLocationBrowse;
+        private System.Windows.Forms.TextBox textLocation;
     }
 }
