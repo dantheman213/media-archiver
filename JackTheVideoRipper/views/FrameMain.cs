@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using JackTheVideoRipper.src.models;
-using Microsoft.VisualBasic;
 
 namespace JackTheVideoRipper
 {
@@ -83,116 +80,131 @@ namespace JackTheVideoRipper
 
                 foreach (ProcessUpdateRow pur in dict.Values)
                 {
-                    if (pur.proc == null)
-                    {
-                        continue;
-                    }
-                    if (pur.proc != null && pur.proc.HasExited)
+                    if (pur.proc == null || (pur.proc != null && pur.proc.HasExited)) 
                     {
                         // TODO: optimize
                         BeginInvoke(new Action(() =>
                         {
+                            bool change = false;
+                            string status = "Complete";
+                            if (pur.proc == null || pur.proc.ExitCode > 0)
+                            {
+                                change = true;
+                                status = "Error";
+                            }
+
                             string str = pur.item.SubItems[1].Text.Trim();
                             if (str != "Error" && str != "Complete")
                             {
-                                pur.item.SubItems[1].Text = "Complete";
+                                change = true;
+                                status = "Complete";
                                 pur.item.SubItems[4].Text = "100%"; // Progress
                                 pur.item.SubItems[5].Text = ""; // Download Speed
                                 pur.item.SubItems[6].Text = "00:00"; // ETA
+                            }
+
+                            if (str != status)
+                            {
+                                pur.item.SubItems[1].Text = status;
+                            }
+
+                            if (change)
+                            {
                                 updateListUI();
                             }
                         }), null);
+
                         continue;
                     }
 
-                    if (pur.results == null || pur.results.Count < 1)
+                    if (pur.results != null && pur.results.Count - 1 >= pur.cursor)
                     {
-                        break;
-                    }
-
-                    string line = pur.results[pur.results.Count - 1];
-                    if (!String.IsNullOrEmpty(line))
-                    {
-                        string l = Regex.Replace(line, @"\s+", " ");
-                        string[] parts = l.Split(' ');
-                        if (l.IndexOf("[youtube]") > -1)
+                        string line = pur.results[pur.cursor];
+                        if (!String.IsNullOrEmpty(line))
                         {
-                            BeginInvoke(new Action(() =>
-                            {
-                                if (pur.item.SubItems[1].Text != "Reading Metadata")
-                                {
-                                    pur.item.SubItems[1].Text = "Reading Metadata";
-                                    updateListUI();
-                                }
-                            }), null);
-                        }
-                        else if (l.IndexOf("[ffmpeg]") > -1)
-                        {
-                            BeginInvoke(new Action(() =>
-                            {
-                                if (pur.item.SubItems[1].Text != "Transcoding")
-                                {
-                                    pur.item.SubItems[1].Text = "Transcoding";
-                                    pur.item.SubItems[4].Text = "99%"; // Progress
-                                    pur.item.SubItems[5].Text = ""; // Download Speed
-                                    pur.item.SubItems[6].Text = "0:01"; // ETA
-
-                                    updateListUI();
-                                }
-                            }), null);
-                        }
-                        else if (l.IndexOf("[download]") > -1)
-                        {
-                            if (l.IndexOf("%") > -1 && parts.Length >= 8)
+                            string l = Regex.Replace(line, @"\s+", " ");
+                            string[] parts = l.Split(' ');
+                            if (l.IndexOf("[youtube]") > -1)
                             {
                                 BeginInvoke(new Action(() =>
                                 {
-                                    bool change = false;
-                                    if (pur.item.SubItems[1].Text != "Downloading")
+                                    if (pur.item.SubItems[1].Text != "Reading Metadata")
                                     {
-                                        pur.item.SubItems[1].Text = "Downloading";
-                                        change = true;
-                                    }
-                                    if (pur.item.SubItems[3].Text == "" || pur.item.SubItems[3].Text == "-")
-                                    {
-                                        pur.item.SubItems[3].Text = parts[3]; // Size
-                                        change = true;
-                                    }
-                                    if (parts[1].Trim() != "100%")
-                                    {
-                                        pur.item.SubItems[4].Text = parts[1]; // Progress
-                                        change = true;
-                                    }
-                                    pur.item.SubItems[5].Text = parts[5]; // Download Speed
-                                    if (parts[7].Trim() != "00:00")
-                                    {
-                                        pur.item.SubItems[6].Text = parts[7]; // ETA
-                                        change = true;
-                                    }
-
-                                    if (change)
-                                    {
+                                        pur.item.SubItems[1].Text = "Reading Metadata";
                                         updateListUI();
                                     }
                                 }), null);
                             }
-                        }
-                        else if (l.ToString().IndexOf("error") > -1)
-                        {
-                            Console.WriteLine("error " + l);
-                            BeginInvoke(new Action(() =>
+                            else if (l.IndexOf("[ffmpeg]") > -1)
                             {
-                                if (pur.item.SubItems[1].Text != "Error")
+                                BeginInvoke(new Action(() =>
                                 {
-                                    pur.item.SubItems[1].Text = "Error";
-                                    pur.item.SubItems[5].Text = ""; // Download Speed
-                                    pur.item.SubItems[6].Text = "00:00"; // ETA
-                                    updateListUI();
-                                }
-                            }), null);
+                                    if (pur.item.SubItems[1].Text != "Transcoding")
+                                    {
+                                        pur.item.SubItems[1].Text = "Transcoding";
+                                        pur.item.SubItems[4].Text = "99%"; // Progress
+                                        pur.item.SubItems[5].Text = ""; // Download Speed
+                                        pur.item.SubItems[6].Text = "0:01"; // ETA
 
-                            pur.proc.Kill();
+                                        updateListUI();
+                                    }
+                                }), null);
+                            }
+                            else if (l.IndexOf("[download]") > -1)
+                            {
+                                if (l.IndexOf("%") > -1 && parts.Length >= 8)
+                                {
+                                    BeginInvoke(new Action(() =>
+                                    {
+                                        bool change = false;
+                                        if (pur.item.SubItems[1].Text != "Downloading")
+                                        {
+                                            pur.item.SubItems[1].Text = "Downloading";
+                                            change = true;
+                                        }
+                                        if (pur.item.SubItems[3].Text == "" || pur.item.SubItems[3].Text == "-")
+                                        {
+                                            pur.item.SubItems[3].Text = parts[3]; // Size
+                                            change = true;
+                                        }
+                                        if (parts[1].Trim() != "100%")
+                                        {
+                                            pur.item.SubItems[4].Text = parts[1]; // Progress
+                                            change = true;
+                                        }
+                                        pur.item.SubItems[5].Text = parts[5]; // Download Speed
+                                        if (parts[7].Trim() != "00:00")
+                                        {
+                                            pur.item.SubItems[6].Text = parts[7]; // ETA
+                                            change = true;
+                                        }
+
+                                        if (change)
+                                        {
+                                            updateListUI();
+                                        }
+                                    }), null);
+                                }
+                            }
+                            else if (l.ToLower().IndexOf("error") > -1 || l.Substring(0, 21) == "Usage: youtube-dl.exe")
+                            {
+                                Console.WriteLine("error " + l);
+                                BeginInvoke(new Action(() =>
+                                {
+                                    if (pur.item.SubItems[1].Text != "Error")
+                                    {
+                                        pur.item.SubItems[1].Text = "Error";
+                                        pur.item.SubItems[5].Text = ""; // Download Speed
+                                        pur.item.SubItems[6].Text = "00:00"; // ETA
+                                        updateListUI();
+                                    }
+                                }), null);
+
+                                pur.proc.Kill();
+                            }
                         }
+
+                        pur.cursor += 1;
                     }
                 }
 
@@ -284,6 +296,7 @@ namespace JackTheVideoRipper
             string filePath = listItems.SelectedItems[0].SubItems[8].Text;
             if (!String.IsNullOrEmpty(filePath))
             {
+                // TODO: fix file pathing issue
                 if (File.Exists(filePath))
                 {
                     Common.openFolderWithFileSelect(filePath);

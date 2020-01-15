@@ -6,12 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace JackTheVideoRipper.src.models
+namespace JackTheVideoRipper
 {
     class ProcessUpdateRow
     {
         public Process proc { get; set; }
         public ListViewItem item { get; set; }
         public List<string> results { get; set; }
+        public int cursor { get; set; }
     }
 }
