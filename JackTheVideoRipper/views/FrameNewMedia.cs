@@ -60,7 +60,7 @@ namespace JackTheVideoRipper
                                 string codec = ((!String.IsNullOrEmpty(format.vcodec) && format.vcodec != "none") ? format.vcodec : "unknwon codec");
                                 string tbr = ((!String.IsNullOrEmpty(format.tbr)) ? Math.Floor(Convert.ToDecimal(format.tbr)).ToString() + "k" : "---"); // rounds down
                                 string fps = ((!String.IsNullOrEmpty(format.fps)) ? format.fps + "fps" : "---");
-                                string str = String.Format("{0} x {1} / {2} / {3} / {4} / {5} {6}", format.width.PadLeft(4), format.height.PadRight(4), tbr.PadRight(7), format.ext.PadRight(5), format.formateNote.PadRight(6), fps.PadLeft(6), codec);
+                                string str = String.Format("{0} x {1} / {2} / {3} / {4} / {5} {6}", format.width.PadRight(4), format.height.PadLeft(4), tbr.PadRight(7), format.ext.PadRight(5), format.formateNote.PadRight(6), fps.PadLeft(6), codec);
                           
                                 if (info.requestedFormats != null && String.IsNullOrEmpty(recommendedVideoFormat))
                                 {
@@ -77,7 +77,7 @@ namespace JackTheVideoRipper
                             {
                                 var bitrate = (String.IsNullOrEmpty(format.abr) ? "---" : format.abr + " kbps");
                                 var sampleRate = (String.IsNullOrEmpty(format.asr) ? "---" : format.asr + "Hz");
-                                var str = String.Format("{0} / {1} / {2} / {3}", bitrate.PadLeft(9), sampleRate.PadLeft(8), format.ext.PadRight(5), format.acodec);
+                                var str = String.Format("{0} / {1} / {2} / {3}", bitrate.PadRight(9), sampleRate.PadLeft(8), format.ext.PadRight(5), format.acodec);
 
                                 if (info.requestedFormats != null && String.IsNullOrEmpty(recommendedAudioFormat))
                                 {
