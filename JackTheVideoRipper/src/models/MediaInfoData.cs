@@ -46,5 +46,6 @@ namespace JackTheVideoRipper
         public string vbr { get; set; } // video bitrate
         public string asr { get; set; } // sampling rate
         public string tbr { get; set; } 
+        public string fps { get; set; }
     }
 }

@@ -1,11 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace JackTheVideoRipper
@@ -65,8 +59,9 @@ namespace JackTheVideoRipper
                             {
                                 string codec = ((!String.IsNullOrEmpty(format.vcodec) && format.vcodec != "none") ? format.vcodec : "unknwon codec");
                                 string tbr = ((!String.IsNullOrEmpty(format.tbr)) ? Math.Floor(Convert.ToDecimal(format.tbr)).ToString() + "k" : "---"); // rounds down
-                                string str = String.Format("{0} x {1} / {2} / {3} / {4} / {5}", format.width.PadLeft(4), format.height.PadRight(4), tbr.PadRight(7), format.ext.PadRight(5), format.formateNote.PadRight(6), codec);
-                                Console.WriteLine(str);
+                                string fps = ((!String.IsNullOrEmpty(format.fps)) ? format.fps + "fps" : "---");
+                                string str = String.Format("{0} x {1} / {2} / {3} / {4} / {5} {6}", format.width.PadLeft(4), format.height.PadRight(4), tbr.PadRight(7), format.ext.PadRight(5), format.formateNote.PadRight(6), fps.PadLeft(6), codec);
+                          
                                 if (info.requestedFormats != null && String.IsNullOrEmpty(recommendedVideoFormat))
                                 {
                                     str += " [Recommended]";
