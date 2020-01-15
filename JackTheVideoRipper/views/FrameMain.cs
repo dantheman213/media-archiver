@@ -143,6 +143,20 @@ namespace JackTheVideoRipper
                             {
                                 if (l.IndexOf("%") > -1 && parts.Length >= 8)
                                 {
+                                    // download messages stream fast, bump the cursor up to one of the latest messages, if it exists...
+                                    // only start skipping cursor ahead once download messages have started otherwise important info could be skipped
+                                    if (pur.cursor + 10 < pur.results.Count)
+                                    {
+                                        for (int i = pur.results.Count; i > pur.results.Count - 10; i--)
+                                        {
+                                            if (l.IndexOf("[download]") > -1)
+                                            {
+                                                pur.cursor = i;
+                                                break;
+                                            }
+                                        }
+                                    }
+
                                     BeginInvoke(new Action(() =>
                                     {
                                         if (pur.item.SubItems[1].Text != "Downloading")

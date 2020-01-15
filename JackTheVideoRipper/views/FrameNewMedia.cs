@@ -73,7 +73,8 @@ namespace JackTheVideoRipper
                                 string codec = ((!String.IsNullOrEmpty(format.vcodec) && format.vcodec != "none") ? format.vcodec : "unknwon codec");
                                 string tbr = ((!String.IsNullOrEmpty(format.tbr)) ? Math.Floor(Convert.ToDecimal(format.tbr)).ToString() + "k" : "---"); // rounds down
                                 string fps = ((!String.IsNullOrEmpty(format.fps)) ? format.fps + "fps" : "---");
-                                string str = String.Format("{0} x {1} / {2} / {3} / {4} / {5} {6}", format.width.PadRight(4), format.height.PadLeft(4), tbr.PadRight(7), format.ext.PadRight(5), format.formateNote.PadRight(6), fps.PadLeft(6), codec);
+                                string note = ((!String.IsNullOrEmpty(format.formateNote)) ? format.formateNote : "---");
+                                string str = String.Format("{0} x {1} / {2} / {3} / {4} / {5} {6}", format.width.PadRight(4), format.height.PadLeft(4), tbr.PadRight(7), format.ext.PadRight(5), note.PadRight(6), fps.PadLeft(6), codec);
 
                                 if (info.requestedFormats != null && String.IsNullOrEmpty(recommendedVideoFormat))
                                 {
@@ -142,7 +143,7 @@ namespace JackTheVideoRipper
                         {
                             audioFormatList.Sort((x, y) => Int32.Parse(x.Trim().Split(' ')[0]).CompareTo(Int32.Parse(y.Trim().Split(' ')[0])));
                         }
-                        catch(FormatException ex)
+                        catch(Exception ex)
                         {
                             Console.WriteLine(ex);
                         }
@@ -325,9 +326,16 @@ namespace JackTheVideoRipper
         {
             if (cbVideoFormat.Enabled && cbVideoEncoder.SelectedIndex == 0)
             {
-                string filePath = textLocation.Text.Trim();
-                filePath = String.Format("{0}{1}", filePath.Substring(0, filePath.LastIndexOf('.') + 1), cbVideoFormat.Text.Split('/')[2].Trim());
-                textLocation.Text = filePath;
+                try
+                {
+                    string filePath = textLocation.Text.Trim();
+                    filePath = String.Format("{0}{1}", filePath.Substring(0, filePath.LastIndexOf('.') + 1), cbVideoFormat.Text.Split('/')[2].Trim());
+                    textLocation.Text = filePath;
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
         }
 
@@ -335,9 +343,16 @@ namespace JackTheVideoRipper
         {
             if (!chkBoxExportVideo.Checked && cbAudioFormat.Enabled && cbAudioEncoder.SelectedIndex == 0)
             {
-                string filePath = textLocation.Text.Trim();
-                filePath = String.Format("{0}{1}", filePath.Substring(0, filePath.LastIndexOf('.') + 1), cbAudioFormat.Text.Split('/')[2].Trim());
-                textLocation.Text = filePath;
+                try
+                {
+                    string filePath = textLocation.Text.Trim();
+                    filePath = String.Format("{0}{1}", filePath.Substring(0, filePath.LastIndexOf('.') + 1), cbAudioFormat.Text.Split('/')[2].Trim());
+                    textLocation.Text = filePath;
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
         }
 
