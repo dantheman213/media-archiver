@@ -19,7 +19,7 @@ namespace JackTheVideoRipper
         {
             string result = Environment.GetEnvironmentVariable("PATH");
 
-            if (result.IndexOf("youtube-dl", StringComparison.CurrentCultureIgnoreCase) > -1)
+            if (result.ToLower().IndexOf("youtube-dl") > -1)
             {
                 return true;
             }

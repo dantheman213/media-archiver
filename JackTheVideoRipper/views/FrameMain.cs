@@ -87,12 +87,13 @@ namespace JackTheVideoRipper
                     {
                         continue;
                     }
-                    if (pur.proc.HasExited)
+                    if (pur.proc != null && pur.proc.HasExited)
                     {
                         // TODO: optimize
                         BeginInvoke(new Action(() =>
                         {
-                            if (pur.item.SubItems[1].Text != "Complete")
+                            string str = pur.item.SubItems[1].Text.Trim();
+                            if (str != "Error" && str != "Complete")
                             {
                                 pur.item.SubItems[1].Text = "Complete";
                                 pur.item.SubItems[4].Text = "100%"; // Progress
@@ -121,6 +122,7 @@ namespace JackTheVideoRipper
                                 if (pur.item.SubItems[1].Text != "Reading Metadata")
                                 {
                                     pur.item.SubItems[1].Text = "Reading Metadata";
+                                    updateListUI();
                                 }
                             }), null);
                         }
@@ -134,6 +136,7 @@ namespace JackTheVideoRipper
                                     pur.item.SubItems[4].Text = "99%"; // Progress
                                     pur.item.SubItems[5].Text = ""; // Download Speed
                                     pur.item.SubItems[6].Text = "0:01"; // ETA
+
                                     updateListUI();
                                 }
                             }), null);
@@ -144,27 +147,37 @@ namespace JackTheVideoRipper
                             {
                                 BeginInvoke(new Action(() =>
                                 {
+                                    bool change = false;
                                     if (pur.item.SubItems[1].Text != "Downloading")
                                     {
                                         pur.item.SubItems[1].Text = "Downloading";
+                                        change = true;
                                     }
                                     if (pur.item.SubItems[3].Text == "" || pur.item.SubItems[3].Text == "-")
                                     {
                                         pur.item.SubItems[3].Text = parts[3]; // Size
+                                        change = true;
                                     }
                                     if (parts[1].Trim() != "100%")
                                     {
                                         pur.item.SubItems[4].Text = parts[1]; // Progress
+                                        change = true;
                                     }
                                     pur.item.SubItems[5].Text = parts[5]; // Download Speed
                                     if (parts[7].Trim() != "00:00")
                                     {
                                         pur.item.SubItems[6].Text = parts[7]; // ETA
+                                        change = true;
+                                    }
+
+                                    if (change)
+                                    {
+                                        updateListUI();
                                     }
                                 }), null);
                             }
                         }
-                        else if (l.IndexOf("error", StringComparison.CurrentCultureIgnoreCase) > -1)
+                        else if (l.ToString().IndexOf("error") > -1)
                         {
                             Console.WriteLine("error " + l);
                             BeginInvoke(new Action(() =>
@@ -174,15 +187,12 @@ namespace JackTheVideoRipper
                                     pur.item.SubItems[1].Text = "Error";
                                     pur.item.SubItems[5].Text = ""; // Download Speed
                                     pur.item.SubItems[6].Text = "00:00"; // ETA
+                                    updateListUI();
                                 }
                             }), null);
-                            pur.proc = null;
-                        }
 
-                        BeginInvoke(new Action(() =>
-                        {
-                            updateListUI();
-                        }), null);
+                            pur.proc.Kill();
+                        }
                     }
                 }
 
@@ -236,21 +246,33 @@ namespace JackTheVideoRipper
             {
                 "" // intentional
             };
+
             Task.Run(() =>
             {
-                while (!pur.proc.HasExited)
+                // spawns a new thread to read standard out data
+                while (pur.proc != null && !pur.proc.HasExited)
                 {
                     pur.results.Add(pur.proc.StandardOutput.ReadLine());
                 }
             });
+
+            Task.Run(() =>
+            {
+                // spawns a new thread to read error stream data
+                while (pur.proc != null && !pur.proc.HasExited)
+                {
+                    string line = pur.proc.StandardError.ReadLine();
+                    if (!String.IsNullOrEmpty(line))
+                    {
+                        pur.results.Add(line);
+                    }
+                }
+            });
+
             dict.Add(li.Tag.ToString(), pur);
 
-            int index = -1;
-            if (type == "video")
-            {
-                index = 0;
-            }
-            else if (type == "audio")
+            int index = 0; // video
+            if (type == "audio")
             {
                 index = 1;
             }
@@ -359,7 +381,7 @@ namespace JackTheVideoRipper
                         // kill all processes
                         foreach(var pur in dict.Values)
                         {
-                            if (!pur.proc.HasExited)
+                            if (pur.proc != null && !pur.proc.HasExited)
                             {
                                 Common.KillProcessAndChildren(pur.proc.Id);
                             }

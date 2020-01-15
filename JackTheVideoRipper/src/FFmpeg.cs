@@ -16,7 +16,7 @@ namespace JackTheVideoRipper
         {
             string result = Environment.GetEnvironmentVariable("PATH");
 
-            if (result.IndexOf("ffmpeg", StringComparison.CurrentCultureIgnoreCase) > -1)
+            if (result.ToLower().IndexOf("ffmpeg") > -1)
             {
                 return true;
             }
