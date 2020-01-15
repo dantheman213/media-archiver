@@ -58,8 +58,8 @@
             this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
             this.buttonCancel = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.textLocation = new System.Windows.Forms.TextBox();
             this.buttonLocationBrowse = new System.Windows.Forms.Button();
+            this.textLocation = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.tabImportType.SuspendLayout();
             this.tabPageVideo.SuspendLayout();
@@ -325,6 +325,7 @@
             this.chkBoxExportAudio.TabIndex = 15;
             this.chkBoxExportAudio.Text = "Export Audio";
             this.chkBoxExportAudio.UseVisualStyleBackColor = true;
+            this.chkBoxExportAudio.CheckedChanged += new System.EventHandler(this.chkBoxExportAudio_CheckedChanged);
             // 
             // chkBoxExportVideo
             // 
@@ -337,6 +338,7 @@
             this.chkBoxExportVideo.TabIndex = 14;
             this.chkBoxExportVideo.Text = "Export Video";
             this.chkBoxExportVideo.UseVisualStyleBackColor = true;
+            this.chkBoxExportVideo.CheckedChanged += new System.EventHandler(this.chkBoxExportVideo_CheckedChanged);
             // 
             // chkEmbedSubs
             // 
@@ -387,14 +389,6 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Location";
             // 
-            // textLocation
-            // 
-            this.textLocation.Location = new System.Drawing.Point(14, 36);
-            this.textLocation.Name = "textLocation";
-            this.textLocation.ReadOnly = true;
-            this.textLocation.Size = new System.Drawing.Size(378, 26);
-            this.textLocation.TabIndex = 0;
-            // 
             // buttonLocationBrowse
             // 
             this.buttonLocationBrowse.Location = new System.Drawing.Point(398, 31);
@@ -404,6 +398,14 @@
             this.buttonLocationBrowse.Text = "Browse";
             this.buttonLocationBrowse.UseVisualStyleBackColor = true;
             this.buttonLocationBrowse.Click += new System.EventHandler(this.buttonLocationBrowse_Click);
+            // 
+            // textLocation
+            // 
+            this.textLocation.Location = new System.Drawing.Point(14, 36);
+            this.textLocation.Name = "textLocation";
+            this.textLocation.ReadOnly = true;
+            this.textLocation.Size = new System.Drawing.Size(378, 26);
+            this.textLocation.TabIndex = 0;
             // 
             // FrameNewMedia
             // 

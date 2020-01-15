@@ -173,5 +173,49 @@ namespace JackTheVideoRipper
                 textLocation.Text = d.SelectedPath;
             }
         }
+
+        private void chkBoxExportAudio_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!chkBoxExportAudio.Checked && !chkBoxExportVideo.Checked)
+            {
+                chkBoxExportAudio.Checked = true;
+            }
+
+            if (chkBoxExportAudio.Checked && !chkBoxExportVideo.Checked)
+            {
+                cbAudioEncoder.Enabled = true;
+            }
+            
+            if (chkBoxExportAudio.Checked)
+            {
+                cbAudioFormat.Enabled = true;
+            }
+            else
+            {
+                cbAudioFormat.Enabled = false;
+                cbAudioEncoder.Enabled = false;
+            }
+        }
+
+        private void chkBoxExportVideo_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!chkBoxExportVideo.Checked && !chkBoxExportAudio.Checked)
+            {
+                chkBoxExportVideo.Checked = true;
+            }
+
+            if (chkBoxExportVideo.Checked)
+            {
+                cbVideoFormat.Enabled = true;
+                cbVideoEncoder.Enabled = true;
+                cbAudioEncoder.Enabled = false;
+            }
+            else
+            {
+                cbVideoFormat.Enabled = false;
+                cbVideoEncoder.Enabled = false;
+                cbAudioEncoder.Enabled = true;
+            }
+        }
     }
 }
