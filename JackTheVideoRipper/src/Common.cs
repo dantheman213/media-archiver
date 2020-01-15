@@ -134,7 +134,14 @@ namespace JackTheVideoRipper
                 ManagementObjectCollection moc = searcher.Get();
                 foreach (ManagementObject mo in moc)
                 {
-                    KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
+                    try
+                    {
+                        KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
                 }
             }
             catch(Exception ex)
