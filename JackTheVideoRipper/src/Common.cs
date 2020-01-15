@@ -87,6 +87,38 @@ namespace JackTheVideoRipper
             return ramCounter.NextValue() + "MB";
         }
 
+        private static List<PerformanceCounter> networkCounters;
+        public static string getNetworkTransfer()
+        {
+            // get the network transfer in kbps or mbps automatically
+
+            if (networkCounters == null)
+            {
+                networkCounters = new List<PerformanceCounter>();
+
+                PerformanceCounterCategory pcg = new PerformanceCounterCategory("Network Interface");
+                foreach (var instance in pcg.GetInstanceNames())
+                {
+                    networkCounters.Add(new PerformanceCounter("Network Interface", "Bytes Received/sec", instance));
+                }
+            }
+
+            double count = 0;
+            foreach(var counter in networkCounters)
+            {
+                count += Math.Round(counter.NextValue() / 1024, 2);
+            }
+
+            string suffix = "kbps";
+            if (count >= 1000)
+            {
+                suffix = "mbps";
+                count = Math.Round(count / 1000, 2);
+            }
+            
+            return String.Format("{0} {1}", count, suffix);
+        }
+
         public static bool IsAdministrator()
         {
             WindowsIdentity identity = WindowsIdentity.GetCurrent();

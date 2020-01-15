@@ -55,6 +55,7 @@
             this.downloadFFmpegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadHandbrakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadVLCPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadAtomicParsleyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuListItems = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.convertMediaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
@@ -70,7 +71,7 @@
             this.toolBarLabelMemory = new System.Windows.Forms.ToolStripStatusLabel();
             this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
             this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
-            this.downloadAtomicParsleyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolBarLabelNetwork = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -267,6 +268,13 @@
             this.downloadVLCPlayerToolStripMenuItem.Text = "Download VLC Player";
             this.downloadVLCPlayerToolStripMenuItem.Click += new System.EventHandler(this.downloadVLCPlayerToolStripMenuItem_Click);
             // 
+            // downloadAtomicParsleyToolStripMenuItem
+            // 
+            this.downloadAtomicParsleyToolStripMenuItem.Name = "downloadAtomicParsleyToolStripMenuItem";
+            this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
+            this.downloadAtomicParsleyToolStripMenuItem.Text = "Download AtomicParsley";
+            this.downloadAtomicParsleyToolStripMenuItem.Click += new System.EventHandler(this.downloadAtomicParsleyToolStripMenuItem_Click);
+            // 
             // contextMenuListItems
             // 
             this.contextMenuListItems.ImageScalingSize = new System.Drawing.Size(24, 24);
@@ -350,7 +358,8 @@
             this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolbarLabelStatus,
             this.toolBarLabelCpu,
-            this.toolBarLabelMemory});
+            this.toolBarLabelMemory,
+            this.toolBarLabelNetwork});
             this.statusBar.Location = new System.Drawing.Point(0, 1258);
             this.statusBar.Name = "statusBar";
             this.statusBar.Size = new System.Drawing.Size(2175, 30);
@@ -386,12 +395,11 @@
             this.timerPostLoad.Interval = 1500;
             this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
             // 
-            // downloadAtomicParsleyToolStripMenuItem
+            // toolBarLabelNetwork
             // 
-            this.downloadAtomicParsleyToolStripMenuItem.Name = "downloadAtomicParsleyToolStripMenuItem";
-            this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
-            this.downloadAtomicParsleyToolStripMenuItem.Text = "Download AtomicParsley";
-            this.downloadAtomicParsleyToolStripMenuItem.Click += new System.EventHandler(this.downloadAtomicParsleyToolStripMenuItem_Click);
+            this.toolBarLabelNetwork.Name = "toolBarLabelNetwork";
+            this.toolBarLabelNetwork.Size = new System.Drawing.Size(179, 25);
+            this.toolBarLabelNetwork.Text = "toolStripStatusLabel1";
             // 
             // FrameMain
             // 
@@ -464,6 +472,7 @@
         private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem downloadAtomicParsleyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel toolBarLabelNetwork;
     }
 }
 
