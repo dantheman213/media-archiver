@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Security.AccessControl;
 using Newtonsoft.Json;
+using static System.Environment;
 
 namespace JackTheVideoRipper
 {
@@ -11,7 +12,7 @@ namespace JackTheVideoRipper
     {
         public static string defaultDownloadPath = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Downloads");
         private static string binName = "youtube-dl.exe";
-        private static string installPath = "C:\\Program Files\\youtube-dl\\bin";
+        private static string installPath = String.Format("{0}\\bin", SpecialFolder.CommonApplicationData);
         private static string binPath = String.Format("{0}\\{1}", installPath, binName);
         private static string downloadURL = "https://yt-dl.org/downloads/latest/youtube-dl.exe";
 
@@ -40,17 +41,7 @@ namespace JackTheVideoRipper
             if (!File.Exists(binPath))
             {
                 Directory.CreateDirectory(installPath);
-
-                // change perms
-                var directory = new DirectoryInfo(installPath);
-                var security = directory.GetAccessControl();
-
-                security.AddAccessRule(
-                    new FileSystemAccessRule(Environment.UserDomainName + "\\" + Environment.UserName,
-                    FileSystemRights.Modify,
-                    AccessControlType.Deny));
-                directory.SetAccessControl(security);
-
+                
                 // Download binary to directory
                 using (WebClient c = new WebClient())
                 {

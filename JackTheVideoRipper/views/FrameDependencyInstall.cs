@@ -16,5 +16,13 @@ namespace JackTheVideoRipper
         {
             InitializeComponent();
         }
+
+        private void FrameDependencyInstall_Shown(object sender, EventArgs e)
+        {
+            YouTubeDL.downloadAndInstall();
+            FFmpeg.downloadAndInstall();
+            AtomicParsley.downloadAndInstall();
+            this.Close();
+        }
     }
 }

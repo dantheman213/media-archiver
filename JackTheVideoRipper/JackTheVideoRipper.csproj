@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\AtomicParsley.cs" />
     <Compile Include="src\FFmpeg.cs" />
     <Compile Include="src\models\MediaInfoData.cs" />
     <Compile Include="src\models\ProcessUpdateRow.cs" />

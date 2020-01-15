@@ -20,7 +20,7 @@ namespace JackTheVideoRipper
         
         private void checkDependencies()
         {
-            if (!FFmpeg.isInstalled() || !YouTubeDL.isInstalled())
+            if (!FFmpeg.isInstalled() || !YouTubeDL.isInstalled() || !AtomicParsley.isInstalled())
             {
                 DialogResult result = DialogResult.No;
                 if (!YouTubeDL.isInstalled())
@@ -31,23 +31,16 @@ namespace JackTheVideoRipper
                 {
                     result = MessageBox.Show("Could not find FFmpeg on your system. Other components may also be missing. Install required missing components?", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 }
+                else if (!FFmpeg.isInstalled())
+                {
+                    result = MessageBox.Show("Could not find AtomicParsley on your system. Other components may also be missing. Install required missing components?", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                }
 
                 if (result == DialogResult.Yes)
                 {
                     var f = new FrameDependencyInstall();
                     f.ShowDialog();
-
-                    if (!Common.IsAdministrator())
-                    {
-                        var p = CLI.runElevatedSystemCommand(String.Format("{0}\\{1} --install-deps", Common.AppPath, Process.GetCurrentProcess().ProcessName));
-                        p.WaitForExit();
-                    }
-                    else
-                    {
-                        YouTubeDL.checkDownload();
-                        FFmpeg.checkDownload();
-                    }
-
+                    // TODO ?
                     MessageBox.Show("Components have been installed successfully! Please reboot your computer for changes to take effect.", "Required Components Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     f.Close();
                 }

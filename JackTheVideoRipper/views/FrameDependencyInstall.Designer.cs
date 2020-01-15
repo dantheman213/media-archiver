@@ -57,6 +57,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Installing...";
             this.TopMost = true;
+            this.Shown += new System.EventHandler(this.FrameDependencyInstall_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -15,16 +15,6 @@ namespace JackTheVideoRipper
         [STAThread]
         static void Main(string[] args)
         {
-            if (args != null && args.Length > 0)
-            {
-                if (args[0] == "--install-deps")
-                {
-                    YouTubeDL.downloadAndInstall();
-                    FFmpeg.downloadAndInstall();
-                    return;
-                }
-            }
-
             bool firstRun = false;
             using (Mutex mtex = new Mutex(true, "JackTheVideoRipper", out firstRun))
             {
