@@ -50,6 +50,8 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.downloadFFmpegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadHandbrakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadVLCPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,8 +70,7 @@
             this.toolBarLabelMemory = new System.Windows.Forms.ToolStripStatusLabel();
             this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
             this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
-            this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.downloadAtomicParsleyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -215,7 +216,8 @@
             this.toolStripSeparator2,
             this.downloadFFmpegToolStripMenuItem,
             this.downloadHandbrakeToolStripMenuItem,
-            this.downloadVLCPlayerToolStripMenuItem});
+            this.downloadVLCPlayerToolStripMenuItem,
+            this.downloadAtomicParsleyToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(61, 29);
             this.helpToolStripMenuItem.Text = "Help";
@@ -223,33 +225,45 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(267, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(291, 6);
+            // 
+            // checkForUpdatesToolStripMenuItem
+            // 
+            this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
+            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
+            this.checkForUpdatesToolStripMenuItem.Text = "Check For Updates";
+            this.checkForUpdatesToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdatesToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(291, 6);
             // 
             // downloadFFmpegToolStripMenuItem
             // 
             this.downloadFFmpegToolStripMenuItem.Name = "downloadFFmpegToolStripMenuItem";
-            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
             this.downloadFFmpegToolStripMenuItem.Text = "Download FFmpeg";
             this.downloadFFmpegToolStripMenuItem.Click += new System.EventHandler(this.downloadFFmpegToolStripMenuItem_Click);
             // 
             // downloadHandbrakeToolStripMenuItem
             // 
             this.downloadHandbrakeToolStripMenuItem.Name = "downloadHandbrakeToolStripMenuItem";
-            this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
             this.downloadHandbrakeToolStripMenuItem.Text = "Download Handbrake";
             this.downloadHandbrakeToolStripMenuItem.Click += new System.EventHandler(this.downloadHandbrakeToolStripMenuItem_Click);
             // 
             // downloadVLCPlayerToolStripMenuItem
             // 
             this.downloadVLCPlayerToolStripMenuItem.Name = "downloadVLCPlayerToolStripMenuItem";
-            this.downloadVLCPlayerToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
+            this.downloadVLCPlayerToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
             this.downloadVLCPlayerToolStripMenuItem.Text = "Download VLC Player";
             this.downloadVLCPlayerToolStripMenuItem.Click += new System.EventHandler(this.downloadVLCPlayerToolStripMenuItem_Click);
             // 
@@ -372,17 +386,12 @@
             this.timerPostLoad.Interval = 1500;
             this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
             // 
-            // checkForUpdatesToolStripMenuItem
+            // downloadAtomicParsleyToolStripMenuItem
             // 
-            this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(270, 30);
-            this.checkForUpdatesToolStripMenuItem.Text = "Check For Updates";
-            this.checkForUpdatesToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdatesToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(267, 6);
+            this.downloadAtomicParsleyToolStripMenuItem.Name = "downloadAtomicParsleyToolStripMenuItem";
+            this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
+            this.downloadAtomicParsleyToolStripMenuItem.Text = "Download AtomicParsley";
+            this.downloadAtomicParsleyToolStripMenuItem.Click += new System.EventHandler(this.downloadAtomicParsleyToolStripMenuItem_Click);
             // 
             // FrameMain
             // 
@@ -454,6 +463,7 @@
         private System.Windows.Forms.Timer timerPostLoad;
         private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem downloadAtomicParsleyToolStripMenuItem;
     }
 }
 

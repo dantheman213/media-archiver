@@ -163,24 +163,6 @@ namespace JackTheVideoRipper
                                     }
                                 }), null);
                             }
-                            else if (l.IndexOf("Destination") > -1)
-                            {
-                                int start = l.IndexOf(": ") + 2;
-                                string filePath = l.Substring(start, l.Length - start);
-                                string fileName = filePath.Substring(filePath.LastIndexOf('\\') + 1);
-                                fileName = fileName.Substring(0, fileName.LastIndexOf("."));
-                                BeginInvoke(new Action(() =>
-                                {
-                                    if (pur.item.SubItems[0].Text == "")
-                                    {
-                                        pur.item.SubItems[0].Text = fileName; // Title
-                                    }
-                                    if (pur.item.SubItems[8].Text == "")
-                                    {
-                                        pur.item.SubItems[8].Text = filePath; // Path
-                                    }
-                                }), null);
-                            }
                         }
                         else if (l.IndexOf("error", StringComparison.CurrentCultureIgnoreCase) > -1)
                         {
@@ -234,46 +216,19 @@ namespace JackTheVideoRipper
         private void downloadMediaDialog(string type)
         {
             var f = new FrameNewMedia();
-            f.ShowDialog();
-            return;
+            if (f.ShowDialog() == DialogResult.OK)
+            {
+                addMediaItemRow(f.title, f.type, f.url, f.opts, f.filePath);
+            }
+        }
 
-            // TODO: remove
-            string videoUrl = null;
-            if (type == "video")
-            {
-                //videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Video", "", -1, -1);
-            }
-            else if (type == "audio")
-            {
-                //videoUrl = Interaction.InputBox("YouTube URL:", "Download Media As Audio", "", -1, -1);
-            }
-       
-            if (String.IsNullOrEmpty(videoUrl))
-            {
-                return;
-            }
-
-            if (!Common.isValidURL(videoUrl))
-            {
-                MessageBox.Show("Invalid URL!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            string title = "TODO";
-            var li = new ListViewItem(new string[] { title, "Waiting", String.Format("{0}{1}", type.Substring(0, 1).ToUpper(), type.Substring(1)), "-", "", "0%", "0.0 KB/s", videoUrl, "" });
+        private void addMediaItemRow(string title, string type, string url, string opts, string filePath)
+        {
+            var li = new ListViewItem(new string[] { title, "Waiting", type, "-", "", "0%", "0.0 KB/s", url, filePath });
             li.Tag = DateTime.Now.ToString("yyyyMMddhmmsstt");
             listItems.Items.Add(li);
 
-            Process p = null;
-            if (type == "video")
-            {
-                p = YouTubeDL.downloadVideo(videoUrl, Common.formatTitleForFileName(title));
-            }
-            else if (type == "audio")
-            {
-                p = YouTubeDL.downloadAudio(videoUrl, Common.formatTitleForFileName(title));
-            }
-
+            Process p = YouTubeDL.run(opts);
             ProcessUpdateRow pur = new ProcessUpdateRow();
             pur.proc = p;
             pur.item = listItems.Items[listItems.Items.Count - 1];
@@ -444,6 +399,11 @@ namespace JackTheVideoRipper
         private void downloadVLCPlayerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("https://www.videolan.org/vlc/");
+        }
+        
+        private void downloadAtomicParsleyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("http://atomicparsley.sourceforge.net/");
         }
 
         private void timerStatusBar_Tick(object sender, EventArgs e)

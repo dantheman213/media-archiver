@@ -113,5 +113,13 @@ namespace JackTheVideoRipper
                 // Process already exited.
             }
         }
+
+        public static string stripIllegalFileNameChars(string str)
+        {
+            Regex rgx = new Regex("[^a-zA-Z0-9 -]");
+            return rgx.Replace(str, "_").Replace(' ', '_');
+
+            // return string.Join("_", str.Split(Path.GetInvalidFileNameChars()));
+        }
     }
 }

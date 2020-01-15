@@ -27,6 +27,8 @@ namespace JackTheVideoRipper
         public string uploader { get; set; }
         public string title { get; set; }
         public string format { get; set; }
+        [JsonProperty("_filename")]
+        public string filename { get; set; }
     }
 
     class MediaFormatItem
@@ -45,7 +47,7 @@ namespace JackTheVideoRipper
         public string abr { get; set; } // audio bitrate
         public string vbr { get; set; } // video bitrate
         public string asr { get; set; } // sampling rate
-        public string tbr { get; set; } 
+        public string tbr { get; set; } // average bitrate of audio and video in KBit/s
         public string fps { get; set; }
     }
 }

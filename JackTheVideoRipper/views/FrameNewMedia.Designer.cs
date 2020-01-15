@@ -174,6 +174,7 @@
             this.cbVideoEncoder.Name = "cbVideoEncoder";
             this.cbVideoEncoder.Size = new System.Drawing.Size(532, 28);
             this.cbVideoEncoder.TabIndex = 14;
+            this.cbVideoEncoder.TextChanged += new System.EventHandler(this.cbVideoEncoder_TextChanged);
             // 
             // label7
             // 
@@ -194,6 +195,7 @@
             this.cbVideoFormat.Name = "cbVideoFormat";
             this.cbVideoFormat.Size = new System.Drawing.Size(532, 28);
             this.cbVideoFormat.TabIndex = 12;
+            this.cbVideoFormat.TextChanged += new System.EventHandler(this.cbVideoFormat_TextChanged);
             // 
             // label3
             // 
@@ -237,6 +239,7 @@
             this.cbAudioEncoder.Name = "cbAudioEncoder";
             this.cbAudioEncoder.Size = new System.Drawing.Size(532, 28);
             this.cbAudioEncoder.TabIndex = 16;
+            this.cbAudioEncoder.TextChanged += new System.EventHandler(this.cbAudioEncoder_TextChanged);
             // 
             // label8
             // 
@@ -257,6 +260,7 @@
             this.cbAudioFormat.Name = "cbAudioFormat";
             this.cbAudioFormat.Size = new System.Drawing.Size(532, 28);
             this.cbAudioFormat.TabIndex = 14;
+            this.cbAudioFormat.TextChanged += new System.EventHandler(this.cbAudioFormat_TextChanged);
             // 
             // label6
             // 
@@ -364,7 +368,6 @@
             // 
             // timerPostLoad
             // 
-            this.timerPostLoad.Enabled = true;
             this.timerPostLoad.Interval = 600;
             this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
             // 

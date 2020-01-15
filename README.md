@@ -14,6 +14,14 @@ Download the latest version in the [release](https://github.com/dantheman213/Jac
 
 * Windows 10 / .NET 4.6
 
+### Install Automatically On First Run
+
+* youtube-dl
+
+* ffmpeg
+
+* AtomicParsley
+
 ## FAQs
 
 ##### The downloaded file doesn't play on my computer, what's wrong?
