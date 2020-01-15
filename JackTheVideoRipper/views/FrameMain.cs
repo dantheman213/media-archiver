@@ -61,7 +61,7 @@ namespace JackTheVideoRipper
         private void FrameMain_Load(object sender, EventArgs e)
         {
             this.Text = String.Format("JackTheVideoRipper {0}", Common.getAppVersion());
-            listItemRowsUpdateTimer = new System.Threading.Timer(updateListItemRows, null, 0, 250);
+            listItemRowsUpdateTimer = new System.Threading.Timer(updateListItemRows, null, 0, 800);
             
             timerStatusBar_Tick(sender, e);
             timerStatusBar.Enabled = true;
@@ -70,14 +70,14 @@ namespace JackTheVideoRipper
         private static bool locked = false;
         private void updateListItemRows(object state)
         {
+            if (locked)
+            {
+                return;
+            }
+            locked = true;
+
             try
             {
-                if (locked)
-                {
-                    return;
-                }
-                locked = true;
-
                 foreach (ProcessUpdateRow pur in dict.Values)
                 {
                     if (pur.proc == null || (pur.proc != null && pur.proc.HasExited)) 
@@ -85,18 +85,15 @@ namespace JackTheVideoRipper
                         // TODO: optimize
                         BeginInvoke(new Action(() =>
                         {
-                            bool change = false;
                             string status = "Complete";
                             if (pur.proc == null || pur.proc.ExitCode > 0)
                             {
-                                change = true;
                                 status = "Error";
                             }
 
                             string str = pur.item.SubItems[1].Text.Trim();
                             if (str != "Error" && str != "Complete")
                             {
-                                change = true;
                                 status = "Complete";
                                 pur.item.SubItems[4].Text = "100%"; // Progress
                                 pur.item.SubItems[5].Text = ""; // Download Speed
@@ -106,11 +103,6 @@ namespace JackTheVideoRipper
                             if (str != status)
                             {
                                 pur.item.SubItems[1].Text = status;
-                            }
-
-                            if (change)
-                            {
-                                updateListUI();
                             }
                         }), null);
 
@@ -131,7 +123,6 @@ namespace JackTheVideoRipper
                                     if (pur.item.SubItems[1].Text != "Reading Metadata")
                                     {
                                         pur.item.SubItems[1].Text = "Reading Metadata";
-                                        updateListUI();
                                     }
                                 }), null);
                             }
@@ -145,8 +136,6 @@ namespace JackTheVideoRipper
                                         pur.item.SubItems[4].Text = "99%"; // Progress
                                         pur.item.SubItems[5].Text = ""; // Download Speed
                                         pur.item.SubItems[6].Text = "0:01"; // ETA
-
-                                        updateListUI();
                                     }
                                 }), null);
                             }
@@ -156,32 +145,22 @@ namespace JackTheVideoRipper
                                 {
                                     BeginInvoke(new Action(() =>
                                     {
-                                        bool change = false;
                                         if (pur.item.SubItems[1].Text != "Downloading")
                                         {
                                             pur.item.SubItems[1].Text = "Downloading";
-                                            change = true;
                                         }
                                         if (pur.item.SubItems[3].Text == "" || pur.item.SubItems[3].Text == "-")
                                         {
                                             pur.item.SubItems[3].Text = parts[3]; // Size
-                                            change = true;
                                         }
                                         if (parts[1].Trim() != "100%")
                                         {
                                             pur.item.SubItems[4].Text = parts[1]; // Progress
-                                            change = true;
                                         }
                                         pur.item.SubItems[5].Text = parts[5]; // Download Speed
                                         if (parts[7].Trim() != "00:00")
                                         {
                                             pur.item.SubItems[6].Text = parts[7]; // ETA
-                                            change = true;
-                                        }
-
-                                        if (change)
-                                        {
-                                            updateListUI();
                                         }
                                     }), null);
                                 }
@@ -196,7 +175,6 @@ namespace JackTheVideoRipper
                                         pur.item.SubItems[1].Text = "Error";
                                         pur.item.SubItems[5].Text = ""; // Download Speed
                                         pur.item.SubItems[6].Text = "00:00"; // ETA
-                                        updateListUI();
                                     }
                                 }), null);
 
@@ -207,22 +185,14 @@ namespace JackTheVideoRipper
                         pur.cursor += 1;
                     }
                 }
-
-                locked = false;
             }
             catch(Exception ex)
             {
                 // TODO?
                 Console.WriteLine(ex);
             }
-        }
 
-        private void updateListUI()
-        {
-            listItems.Invalidate();
-            listItems.Update();
-            listItems.Refresh();
-            Application.DoEvents();
+            locked = false;
         }
 
         private void downloadAsVideoToolStripMenuItem_Click(object sender, EventArgs e)
