@@ -29,6 +29,18 @@ namespace JackTheVideoRipper
         private void FrameAbout_Load(object sender, EventArgs e)
         {
             labelVersion.Text = Common.getAppVersion();
+
+            try
+            {
+                var p = CLI.runYouTubeCommand(YouTubeDL.binPath, "--list-extractors");
+                var lines ="* " + p.StandardOutput.ReadToEnd().Trim().Replace("\n", "\r\n* ");
+                textExtractors.Text = lines;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                textExtractors.Text = "ERROR: Can't get list of supported services.";
+            }
         }
     }
 }
