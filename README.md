@@ -16,13 +16,15 @@ Download the latest version in the [release](https://github.com/dantheman213/Jac
 
 * Windows 10 / .NET 4.6
 
-### Automatically Installed Dependencies
+### Automatically Installed & Managed Dependencies
 
 * youtube-dl
 
 * ffmpeg
 
 * AtomicParsley
+
+All required dependencies are installed, updated, and maintenanced automatically for you.
 
 ## FAQs
 
