@@ -31,7 +31,7 @@ namespace JackTheVideoRipper
                 {
                     result = MessageBox.Show("Could not find FFmpeg on your system. Other components may also be missing. Install required missing components?", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 }
-                else if (!FFmpeg.isInstalled())
+                else if (!AtomicParsley.isInstalled())
                 {
                     result = MessageBox.Show("Could not find AtomicParsley on your system. Other components may also be missing. Install required missing components?", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 }

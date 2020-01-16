@@ -18,9 +18,7 @@ namespace JackTheVideoRipper
 
         public static bool isInstalled()
         {
-            string result = Environment.GetEnvironmentVariable("PATH");
-
-            if (result.ToLower().IndexOf("youtube-dl") > -1)
+            if (File.Exists(binPath))
             {
                 return true;
             }
@@ -48,8 +46,6 @@ namespace JackTheVideoRipper
                     c.DownloadFile(downloadURL, binPath);
                 }
             }
-
-            CLI.addToPathEnv(installPath);
         }
 
         public static void checkForUpdates()
