@@ -8,9 +8,9 @@ namespace JackTheVideoRipper
 {
     class AtomicParsley
     {
-        private static string downloadURL = "https://github.com/dantheman213/JackTheVideoRipper/raw/master/install/atomicparsley.zip";
+        private static string downloadURL = "https://github.com/dantheman213/JackTheVideoRipper/raw/master/install/AtomicParsley.zip";
         private static string binName = "AtomicParsley.exe";
-        private static string installPath = String.Format("{0}\\bin", SpecialFolder.CommonApplicationData);
+        private static string installPath = String.Format("{0}\\JackTheVideoRipper\\bin", Environment.GetFolderPath(SpecialFolder.CommonApplicationData));
         private static string binPath = String.Format("{0}\\{1}", installPath, binName);
 
         public static bool isInstalled()
@@ -51,7 +51,7 @@ namespace JackTheVideoRipper
                     {
                         try
                         {
-                            string filePath = Path.Combine(Common.AppPath, entry.FullName);
+                            string filePath = Path.Combine(tmpDir, entry.FullName);
                             if (File.Exists(filePath))
                             {
                                 File.Delete(filePath);

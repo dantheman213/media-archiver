@@ -41,7 +41,7 @@ namespace JackTheVideoRipper
                     var f = new FrameDependencyInstall();
                     f.ShowDialog();
                     // TODO ?
-                    MessageBox.Show("Components have been installed successfully! Please reboot your computer for changes to take effect.", "Required Components Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Components have been installed successfully!", "Required Components Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     f.Close();
                 }
                 else

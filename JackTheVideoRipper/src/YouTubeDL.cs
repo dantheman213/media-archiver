@@ -12,7 +12,7 @@ namespace JackTheVideoRipper
     {
         public static string defaultDownloadPath = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Downloads");
         private static string binName = "youtube-dl.exe";
-        private static string installPath = String.Format("{0}\\bin", SpecialFolder.CommonApplicationData);
+        private static string installPath = String.Format("{0}\\JackTheVideoRipper\\bin", Environment.GetFolderPath(SpecialFolder.CommonApplicationData));
         private static string binPath = String.Format("{0}\\{1}", installPath, binName);
         private static string downloadURL = "https://yt-dl.org/downloads/latest/youtube-dl.exe";
 
@@ -58,7 +58,7 @@ namespace JackTheVideoRipper
 
         public static Process run(string opts)
         {
-            return CLI.runYouTubeCommand(opts);
+            return CLI.runYouTubeCommand(binPath, opts);
         }
         
         public static string downloadThumbnail(string thumbnailUrl)
@@ -88,7 +88,7 @@ namespace JackTheVideoRipper
         public static MediaInfoData getMediaData(string url)
         {
             string opts = "-s --no-warnings --no-cache-dir --print-json " + url;
-            var p = CLI.runYouTubeCommand(opts);
+            var p = CLI.runYouTubeCommand(binPath, opts);
             string json = p.StandardOutput.ReadToEnd().Trim();
             return JsonConvert.DeserializeObject<MediaInfoData>(json);
         }
