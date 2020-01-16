@@ -1,6 +1,6 @@
 # Jack The Video Ripper
 
-Download YouTube videos easily with a few point and clicks. Designed and developed for Windows 10.
+Download videos from YouTube and hundreds of more video providers. Designed and developed for Windows 10.
 
 ![](https://github.com/dantheman213/JackTheVideoRipper/raw/master/docs/demo.gif)
 
