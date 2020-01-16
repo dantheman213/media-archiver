@@ -2,9 +2,11 @@
 
 Download YouTube videos easily with a few point and clicks. Designed and developed for Windows 10.
 
+![](https://github.com/dantheman213/JackTheVideoRipper/raw/master/docs/demo.gif)
+
 ## How Does It Work?
 
-Jack is a graphical interface that sits on top of another popular tool called `youtube-dl`. This tool allows for easy and powerful access to YouTube media through the command-line.
+JTVR is a graphical interface that sits on top of another popular tool called `youtube-dl`. This tool allows for easy and powerful access to YouTube media through the command-line.
 
 ## Download
 
@@ -14,7 +16,7 @@ Download the latest version in the [release](https://github.com/dantheman213/Jac
 
 * Windows 10 / .NET 4.6
 
-### Install Automatically On First Run
+### Automatically Installed Dependencies
 
 * youtube-dl
 
