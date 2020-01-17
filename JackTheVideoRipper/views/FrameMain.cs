@@ -454,5 +454,10 @@ namespace JackTheVideoRipper
 
             checkForUpdatesToolStripMenuItem_Click(false, e);
         }
+
+        private void downloadVS2010RedistributableToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://www.microsoft.com/en-us/download/confirmation.aspx?id=5555");
+        }
     }
 }

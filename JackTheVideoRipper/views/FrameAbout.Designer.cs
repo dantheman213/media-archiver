@@ -109,7 +109,7 @@
             this.textDependencies.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textDependencies.Size = new System.Drawing.Size(735, 229);
             this.textDependencies.TabIndex = 5;
-            this.textDependencies.Text = "* youtube-dl\r\n* ffmpeg\r\n* AtomicParsley";
+            this.textDependencies.Text = "* Visual C++ 2010 Redistributable (x86)\r\n* youtube-dl\r\n* ffmpeg\r\n* AtomicParsley";
             // 
             // FrameAbout
             // 

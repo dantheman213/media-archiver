@@ -71,6 +71,7 @@
             this.toolBarLabelMemory = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolBarLabelNetwork = new System.Windows.Forms.ToolStripStatusLabel();
             this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
+            this.downloadVS2010RedistributableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -214,10 +215,11 @@
             this.toolStripSeparator1,
             this.checkForUpdatesToolStripMenuItem,
             this.toolStripSeparator2,
+            this.downloadVS2010RedistributableToolStripMenuItem,
+            this.downloadAtomicParsleyToolStripMenuItem,
             this.downloadFFmpegToolStripMenuItem,
-            this.downloadHandbrakeToolStripMenuItem,
             this.downloadVLCPlayerToolStripMenuItem,
-            this.downloadAtomicParsleyToolStripMenuItem});
+            this.downloadHandbrakeToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(61, 29);
             this.helpToolStripMenuItem.Text = "Help";
@@ -225,52 +227,52 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(291, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(369, 6);
             // 
             // checkForUpdatesToolStripMenuItem
             // 
             this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
+            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
             this.checkForUpdatesToolStripMenuItem.Text = "Check For Updates";
             this.checkForUpdatesToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdatesToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(291, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(369, 6);
             // 
             // downloadFFmpegToolStripMenuItem
             // 
             this.downloadFFmpegToolStripMenuItem.Name = "downloadFFmpegToolStripMenuItem";
-            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
+            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
             this.downloadFFmpegToolStripMenuItem.Text = "Download FFmpeg";
             this.downloadFFmpegToolStripMenuItem.Click += new System.EventHandler(this.downloadFFmpegToolStripMenuItem_Click);
             // 
             // downloadHandbrakeToolStripMenuItem
             // 
             this.downloadHandbrakeToolStripMenuItem.Name = "downloadHandbrakeToolStripMenuItem";
-            this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
+            this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
             this.downloadHandbrakeToolStripMenuItem.Text = "Download Handbrake";
             this.downloadHandbrakeToolStripMenuItem.Click += new System.EventHandler(this.downloadHandbrakeToolStripMenuItem_Click);
             // 
             // downloadVLCPlayerToolStripMenuItem
             // 
             this.downloadVLCPlayerToolStripMenuItem.Name = "downloadVLCPlayerToolStripMenuItem";
-            this.downloadVLCPlayerToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
+            this.downloadVLCPlayerToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
             this.downloadVLCPlayerToolStripMenuItem.Text = "Download VLC Player";
             this.downloadVLCPlayerToolStripMenuItem.Click += new System.EventHandler(this.downloadVLCPlayerToolStripMenuItem_Click);
             // 
             // downloadAtomicParsleyToolStripMenuItem
             // 
             this.downloadAtomicParsleyToolStripMenuItem.Name = "downloadAtomicParsleyToolStripMenuItem";
-            this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(294, 30);
+            this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
             this.downloadAtomicParsleyToolStripMenuItem.Text = "Download AtomicParsley";
             this.downloadAtomicParsleyToolStripMenuItem.Click += new System.EventHandler(this.downloadAtomicParsleyToolStripMenuItem_Click);
             // 
@@ -386,13 +388,20 @@
             // toolBarLabelNetwork
             // 
             this.toolBarLabelNetwork.Name = "toolBarLabelNetwork";
-            this.toolBarLabelNetwork.Size = new System.Drawing.Size(179, 25);
-            this.toolBarLabelNetwork.Text = "toolStripStatusLabel1";
+            this.toolBarLabelNetwork.Size = new System.Drawing.Size(182, 25);
+            this.toolBarLabelNetwork.Text = "Network Ingress: N/A";
             // 
             // timerStatusBar
             // 
             this.timerStatusBar.Interval = 2500;
             this.timerStatusBar.Tick += new System.EventHandler(this.timerStatusBar_Tick);
+            // 
+            // downloadVS2010RedistributableToolStripMenuItem
+            // 
+            this.downloadVS2010RedistributableToolStripMenuItem.Name = "downloadVS2010RedistributableToolStripMenuItem";
+            this.downloadVS2010RedistributableToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
+            this.downloadVS2010RedistributableToolStripMenuItem.Text = "Download VS 2010 Redistributable";
+            this.downloadVS2010RedistributableToolStripMenuItem.Click += new System.EventHandler(this.downloadVS2010RedistributableToolStripMenuItem_Click);
             // 
             // FrameMain
             // 
@@ -466,6 +475,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem downloadAtomicParsleyToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel toolBarLabelNetwork;
+        private System.Windows.Forms.ToolStripMenuItem downloadVS2010RedistributableToolStripMenuItem;
     }
 }
 
