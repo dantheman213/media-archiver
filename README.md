@@ -7,7 +7,7 @@ Download music and videos from YouTube and hundreds of more streaming providers.
 ## How Does It Work?
 
 This app runs `youtube-dl` under-the-hood. `youtube-dl` is a powerful command-line
-app that allows you to download video and audio from 100s of streaming providers. JTVR is a graphical interface that makes using this complex and powerful as easy as a few point and clicks of your mouse.
+app that allows you to download video and audio from 100s of streaming providers. JTVR is a graphical interface that makes using this complex and powerful tool as easy as a few point and clicks of your mouse.
 
 ## Download
 
