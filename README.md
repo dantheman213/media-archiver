@@ -6,7 +6,8 @@ Download music and videos from YouTube and hundreds of more streaming providers.
 
 ## How Does It Work?
 
-JTVR is a graphical interface that sits on top of another popular tool called `youtube-dl`. This tool allows for easy and powerful access to YouTube media through the command-line.
+This app runs `youtube-dl` under-the-hood. `youtube-dl` is a powerful command-line
+app that allows you to download video and audio from 100s of streaming providers. JTVR is a graphical interface that makes using this complex and powerful as easy as a few point and clicks of your mouse.
 
 ## Download
 
@@ -19,12 +20,13 @@ Download the latest version in the [release](https://github.com/dantheman213/Jac
 ### Automatically Installed & Managed Dependencies
 
 * youtube-dl
+  - Microsoft Visual C++ 2010 Redistributable Package (x86)
+
 
 * ffmpeg
+  - AtomicParsley
 
-* AtomicParsley
-
-All required dependencies are installed, updated, and maintenanced automatically for you.
+All required dependencies are installed, updated, and maintained automatically for you.
 
 ## FAQs
 
