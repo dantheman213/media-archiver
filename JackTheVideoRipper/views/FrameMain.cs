@@ -459,5 +459,10 @@ namespace JackTheVideoRipper
         {
             Process.Start("https://www.microsoft.com/en-us/download/confirmation.aspx?id=5555");
         }
+
+        private void openDownloadFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Common.openFolder(YouTubeDL.defaultDownloadPath);
+        }
     }
 }
