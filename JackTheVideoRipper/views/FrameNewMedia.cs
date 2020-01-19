@@ -42,6 +42,7 @@ namespace JackTheVideoRipper
 
                     labelTitle.Text = info.title;
                     labelDescription.Text = info.description;
+                    // TODO: may need to be revised now that using --restrict-filenames flag in youtube-dl
                     textLocation.Text = YouTubeDL.defaultDownloadPath + "\\" + String.Format("{0}{1}", Common.stripIllegalFileNameChars(info.filename.Substring(0, info.filename.LastIndexOf('.'))), info.filename.Substring(info.filename.LastIndexOf('.')));
 
                     if (info.formats != null && info.formats.Count > 0)
@@ -217,23 +218,31 @@ namespace JackTheVideoRipper
 
                 string videoFormatId = videoIdLookupTable[cbVideoFormat.Text];
                 string audioFormatId = audioIdLookupTable[cbAudioFormat.Text];
-                string filePathTemplate = String.Format("{0}.%(ext)s", this.filePath.Substring(0, this.filePath.LastIndexOf('.'))); // youtube-dl doesn't like it when you provide --audio-format and extension in -o together
+
+                int k = this.filePath.LastIndexOf('.');
+                string fileNameFormatted = this.filePath;
+                if (k > -1)
+                {
+                    fileNameFormatted = this.filePath.Substring(0, k);
+                }
+                string filePathTemplate = String.Format("{0}.%(ext)s", fileNameFormatted); // youtube-dl doesn't like it when you provide --audio-format and extension in -o together
+                
                 if (chkBoxExportVideo.Checked && chkBoxExportAudio.Checked)
                 {
                     // video and audio
-                    this.opts = String.Format("-f {0}+{1}/best {2} -i --no-check-certificate --prefer-ffmpeg --no-warnings {2} {3} {4} {5} -o {6} {7}", videoFormatId, audioFormatId, (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : ""), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), filePathTemplate, url);
+                    this.opts = String.Format("-f {0}+{1}/best {2} -i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames {2} {3} {4} {5} -o {6} {7}", videoFormatId, audioFormatId, (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : ""), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), filePathTemplate, url);
                     this.type = "video+audio";
                 }
                 else if (chkBoxExportVideo.Checked && !chkBoxExportAudio.Checked)
                 {
                     // video only
-                    this.opts = String.Format("-f {0}+{1}/best {2} -i --no-check-certificate --prefer-ffmpeg --no-warnings {2} {3} {4} {5} -o {6} {7}", videoFormatId, audioFormatId, (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : ""), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), filePathTemplate, url);
+                    this.opts = String.Format("-f {0}+{1}/best {2} -i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames {2} {3} {4} {5} -o {6} {7}", videoFormatId, audioFormatId, (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : ""), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), filePathTemplate, url);
                     this.type = "video";
                 }
                 else if (!chkBoxExportVideo.Checked && chkBoxExportAudio.Checked)
                 {
                     // audio only
-                    this.opts = String.Format("-f {0} -x --audio-format {1} --audio-quality 0 -i --no-check-certificate --prefer-ffmpeg --no-warnings {2} {3} {4} -o {5} {6}", audioFormatId, cbAudioEncoder.Text.Trim(), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), filePathTemplate, url);
+                    this.opts = String.Format("-f {0} -x --audio-format {1} --audio-quality 0 -i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames {2} {3} {4} -o {5} {6}", audioFormatId, cbAudioEncoder.Text.Trim(), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), filePathTemplate, url);
                     this.type = "audio";
                 }
 
