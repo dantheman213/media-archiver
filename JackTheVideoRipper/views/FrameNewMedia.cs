@@ -58,12 +58,17 @@ namespace JackTheVideoRipper
 
         private void ingestMediaUrl()
         {
+            var f = new FrameCheckMetadata();
             try
             {
                 string url = textUrl.Text.Trim();
                 if (url != lastValidUrl && Common.isValidURL(url))
                 {
                     lastValidUrl = url;
+
+                    this.Enabled = false;
+                    f.Show();
+                    Application.DoEvents();
 
                     var info = YouTubeDL.getMediaData(url);
                     string thumbnailFilePath = YouTubeDL.downloadThumbnail(info.thumbnail);
@@ -210,6 +215,9 @@ namespace JackTheVideoRipper
                 Console.WriteLine(ex);
                 MessageBox.Show("Unable to detect metadata!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            f.Close();
+            this.Enabled = true;
         }
 
         private void timerPostLoad_Tick(object sender, EventArgs e)

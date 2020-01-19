@@ -371,6 +371,7 @@
             // 
             // buttonCancel
             // 
+            this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.Location = new System.Drawing.Point(915, 692);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(128, 38);
@@ -410,8 +411,10 @@
             // 
             // FrameNewMedia
             // 
+            this.AcceptButton = this.buttonDownload;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(1188, 742);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.buttonCancel);
