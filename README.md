@@ -27,6 +27,10 @@ All required dependencies are installed, updated, and maintained automatically f
 
 ## FAQs
 
+##### What streaming providers are supported?
+
+A list of support services is available within the app; navigate to the menu and go to Help > About. `youtube-dl` will dictate which services are supported.
+
 ##### The downloaded file doesn't play on my computer, what's wrong?
 
 Try using a different media player. The best free media player out there is [VLC Player](https://www.videolan.org/vlc/index.html). Install and use that to ensure you can playback all desired media files.
