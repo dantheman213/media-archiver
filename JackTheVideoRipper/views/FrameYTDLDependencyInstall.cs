@@ -19,6 +19,8 @@ namespace JackTheVideoRipper
 
         private void FrameYTDLDependencyInstall_Shown(object sender, EventArgs e)
         {
+            Application.DoEvents();
+
             YouTubeDL.downloadAndInstall();
             this.Close();
         }

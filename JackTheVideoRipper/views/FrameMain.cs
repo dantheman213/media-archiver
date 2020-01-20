@@ -22,7 +22,7 @@ namespace JackTheVideoRipper
         {
             if (!YouTubeDL.isInstalled())
             {
-                var result = MessageBox.Show("Could not find youtube-dl on your system. Other components may also be missing. Install all required missing components?", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                var result = MessageBox.Show("youtube-dl is required. Install?", "Install Core Component", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result == DialogResult.Yes)
                 {
                     var f = new FrameYTDLDependencyInstall();
