@@ -27,18 +27,10 @@ namespace JackTheVideoRipper
                 {
                     result = MessageBox.Show("Could not find youtube-dl on your system. Other components may also be missing. Install all required missing components?", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 }
-                else if (!FFmpeg.isInstalled())
-                {
-                    result = MessageBox.Show("Could not find FFmpeg on your system. Other components may also be missing. Install required missing components?", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                }
-                else if (!AtomicParsley.isInstalled())
-                {
-                    result = MessageBox.Show("Could not find AtomicParsley on your system. Other components may also be missing. Install required missing components?", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                }
-
+                
                 if (result == DialogResult.Yes)
                 {
-                    var f = new FrameDependencyInstall();
+                    var f = new FrameYTDLDependencyInstall();
                     f.ShowDialog();
                     // TODO ?
                     MessageBox.Show("Components have been installed successfully!", "Required Components Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -47,6 +39,16 @@ namespace JackTheVideoRipper
                 else
                 {
                     MessageBox.Show("Required components not installed! This app will NOT behave correctly because its critical dependencies are missing.", "Application Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (!FFmpeg.isInstalled())
+                {
+                    result = MessageBox.Show("Could not find FFmpeg on your system. This app will NOT behave correctly because its critical dependencies are missing. Please reinstall this app.", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                }
+                else if (!AtomicParsley.isInstalled())
+                {
+                    result = MessageBox.Show("Could not find AtomicParsley on your system.. This app will NOT behave correctly because its critical dependencies are missing. Please reinstall this app.", "Required components not installed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 }
             }
         }

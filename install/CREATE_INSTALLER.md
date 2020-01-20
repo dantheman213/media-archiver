@@ -5,4 +5,5 @@
   - [ffmpeg.exe](https://www.ffmpeg.org/download.html#build-windows)
   - [AtomicParsley.exe](http://atomicparsley.sourceforge.net/)
   - [vcredist_x86.exe](https://www.microsoft.com/en-us/download/details.aspx?id=5555)
+* Compile Release version of app
 * Use NSIS to compile `installer.nsi`

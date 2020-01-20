@@ -10,18 +10,16 @@ using System.Windows.Forms;
 
 namespace JackTheVideoRipper
 {
-    public partial class FrameDependencyInstall : Form
+    public partial class FrameYTDLDependencyInstall : Form
     {
-        public FrameDependencyInstall()
+        public FrameYTDLDependencyInstall()
         {
             InitializeComponent();
         }
 
-        private void FrameDependencyInstall_Shown(object sender, EventArgs e)
+        private void FrameYTDLDependencyInstall_Shown(object sender, EventArgs e)
         {
             YouTubeDL.downloadAndInstall();
-            FFmpeg.downloadAndInstall();
-            AtomicParsley.downloadAndInstall();
             this.Close();
         }
     }

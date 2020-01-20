@@ -1,6 +1,6 @@
 ﻿namespace JackTheVideoRipper
 {
-    partial class FrameDependencyInstall
+    partial class FrameYTDLDependencyInstall
     {
         /// <summary>
         /// Required designer variable.
@@ -41,7 +41,7 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Installing Dependencies...";
             // 
-            // FrameDependencyInstall
+            // FrameYTDLDependencyInstall
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -51,13 +51,13 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "FrameDependencyInstall";
+            this.Name = "FrameYTDLDependencyInstall";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Installing...";
             this.TopMost = true;
-            this.Shown += new System.EventHandler(this.FrameDependencyInstall_Shown);
+            this.Shown += new System.EventHandler(this.FrameYTDLDependencyInstall_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 
