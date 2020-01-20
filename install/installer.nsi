@@ -98,7 +98,15 @@ SetOutPath "${INSTDIR_DATA}"
 File "deps\AtomicParsley.exe"
 File "deps\ffmpeg.exe"
 File "deps\vcredist_x86.exe"
-Exec "${INSTDIR_DATA}\vcredist_x86.exe"
+
+# Download latest version of youtube-dl for end-user
+# TODO: This currently runs in background and silently. On computers with slow or spotty Internet connections may be an issue
+# This should wait until finished before continuing...
+nsExec::ExecToStack 'powershell.exe -Command "(new-object System.Net.WebClient).DownloadFile(\"https://yt-dl.org/downloads/latest/youtube-dl.exe\", \"${INSTDIR_DATA}\youtube-dl.exe\")"'
+
+# Run external installer
+ExecWait "${INSTDIR_DATA}\vcredist_x86.exe"
+
 SectionEnd
 
 ######################################################################
