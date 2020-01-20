@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.label1 = new System.Windows.Forms.Label();
+            this.timerPostLoad = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // label1
@@ -40,6 +42,12 @@
             this.label1.Size = new System.Drawing.Size(227, 25);
             this.label1.TabIndex = 0;
             this.label1.Text = "Downloading Metadata...";
+            // 
+            // timerPostLoad
+            // 
+            this.timerPostLoad.Enabled = true;
+            this.timerPostLoad.Interval = 10000;
+            this.timerPostLoad.Tick += new System.EventHandler(this.timerPostLoad_Tick);
             // 
             // FrameCheckMetadata
             // 
@@ -64,5 +72,6 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Timer timerPostLoad;
     }
 }

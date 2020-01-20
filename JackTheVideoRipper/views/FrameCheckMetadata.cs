@@ -16,5 +16,11 @@ namespace JackTheVideoRipper
         {
             InitializeComponent();
         }
+
+        private void timerPostLoad_Tick(object sender, EventArgs e)
+        {
+            // Timeout
+            this.Close();
+        }
     }
 }
