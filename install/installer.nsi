@@ -3,7 +3,6 @@
 #               Entirely Edited with NullSoft Scriptable Installation System                
 #              by Vlasis K. Barkas aka Red Wine red_wine@freemail.gr Sep 2006               
 ############################################################################################
-
 !define APP_NAME "JackTheVideoRipper"
 !define COMP_NAME "dantheman213"
 !define WEB_SITE "https://github.com/dantheman213/JackTheVideoRipper"
@@ -93,11 +92,13 @@ SectionEnd
 ######################################################################
 
 Section -Additional
-SetOutPath "$APPDATA\${APP_NAME}\bin"
+SetShellVarContext all
+!define INSTDIR_DATA "$APPDATA\${APP_NAME}\bin"
+SetOutPath "${INSTDIR_DATA}"
 File "deps\AtomicParsley.exe"
 File "deps\ffmpeg.exe"
 File "deps\vcredist_x86.exe"
-Exec "$APPDATA\${APP_NAME}\bin\vcredist_x86.exe"
+Exec "${INSTDIR_DATA}\vcredist_x86.exe"
 SectionEnd
 
 ######################################################################
@@ -157,9 +158,9 @@ Delete "$INSTDIR\${APP_NAME} website.url"
 RmDir "$INSTDIR"
 
 !ifndef NEVER_UNINSTALL
-Delete "$TEMP\${APP_NAME}\AtomicParsley.exe"
-Delete "$TEMP\${APP_NAME}\ffmpeg.exe"
-Delete "$TEMP\${APP_NAME}\vcredist_x86.exe"
+Delete "${INSTDIR_DATA}\AtomicParsley.exe"
+Delete "${INSTDIR_DATA}\ffmpeg.exe"
+Delete "${INSTDIR_DATA}\vcredist_x86.exe"
  
 RmDir "$TEMP\${APP_NAME}"
 !endif

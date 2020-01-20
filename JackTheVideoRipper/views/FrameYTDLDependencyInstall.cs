@@ -22,5 +22,10 @@ namespace JackTheVideoRipper
             YouTubeDL.downloadAndInstall();
             this.Close();
         }
+
+        private void FrameYTDLDependencyInstall_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
