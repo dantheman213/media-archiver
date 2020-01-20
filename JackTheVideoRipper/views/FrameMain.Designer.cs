@@ -47,6 +47,8 @@
             this.youTubeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadAsVideoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadAsAudioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.openDownloadFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -72,8 +74,6 @@
             this.toolBarLabelMemory = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolBarLabelNetwork = new System.Windows.Forms.ToolStripStatusLabel();
             this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
-            this.openDownloadFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -211,6 +211,18 @@
             this.downloadAsAudioToolStripMenuItem.Size = new System.Drawing.Size(282, 30);
             this.downloadAsAudioToolStripMenuItem.Text = "Download As Audio";
             this.downloadAsAudioToolStripMenuItem.Click += new System.EventHandler(this.downloadAsAudioToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(279, 6);
+            // 
+            // openDownloadFolderToolStripMenuItem
+            // 
+            this.openDownloadFolderToolStripMenuItem.Name = "openDownloadFolderToolStripMenuItem";
+            this.openDownloadFolderToolStripMenuItem.Size = new System.Drawing.Size(282, 30);
+            this.openDownloadFolderToolStripMenuItem.Text = "Open Download Folder";
+            this.openDownloadFolderToolStripMenuItem.Click += new System.EventHandler(this.openDownloadFolderToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -393,8 +405,8 @@
             // toolBarLabelMemory
             // 
             this.toolBarLabelMemory.Name = "toolBarLabelMemory";
-            this.toolBarLabelMemory.Size = new System.Drawing.Size(120, 25);
-            this.toolBarLabelMemory.Text = "Memory: N/A";
+            this.toolBarLabelMemory.Size = new System.Drawing.Size(196, 25);
+            this.toolBarLabelMemory.Text = "Available Memory: N/A";
             // 
             // toolBarLabelNetwork
             // 
@@ -406,18 +418,6 @@
             // 
             this.timerStatusBar.Interval = 2500;
             this.timerStatusBar.Tick += new System.EventHandler(this.timerStatusBar_Tick);
-            // 
-            // openDownloadFolderToolStripMenuItem
-            // 
-            this.openDownloadFolderToolStripMenuItem.Name = "openDownloadFolderToolStripMenuItem";
-            this.openDownloadFolderToolStripMenuItem.Size = new System.Drawing.Size(282, 30);
-            this.openDownloadFolderToolStripMenuItem.Text = "Open Download Folder";
-            this.openDownloadFolderToolStripMenuItem.Click += new System.EventHandler(this.openDownloadFolderToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(279, 6);
             // 
             // FrameMain
             // 

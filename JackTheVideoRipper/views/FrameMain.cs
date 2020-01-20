@@ -419,7 +419,7 @@ namespace JackTheVideoRipper
         private void timerStatusBar_Tick(object sender, EventArgs e)
         {
             toolBarLabelCpu.Text = String.Format("CPU: {0}", Common.getCpuUsagePercentage());
-            toolBarLabelMemory.Text = String.Format("Availble Memory: {0}", Common.getAvailableMemory());
+            toolBarLabelMemory.Text = String.Format("Available Memory: {0}", Common.getAvailableMemory());
             toolBarLabelNetwork.Text = String.Format("Network Ingress: {0}", Common.getNetworkTransfer());
         }
 
