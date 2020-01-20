@@ -38,3 +38,7 @@ The best free easy-to-use GUI tool is [Handbrake](https://handbrake.fr/).
 ##### Feature X isn't working correctly, why not?
 
 This app is currently in pre-release and not everything will work correctly. Please standby for further updates.
+
+##### Why is `youtube-dl` not bundled but rather downloaded when Windows Installer runs?
+
+This has to do with `youtube-dl`'s features and functionality. `youtube-dl` is constantly evolving and updating to make sure it is working with the latest changes made by streaming providers. Because of the ever changing nature bundling the current version of `youtube-dl` doesn't make sense. It will likely be out of date already by the time a user runs the installer. Most other software, like bundled apps `vcredist-x86` or `ffmpeg`, are extremely stable and do not need to be altered frequently to work correctly.
