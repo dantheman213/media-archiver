@@ -25,6 +25,10 @@ All required dependencies are installed, updated, and maintained automatically f
 * [ffmpeg](https://www.ffmpeg.org/download.html#build-windows)
 * [AtomicParsley](http://atomicparsley.sourceforge.net)
 
+## Development
+
+It is recommended that you [download and run the Windows Installer](https://github.com/dantheman213/JackTheVideoRipper/releases) so that all dependencies are installed correctly before you download the source code, build, and run the application. If the dependencies are not installed when the application runs, the application will crash or not behave correctly.
+
 ## FAQs
 
 ##### What streaming providers are supported?
