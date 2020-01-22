@@ -35,6 +35,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.textDependencies = new System.Windows.Forms.TextBox();
+            this.labelYouTubeDL = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -64,7 +65,7 @@
             this.labelVersion.AutoSize = true;
             this.labelVersion.BackColor = System.Drawing.Color.Transparent;
             this.labelVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelVersion.Location = new System.Drawing.Point(475, 28);
+            this.labelVersion.Location = new System.Drawing.Point(468, 28);
             this.labelVersion.Name = "labelVersion";
             this.labelVersion.Size = new System.Drawing.Size(75, 29);
             this.labelVersion.TabIndex = 2;
@@ -111,11 +112,23 @@
             this.textDependencies.TabIndex = 5;
             this.textDependencies.Text = "* Visual C++ 2010 Redistributable (x86)\r\n* youtube-dl\r\n* ffmpeg\r\n* AtomicParsley";
             // 
+            // labelYouTubeDL
+            // 
+            this.labelYouTubeDL.AutoSize = true;
+            this.labelYouTubeDL.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelYouTubeDL.ForeColor = System.Drawing.Color.Red;
+            this.labelYouTubeDL.Location = new System.Drawing.Point(16, 70);
+            this.labelYouTubeDL.Name = "labelYouTubeDL";
+            this.labelYouTubeDL.Size = new System.Drawing.Size(152, 25);
+            this.labelYouTubeDL.TabIndex = 7;
+            this.labelYouTubeDL.Text = "youtube-dl 0.0.0";
+            // 
             // FrameAbout
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(759, 851);
+            this.Controls.Add(this.labelYouTubeDL);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.textDependencies);
             this.Controls.Add(this.label2);
@@ -146,5 +159,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textDependencies;
+        private System.Windows.Forms.Label labelYouTubeDL;
     }
 }

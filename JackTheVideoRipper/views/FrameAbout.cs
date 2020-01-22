@@ -32,10 +32,10 @@ namespace JackTheVideoRipper
 
             try
             {
-                var p = CLI.runYouTubeCommand(YouTubeDL.binPath, "--list-extractors");
-                p.Start();
-                var lines ="* " + p.StandardOutput.ReadToEnd().Trim().Replace("\n", "\r\n* ");
+                var lines = YouTubeDL.getExtractors().Replace("\n", "\r\n* ");
                 textExtractors.Text = lines;
+
+                labelYouTubeDL.Text = String.Format("youtube-dl {0}", YouTubeDL.getVersion());
             }
             catch (Exception ex)
             {

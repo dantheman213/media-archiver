@@ -113,5 +113,21 @@ namespace JackTheVideoRipper
             string json = p.StandardOutput.ReadToEnd().Trim();
             return JsonConvert.DeserializeObject<MediaInfoData>(json);
         }
+
+        public static string getExtractors()
+        {
+            string opts = "--list-extractors";
+            var p = CLI.runYouTubeCommand(binPath, opts);
+            p.Start();
+            return p.StandardOutput.ReadToEnd().Trim();
+        }
+
+        public static string getVersion()
+        {
+            string opts = "--version";
+            var p = CLI.runYouTubeCommand(binPath, opts);
+            p.Start();
+            return p.StandardOutput.ReadToEnd().Trim();
+        }
     }
 }

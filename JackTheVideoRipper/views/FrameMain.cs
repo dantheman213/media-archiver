@@ -10,7 +10,7 @@ namespace JackTheVideoRipper
 {
     public partial class FrameMain : Form
     {
-        private static int maxConcurrentDownload = 2;
+        private static int maxConcurrentDownload = 5;
 
         private static Dictionary<string, ProcessUpdateRow> dict = new Dictionary<string, ProcessUpdateRow>();
         private static System.Threading.Timer listItemRowsUpdateTimer;
