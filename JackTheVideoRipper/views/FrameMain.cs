@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,7 +11,7 @@ namespace JackTheVideoRipper
 {
     public partial class FrameMain : Form
     {
-        private static int maxConcurrentDownload = 5;
+        public static Settings settings;
 
         private static Dictionary<string, ProcessUpdateRow> dict = new Dictionary<string, ProcessUpdateRow>();
         private static System.Threading.Timer listItemRowsUpdateTimer;
@@ -51,8 +52,22 @@ namespace JackTheVideoRipper
             }
         }
         
+        private void loadConfig()
+        {
+            if (!Settings.Exists())
+            {
+                Directory.CreateDirectory(Settings.dir);
+                File.WriteAllText(Settings.filePath, JsonConvert.SerializeObject(Settings.generateDefaultSettings()));
+            }
+
+            var json = File.ReadAllText(Settings.filePath);
+            settings = JsonConvert.DeserializeObject<Settings>(json);
+        }
+
         private void FrameMain_Load(object sender, EventArgs e)
         {
+            loadConfig();
+            
             this.Text = String.Format("JackTheVideoRipper {0}", Common.getAppVersion());
             listItemRowsUpdateTimer = new System.Threading.Timer(updateListItemRows, null, 0, 800);
             
@@ -266,7 +281,7 @@ namespace JackTheVideoRipper
 
             // couldn't find folder, rolling back to just the folder with no select
             Console.WriteLine(String.Format("couldn't find file to open at {0}", filePath));
-            Common.openFolder(YouTubeDL.defaultDownloadPath);
+            Common.openFolder(settings.defaultDownloadPath);
         }
 
         private void listItems_MouseClick(object sender, MouseEventArgs e)
@@ -450,7 +465,7 @@ namespace JackTheVideoRipper
 
         private void openDownloadFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Common.openFolder(YouTubeDL.defaultDownloadPath);
+            Common.openFolder(settings.defaultDownloadPath);
         }
         
         private void downloadBatchManualToolStripMenuItem_Click(object sender, EventArgs e)
@@ -473,7 +488,7 @@ namespace JackTheVideoRipper
                         addMediaItemRow(item.title, f.type, item.url, item.opts, item.filePath);
                     }
 
-                    for (int i = 0; i < maxConcurrentDownload; i++)
+                    for (int i = 0; i < settings.maxConcurrentDownloads; i++)
                     {
                         Application.DoEvents();
                         System.Threading.Thread.Sleep(1000);
@@ -486,7 +501,7 @@ namespace JackTheVideoRipper
         private void downloadBatchDocumentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var d = new OpenFileDialog();
-            d.InitialDirectory = YouTubeDL.defaultDownloadPath;
+            d.InitialDirectory = settings.defaultDownloadPath;
             d.Filter = "All Files (*.*)|*.*";
 
             if (d.ShowDialog() == DialogResult.OK)
@@ -560,7 +575,7 @@ namespace JackTheVideoRipper
 
                 if (total - done > 0)
                 {
-                    if (active < maxConcurrentDownload)
+                    if (active < settings.maxConcurrentDownloads)
                     {
                         foreach (var pur in dict.Values)
                         {
@@ -604,6 +619,12 @@ namespace JackTheVideoRipper
                     }
                 }
             }
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = new FrameSettings();
+            f.ShowDialog();
         }
     }
 }
