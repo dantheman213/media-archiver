@@ -81,40 +81,5 @@ namespace JackTheVideoRipper
        
             return process;
         }
-
-        public static bool hasStartedButNotFinished(Process p)
-        {
-            bool isRunning = false;
-
-            try
-            {
-                isRunning = !p.HasExited && p.Threads.Count > 0;
-            }
-            catch (SystemException ex)
-            {
-                isRunning = false;
-            }
-
-            return isRunning;
-        }
-
-        public static bool hasNotStarted(Process p)
-        {
-            try
-            {
-                if (!p.HasExited && p.Threads.Count > 0)
-                {
-                    return false;
-                }
-            }
-            catch(InvalidOperationException ioe)
-            {
-                if (ioe.ToString().ToLower().IndexOf("no process is associated with this object") > -1) {
-                    return true;
-                }
-            }
-            
-            return false;
-        }
     }
 }
