@@ -343,7 +343,7 @@ namespace JackTheVideoRipper
         {
             foreach (ListViewItem item in listItems.Items)
             {
-                if (item.SubItems[1].Text != "Complete")
+                if (item.SubItems[1].Text != "Complete" && item.SubItems[1].Text != "Error")
                 {
                     if (MessageBox.Show("You have pending downloads, are you sure you want to exit?", "Verify Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                     {
