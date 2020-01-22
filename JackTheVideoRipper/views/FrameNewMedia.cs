@@ -8,6 +8,8 @@ namespace JackTheVideoRipper
 {
     public partial class FrameNewMedia : Form
     {
+        private string startType;
+
         public string title;
         public string type;
         public string url;
@@ -18,14 +20,18 @@ namespace JackTheVideoRipper
         private Dictionary<string, string> videoIdLookupTable;
         private Dictionary<string, string> audioIdLookupTable;
 
-        public FrameNewMedia()
+        public FrameNewMedia(string type)
         {
+            this.startType = type;
             InitializeComponent();
         }
 
         private void FrameNewMedia_Load(object sender, EventArgs e)
         {
-        
+            if (this.startType == "audio")
+            {
+                chkBoxExportVideo.Checked = false;
+            }
         }
 
         private List<Task<bool>> taskTypeQueue = new List<Task<bool>>();
@@ -268,7 +274,7 @@ namespace JackTheVideoRipper
                 {
                     // video and audio
                     this.opts = String.Format("-f {0}+{1}/best {2} -i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames {2} {3} {4} {5} -o {6} {7}", videoFormatId, audioFormatId, (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : ""), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), filePathTemplate, url);
-                    this.type = "video+audio";
+                    this.type = "video"; // TODO: +audio"; ?
                 }
                 else if (chkBoxExportVideo.Checked && !chkBoxExportAudio.Checked)
                 {
@@ -355,6 +361,8 @@ namespace JackTheVideoRipper
                 cbVideoFormat.Enabled = false;
                 cbVideoEncoder.Enabled = false;
                 cbAudioEncoder.Enabled = true;
+
+                tabImportType.SelectedTab = tabPageAudio;
             }
         }
 

@@ -45,8 +45,12 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.youTubeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadAsVideoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadAsAudioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadVideoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadAudioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.batchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadBatchManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadBatchDocumentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadBatchYouTubePlaylistlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.openDownloadFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,11 +58,12 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.downloadVS2010RedistributableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadAtomicParsleyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadFFmpegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadVLCPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadHandbrakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.downloadVS2010RedistributableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadFFmpegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadAtomicParsleyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuListItems = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.convertMediaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
@@ -74,6 +79,8 @@
             this.toolBarLabelMemory = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolBarLabelNetwork = new System.Windows.Forms.ToolStripStatusLabel();
             this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
+            this.timerCheckForUpdates = new System.Windows.Forms.Timer(this.components);
+            this.timerProcessLimit = new System.Windows.Forms.Timer(this.components);
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -190,27 +197,59 @@
             // youTubeToolStripMenuItem
             // 
             this.youTubeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.downloadAsVideoToolStripMenuItem,
-            this.downloadAsAudioToolStripMenuItem,
+            this.downloadVideoToolStripMenuItem,
+            this.downloadAudioToolStripMenuItem,
+            this.batchToolStripMenuItem,
             this.toolStripSeparator3,
             this.openDownloadFolderToolStripMenuItem});
             this.youTubeToolStripMenuItem.Name = "youTubeToolStripMenuItem";
             this.youTubeToolStripMenuItem.Size = new System.Drawing.Size(73, 29);
             this.youTubeToolStripMenuItem.Text = "&Media";
             // 
-            // downloadAsVideoToolStripMenuItem
+            // downloadVideoToolStripMenuItem
             // 
-            this.downloadAsVideoToolStripMenuItem.Name = "downloadAsVideoToolStripMenuItem";
-            this.downloadAsVideoToolStripMenuItem.Size = new System.Drawing.Size(282, 30);
-            this.downloadAsVideoToolStripMenuItem.Text = "Download As Video";
-            this.downloadAsVideoToolStripMenuItem.Click += new System.EventHandler(this.downloadAsVideoToolStripMenuItem_Click);
+            this.downloadVideoToolStripMenuItem.Name = "downloadVideoToolStripMenuItem";
+            this.downloadVideoToolStripMenuItem.Size = new System.Drawing.Size(282, 30);
+            this.downloadVideoToolStripMenuItem.Text = "Download &Video";
+            this.downloadVideoToolStripMenuItem.Click += new System.EventHandler(this.downloadVideoToolStripMenuItem_Click);
             // 
-            // downloadAsAudioToolStripMenuItem
+            // downloadAudioToolStripMenuItem
             // 
-            this.downloadAsAudioToolStripMenuItem.Name = "downloadAsAudioToolStripMenuItem";
-            this.downloadAsAudioToolStripMenuItem.Size = new System.Drawing.Size(282, 30);
-            this.downloadAsAudioToolStripMenuItem.Text = "Download As Audio";
-            this.downloadAsAudioToolStripMenuItem.Click += new System.EventHandler(this.downloadAsAudioToolStripMenuItem_Click);
+            this.downloadAudioToolStripMenuItem.Name = "downloadAudioToolStripMenuItem";
+            this.downloadAudioToolStripMenuItem.Size = new System.Drawing.Size(282, 30);
+            this.downloadAudioToolStripMenuItem.Text = "Download &Audio";
+            this.downloadAudioToolStripMenuItem.Click += new System.EventHandler(this.downloadAudioToolStripMenuItem_Click);
+            // 
+            // batchToolStripMenuItem
+            // 
+            this.batchToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.downloadBatchManualToolStripMenuItem,
+            this.downloadBatchDocumentToolStripMenuItem,
+            this.downloadBatchYouTubePlaylistlToolStripMenuItem});
+            this.batchToolStripMenuItem.Name = "batchToolStripMenuItem";
+            this.batchToolStripMenuItem.Size = new System.Drawing.Size(282, 30);
+            this.batchToolStripMenuItem.Text = "Download &Batch";
+            // 
+            // downloadBatchManualToolStripMenuItem
+            // 
+            this.downloadBatchManualToolStripMenuItem.Name = "downloadBatchManualToolStripMenuItem";
+            this.downloadBatchManualToolStripMenuItem.Size = new System.Drawing.Size(223, 30);
+            this.downloadBatchManualToolStripMenuItem.Text = "&Manual";
+            this.downloadBatchManualToolStripMenuItem.Click += new System.EventHandler(this.downloadBatchManualToolStripMenuItem_Click);
+            // 
+            // downloadBatchDocumentToolStripMenuItem
+            // 
+            this.downloadBatchDocumentToolStripMenuItem.Name = "downloadBatchDocumentToolStripMenuItem";
+            this.downloadBatchDocumentToolStripMenuItem.Size = new System.Drawing.Size(223, 30);
+            this.downloadBatchDocumentToolStripMenuItem.Text = "Document";
+            this.downloadBatchDocumentToolStripMenuItem.Click += new System.EventHandler(this.downloadBatchDocumentToolStripMenuItem_Click);
+            // 
+            // downloadBatchYouTubePlaylistlToolStripMenuItem
+            // 
+            this.downloadBatchYouTubePlaylistlToolStripMenuItem.Name = "downloadBatchYouTubePlaylistlToolStripMenuItem";
+            this.downloadBatchYouTubePlaylistlToolStripMenuItem.Size = new System.Drawing.Size(223, 30);
+            this.downloadBatchYouTubePlaylistlToolStripMenuItem.Text = "YouTube Playlist";
+            this.downloadBatchYouTubePlaylistlToolStripMenuItem.Click += new System.EventHandler(this.downloadBatchYouTubePlaylistlToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
@@ -221,7 +260,7 @@
             // 
             this.openDownloadFolderToolStripMenuItem.Name = "openDownloadFolderToolStripMenuItem";
             this.openDownloadFolderToolStripMenuItem.Size = new System.Drawing.Size(282, 30);
-            this.openDownloadFolderToolStripMenuItem.Text = "Open Download Folder";
+            this.openDownloadFolderToolStripMenuItem.Text = "&Open Download Folder";
             this.openDownloadFolderToolStripMenuItem.Click += new System.EventHandler(this.openDownloadFolderToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
@@ -231,11 +270,12 @@
             this.toolStripSeparator1,
             this.checkForUpdatesToolStripMenuItem,
             this.toolStripSeparator2,
-            this.downloadVS2010RedistributableToolStripMenuItem,
-            this.downloadAtomicParsleyToolStripMenuItem,
-            this.downloadFFmpegToolStripMenuItem,
             this.downloadVLCPlayerToolStripMenuItem,
-            this.downloadHandbrakeToolStripMenuItem});
+            this.downloadHandbrakeToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.downloadVS2010RedistributableToolStripMenuItem,
+            this.downloadFFmpegToolStripMenuItem,
+            this.downloadAtomicParsleyToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(61, 29);
             this.helpToolStripMenuItem.Text = "Help";
@@ -264,27 +304,6 @@
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(369, 6);
             // 
-            // downloadVS2010RedistributableToolStripMenuItem
-            // 
-            this.downloadVS2010RedistributableToolStripMenuItem.Name = "downloadVS2010RedistributableToolStripMenuItem";
-            this.downloadVS2010RedistributableToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
-            this.downloadVS2010RedistributableToolStripMenuItem.Text = "Download VS 2010 Redistributable";
-            this.downloadVS2010RedistributableToolStripMenuItem.Click += new System.EventHandler(this.downloadVS2010RedistributableToolStripMenuItem_Click);
-            // 
-            // downloadAtomicParsleyToolStripMenuItem
-            // 
-            this.downloadAtomicParsleyToolStripMenuItem.Name = "downloadAtomicParsleyToolStripMenuItem";
-            this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
-            this.downloadAtomicParsleyToolStripMenuItem.Text = "Download AtomicParsley";
-            this.downloadAtomicParsleyToolStripMenuItem.Click += new System.EventHandler(this.downloadAtomicParsleyToolStripMenuItem_Click);
-            // 
-            // downloadFFmpegToolStripMenuItem
-            // 
-            this.downloadFFmpegToolStripMenuItem.Name = "downloadFFmpegToolStripMenuItem";
-            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
-            this.downloadFFmpegToolStripMenuItem.Text = "Download FFmpeg";
-            this.downloadFFmpegToolStripMenuItem.Click += new System.EventHandler(this.downloadFFmpegToolStripMenuItem_Click);
-            // 
             // downloadVLCPlayerToolStripMenuItem
             // 
             this.downloadVLCPlayerToolStripMenuItem.Name = "downloadVLCPlayerToolStripMenuItem";
@@ -298,6 +317,32 @@
             this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
             this.downloadHandbrakeToolStripMenuItem.Text = "Download Handbrake";
             this.downloadHandbrakeToolStripMenuItem.Click += new System.EventHandler(this.downloadHandbrakeToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(369, 6);
+            // 
+            // downloadVS2010RedistributableToolStripMenuItem
+            // 
+            this.downloadVS2010RedistributableToolStripMenuItem.Name = "downloadVS2010RedistributableToolStripMenuItem";
+            this.downloadVS2010RedistributableToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
+            this.downloadVS2010RedistributableToolStripMenuItem.Text = "Download VS 2010 Redistributable";
+            this.downloadVS2010RedistributableToolStripMenuItem.Click += new System.EventHandler(this.downloadVS2010RedistributableToolStripMenuItem_Click);
+            // 
+            // downloadFFmpegToolStripMenuItem
+            // 
+            this.downloadFFmpegToolStripMenuItem.Name = "downloadFFmpegToolStripMenuItem";
+            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
+            this.downloadFFmpegToolStripMenuItem.Text = "Download FFmpeg";
+            this.downloadFFmpegToolStripMenuItem.Click += new System.EventHandler(this.downloadFFmpegToolStripMenuItem_Click);
+            // 
+            // downloadAtomicParsleyToolStripMenuItem
+            // 
+            this.downloadAtomicParsleyToolStripMenuItem.Name = "downloadAtomicParsleyToolStripMenuItem";
+            this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(372, 30);
+            this.downloadAtomicParsleyToolStripMenuItem.Text = "Download AtomicParsley";
+            this.downloadAtomicParsleyToolStripMenuItem.Click += new System.EventHandler(this.downloadAtomicParsleyToolStripMenuItem_Click);
             // 
             // contextMenuListItems
             // 
@@ -419,6 +464,17 @@
             this.timerStatusBar.Interval = 2500;
             this.timerStatusBar.Tick += new System.EventHandler(this.timerStatusBar_Tick);
             // 
+            // timerCheckForUpdates
+            // 
+            this.timerCheckForUpdates.Enabled = true;
+            this.timerCheckForUpdates.Interval = 1000;
+            this.timerCheckForUpdates.Tick += new System.EventHandler(this.timerCheckForUpdates_Tick);
+            // 
+            // timerProcessLimit
+            // 
+            this.timerProcessLimit.Interval = 3500;
+            this.timerProcessLimit.Tick += new System.EventHandler(this.timerProcessLimit_Tick);
+            // 
             // FrameMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -462,9 +518,9 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem downloadAsVideoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem downloadVideoToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader cURL;
-        private System.Windows.Forms.ToolStripMenuItem downloadAsAudioToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem downloadAudioToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader cType;
         private System.Windows.Forms.ColumnHeader cPath;
         private System.Windows.Forms.ContextMenuStrip contextMenuListItems;
@@ -494,6 +550,13 @@
         private System.Windows.Forms.ToolStripMenuItem downloadVS2010RedistributableToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem openDownloadFolderToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem batchToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem downloadBatchManualToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem downloadBatchDocumentToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem downloadBatchYouTubePlaylistlToolStripMenuItem;
+        private System.Windows.Forms.Timer timerCheckForUpdates;
+        private System.Windows.Forms.Timer timerProcessLimit;
     }
 }
 
