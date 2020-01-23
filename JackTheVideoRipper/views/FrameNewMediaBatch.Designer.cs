@@ -102,6 +102,7 @@
             this.chkBoxExportVideo.TabIndex = 19;
             this.chkBoxExportVideo.Text = "Export Video";
             this.chkBoxExportVideo.UseVisualStyleBackColor = true;
+            this.chkBoxExportVideo.CheckedChanged += new System.EventHandler(this.chkBoxExportVideo_CheckedChanged);
             // 
             // cbVideoEncoder
             // 
@@ -197,6 +198,7 @@
             this.chkBoxExportAudio.TabIndex = 19;
             this.chkBoxExportAudio.Text = "Export Audio";
             this.chkBoxExportAudio.UseVisualStyleBackColor = true;
+            this.chkBoxExportAudio.CheckedChanged += new System.EventHandler(this.chkBoxExportAudio_CheckedChanged);
             // 
             // label3
             // 
@@ -248,6 +250,7 @@
             this.buttonLocationBrowse.TabIndex = 1;
             this.buttonLocationBrowse.Text = "Browse";
             this.buttonLocationBrowse.UseVisualStyleBackColor = true;
+            this.buttonLocationBrowse.Click += new System.EventHandler(this.buttonLocationBrowse_Click);
             // 
             // textLocation
             // 
@@ -335,7 +338,6 @@
             // 
             // FrameNewMediaBatch
             // 
-            this.AcceptButton = this.buttonDownload;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;

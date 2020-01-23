@@ -8,9 +8,17 @@ Download videos and audio from YouTube and hundreds of more streaming providers.
 
 Download the latest version in the [release](https://github.com/dantheman213/JackTheVideoRipper/releases) section.
 
+## Features
+
+* Download video and/or audio with wide selection of supported formats
+
+* Extract URLs from any document type or YouTube playlist and add URLs to queue for batch download
+
+* 100+ supported streaming providers
+
 ## How Does It Work?
 
-JackTheVideoRipper manages and automates `youtube-dl` and `ffmpeg` under-the-hood to provide a streamlined, turn-key, point-and-click experience in order to download video or audio in a friendly and easy way.
+`JackTheVideoRipper` is a GUI that manages and automates powerful tools under-the-hood to provide a streamlined, turn-key, point-and-click experience in order to download video, audio, or playlists in a friendly and easy way. The true power lies within included command-line tools `youtube-dl` and `ffmpeg` which do the heavy lifting of extracting and/or transcoding the media.
 
 ## Requirements
 
@@ -25,7 +33,7 @@ All required dependencies are installed, updated, and maintained automatically f
 * [ffmpeg](https://www.ffmpeg.org/download.html#build-windows)
 * [AtomicParsley](http://atomicparsley.sourceforge.net)
 
-## Development
+## Develop
 
 It is recommended that you [download and run the Windows Installer](https://github.com/dantheman213/JackTheVideoRipper/releases) so that all dependencies are installed correctly before you download the source code, build, and run the application. If the dependencies are not installed when the application runs, the application will crash or not behave correctly.
 

@@ -488,13 +488,18 @@ namespace JackTheVideoRipper
                         addMediaItemRow(item.title, f.type, item.url, item.opts, item.filePath);
                     }
 
-                    for (int i = 0; i < settings.maxConcurrentDownloads; i++)
-                    {
-                        Application.DoEvents();
-                        System.Threading.Thread.Sleep(1000);
-                        timerProcessLimit_Tick(sender, e);
-                    }
+                    queueBatchDownloads();
                 }
+            }
+        }
+
+        private void queueBatchDownloads()
+        {
+            for (int i = 0; i < settings.maxConcurrentDownloads; i++)
+            {
+                Application.DoEvents();
+                System.Threading.Thread.Sleep(300);
+                timerProcessLimit_Tick(null, null);
             }
         }
 
@@ -624,7 +629,10 @@ namespace JackTheVideoRipper
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var f = new FrameSettings();
-            f.ShowDialog();
+            if (f.ShowDialog() == DialogResult.OK)
+            {
+                queueBatchDownloads();
+            }
         }
     }
 }
