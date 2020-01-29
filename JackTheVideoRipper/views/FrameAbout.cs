@@ -32,7 +32,7 @@ namespace JackTheVideoRipper
 
             try
             {
-                var lines = YouTubeDL.getExtractors().Replace("\n", "\r\n* ");
+                var lines = "* " + YouTubeDL.getExtractors().Replace("\n", "\r\n* ");
                 textExtractors.Text = lines;
 
                 labelYouTubeDL.Text = String.Format("youtube-dl {0}", YouTubeDL.getVersion());
