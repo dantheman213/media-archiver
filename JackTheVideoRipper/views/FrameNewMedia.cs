@@ -273,23 +273,22 @@ namespace JackTheVideoRipper
                 if (!String.IsNullOrEmpty(textUsername.Text) && !String.IsNullOrEmpty(textPassword.Text)) {
                     optAuth = String.Format("--username {0} --password {1}", textUsername.Text, textPassword.Text);
                 }
-
-                if (chkBoxExportVideo.Checked && chkBoxExportAudio.Checked)
+                string optEncode = (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : "");
+                string optMetadata = (chkBoxWriteMetadata.Checked ? "--add-metadata" : "");
+                string optAds = (chkBoxIncludeAds.Checked ? "--include-ads" : "");
+                string optEmbedThumbnail = (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : "");
+                string optGeneral = "-i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames";
+                if ((chkBoxExportVideo.Checked && chkBoxExportAudio.Checked) || (chkBoxExportVideo.Checked && !chkBoxExportAudio.Checked))
                 {
                     // video and audio
-                    this.opts = String.Format("-f {0}+{1}/best {2} -i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames {2} {3} {4} {5} {6} -o {7} {8}", videoFormatId, audioFormatId, (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : ""), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), optAuth, filePathTemplate, url);
+                    // TODO: split video/audio and video only
+                    this.opts = String.Format("-f {0}+{1}/best {2} {3} {4} {5} {6} {7} -o {8} {9}", videoFormatId, audioFormatId, optEncode, optGeneral, optMetadata, optEmbedThumbnail, optAds, optAuth, filePathTemplate, url);
                     this.type = "video"; // TODO: +audio"; ?
-                }
-                else if (chkBoxExportVideo.Checked && !chkBoxExportAudio.Checked)
-                {
-                    // video only
-                    this.opts = String.Format("-f {0}+{1}/best {2} -i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames {2} {3} {4} {5} {6} -o {7} {8}", videoFormatId, audioFormatId, (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : ""), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), optAuth, filePathTemplate, url);
-                    this.type = "video";
-                }
+                }               
                 else if (!chkBoxExportVideo.Checked && chkBoxExportAudio.Checked)
                 {
                     // audio only
-                    this.opts = String.Format("-f {0} -x --audio-format {1} --audio-quality 0 -i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames {2} {3} {4} -o {5} {6}", audioFormatId, cbAudioEncoder.Text.Trim(), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), filePathTemplate, url);
+                    this.opts = String.Format("-f {0} -x --audio-format {1} --audio-quality 0 {2} {3} {4} -o {4} {5}", audioFormatId, cbAudioEncoder.Text.Trim(), optGeneral, optMetadata, optAds, filePathTemplate, url);
                     this.type = "audio";
                 }
 
@@ -299,7 +298,7 @@ namespace JackTheVideoRipper
             }
             else
             {
-                // TODO
+                // TODO?
             }
         }
 
