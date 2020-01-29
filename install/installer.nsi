@@ -6,7 +6,7 @@
 !define APP_NAME "JackTheVideoRipper"
 !define COMP_NAME "dantheman213"
 !define WEB_SITE "https://github.com/dantheman213/JackTheVideoRipper"
-!define VERSION "0.6.1"
+!define VERSION "0.7.0"
 !define COPYRIGHT "Dan  � 2020"
 !define DESCRIPTION "Download YouTube videos easily with a few point and clicks."
 !define LICENSE_TXT "..\LICENSE"
