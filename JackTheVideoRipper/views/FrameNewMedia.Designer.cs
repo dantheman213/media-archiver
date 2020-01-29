@@ -65,6 +65,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.textPassword = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
+            this.buttonGetCommand = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.tabImportType.SuspendLayout();
             this.tabPageVideo.SuspendLayout();
@@ -461,6 +462,16 @@
             this.label9.TabIndex = 4;
             this.label9.Text = "Password:";
             // 
+            // buttonGetCommand
+            // 
+            this.buttonGetCommand.Location = new System.Drawing.Point(12, 692);
+            this.buttonGetCommand.Name = "buttonGetCommand";
+            this.buttonGetCommand.Size = new System.Drawing.Size(133, 38);
+            this.buttonGetCommand.TabIndex = 16;
+            this.buttonGetCommand.Text = "Get Command";
+            this.buttonGetCommand.UseVisualStyleBackColor = true;
+            this.buttonGetCommand.Click += new System.EventHandler(this.buttonGetCommand_Click);
+            // 
             // FrameNewMedia
             // 
             this.AcceptButton = this.buttonDownload;
@@ -468,6 +479,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(1188, 742);
+            this.Controls.Add(this.buttonGetCommand);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.buttonCancel);
@@ -545,5 +557,6 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textUsername;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button buttonGetCommand;
     }
 }
