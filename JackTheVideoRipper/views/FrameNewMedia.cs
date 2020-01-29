@@ -375,9 +375,16 @@ namespace JackTheVideoRipper
 
         private void buttonGetCommand_Click(object sender, EventArgs e)
         {
-            generateDownloadCommand();
-            Clipboard.SetText(String.Format("youtube-dl.exe {0}", this.opts));
-            MessageBox.Show("Command copied to clipboard!", "Generate Command", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (!String.IsNullOrEmpty(textUrl.Text.Trim()))
+            {
+                generateDownloadCommand();
+                Clipboard.SetText(String.Format("youtube-dl.exe {0}", this.opts));
+                MessageBox.Show("Command copied to clipboard!", "Generate Command", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                // TODO?
+            }
         }
 
         private void generateDownloadCommand()
