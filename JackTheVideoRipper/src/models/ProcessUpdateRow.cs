@@ -13,6 +13,8 @@ namespace JackTheVideoRipper
         public Process proc { get; set; }
         public ListViewItem item { get; set; }
         public List<string> results { get; set; }
-        public int cursor { get; set; }
+        public int cursor { get; set; } // where in message buffer are we
+        public bool started = false;
+        public bool finished = false;
     }
 }

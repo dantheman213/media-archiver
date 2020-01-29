@@ -63,9 +63,13 @@
   <ItemGroup>
     <Compile Include="src\AtomicParsley.cs" />
     <Compile Include="src\FFmpeg.cs" />
+    <Compile Include="src\Import.cs" />
+    <Compile Include="src\models\DownloadMediaItem.cs" />
     <Compile Include="src\models\MediaInfoData.cs" />
+    <Compile Include="src\models\PlaylistInfoItem.cs" />
     <Compile Include="src\models\ProcessUpdateRow.cs" />
     <Compile Include="src\AppUpdate.cs" />
+    <Compile Include="src\models\Settings.cs" />
     <Compile Include="views\FrameAbout.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -88,6 +92,24 @@
     </Compile>
     <Compile Include="views\FrameConvert.Designer.cs">
       <DependentUpon>FrameConvert.cs</DependentUpon>
+    </Compile>
+    <Compile Include="views\FrameImportPlaylist.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="views\FrameImportPlaylist.Designer.cs">
+      <DependentUpon>FrameImportPlaylist.cs</DependentUpon>
+    </Compile>
+    <Compile Include="views\FrameNewMediaBatch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="views\FrameNewMediaBatch.Designer.cs">
+      <DependentUpon>FrameNewMediaBatch.cs</DependentUpon>
+    </Compile>
+    <Compile Include="views\FrameSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="views\FrameSettings.Designer.cs">
+      <DependentUpon>FrameSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="views\FrameYTDLDependencyInstall.cs">
       <SubType>Form</SubType>
@@ -124,6 +146,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="views\FrameConvert.resx">
       <DependentUpon>FrameConvert.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\FrameImportPlaylist.resx">
+      <DependentUpon>FrameImportPlaylist.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\FrameNewMediaBatch.resx">
+      <DependentUpon>FrameNewMediaBatch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\FrameSettings.resx">
+      <DependentUpon>FrameSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="views\FrameYTDLDependencyInstall.resx">
       <DependentUpon>FrameYTDLDependencyInstall.cs</DependentUpon>

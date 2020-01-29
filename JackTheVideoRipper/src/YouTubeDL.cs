@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -85,12 +86,56 @@ namespace JackTheVideoRipper
             return null;
         }
 
+        public static List<PlaylistInfoItem> getPlaylistMetadata(string url)
+        {
+            string opts = "-i --no-warnings --no-cache-dir --dump-json --flat-playlist --skip-download --yes-playlist " + url;
+            var p = CLI.runYouTubeCommand(binPath, opts);
+            p.Start();
+
+            string json = p.StandardOutput.ReadToEnd().Trim();
+            // youtube-dl returns an individual json object per line
+            json = "[" + json;
+            int i = json.IndexOf('\n');
+            while (i > -1)
+            {
+                json = json.Insert(i, ",");
+                i = json.IndexOf('\n', i + 2);
+            }
+            json += "]";
+            return JsonConvert.DeserializeObject<List<PlaylistInfoItem>>(json);
+        }
+
         public static MediaInfoData getMediaData(string url)
         {
             string opts = "-s --no-warnings --no-cache-dir --print-json " + url;
             var p = CLI.runYouTubeCommand(binPath, opts);
+            p.Start();
             string json = p.StandardOutput.ReadToEnd().Trim();
             return JsonConvert.DeserializeObject<MediaInfoData>(json);
+        }
+
+        public static string getExtractors()
+        {
+            string opts = "--list-extractors";
+            var p = CLI.runYouTubeCommand(binPath, opts);
+            p.Start();
+            return p.StandardOutput.ReadToEnd().Trim();
+        }
+
+        public static string getVersion()
+        {
+            string opts = "--version";
+            var p = CLI.runYouTubeCommand(binPath, opts);
+            p.Start();
+            return p.StandardOutput.ReadToEnd().Trim();
+        }
+
+        public static string getTitle(string url)
+        {
+            string opts = "--get-title " + url;
+            var p = CLI.runYouTubeCommand(binPath, opts);
+            p.Start();
+            return p.StandardOutput.ReadToEnd().Trim();
         }
     }
 }

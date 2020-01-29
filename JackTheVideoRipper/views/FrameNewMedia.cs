@@ -8,6 +8,8 @@ namespace JackTheVideoRipper
 {
     public partial class FrameNewMedia : Form
     {
+        private string startType;
+
         public string title;
         public string type;
         public string url;
@@ -18,14 +20,18 @@ namespace JackTheVideoRipper
         private Dictionary<string, string> videoIdLookupTable;
         private Dictionary<string, string> audioIdLookupTable;
 
-        public FrameNewMedia()
+        public FrameNewMedia(string type)
         {
+            this.startType = type;
             InitializeComponent();
         }
 
         private void FrameNewMedia_Load(object sender, EventArgs e)
         {
-        
+            if (this.startType == "audio")
+            {
+                chkBoxExportVideo.Checked = false;
+            }
         }
 
         private List<Task<bool>> taskTypeQueue = new List<Task<bool>>();
@@ -77,7 +83,7 @@ namespace JackTheVideoRipper
                     labelTitle.Text = info.title;
                     labelDescription.Text = info.description;
                     // TODO: may need to be revised now that using --restrict-filenames flag in youtube-dl
-                    textLocation.Text = YouTubeDL.defaultDownloadPath + "\\" + String.Format("{0}{1}", Common.stripIllegalFileNameChars(info.filename.Substring(0, info.filename.LastIndexOf('.'))), info.filename.Substring(info.filename.LastIndexOf('.')));
+                    textLocation.Text = FrameMain.settings.defaultDownloadPath + "\\" + String.Format("{0}{1}", Common.stripIllegalFileNameChars(info.filename.Substring(0, info.filename.LastIndexOf('.'))), info.filename.Substring(info.filename.LastIndexOf('.')));
 
                     if (info.formats != null && info.formats.Count > 0)
                     {
@@ -234,62 +240,15 @@ namespace JackTheVideoRipper
 
         private void buttonDownload_Click(object sender, EventArgs e)
         {
-            this.url = textUrl.Text.Trim();
-            this.filePath = textLocation.Text.Trim();
-
-            if (!String.IsNullOrEmpty(this.url))
+            if (!String.IsNullOrEmpty(textUrl.Text.Trim()))
             {
-                if (chkBoxEmbedThumbnail.Checked)
-                {
-                    if (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 && cbVideoEncoder.Text.Trim() != "mp4")
-                    {
-                        MessageBox.Show("Can not embed thumbnails in non mp4 containers!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                    else if (cbAudioEncoder.Enabled && cbAudioEncoder.SelectedIndex > 0 && (cbAudioEncoder.Text.Trim() != "mp3" && cbAudioEncoder.Text.Trim() != "m4a"))
-                    {
-                        MessageBox.Show("Can only embed thumbnails in mp3 and m4a containers!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                }
-
-                string videoFormatId = videoIdLookupTable[cbVideoFormat.Text];
-                string audioFormatId = audioIdLookupTable[cbAudioFormat.Text];
-
-                int k = this.filePath.LastIndexOf('.');
-                string fileNameFormatted = this.filePath;
-                if (k > -1)
-                {
-                    fileNameFormatted = this.filePath.Substring(0, k);
-                }
-                string filePathTemplate = String.Format("{0}.%(ext)s", fileNameFormatted); // youtube-dl doesn't like it when you provide --audio-format and extension in -o together
-                
-                if (chkBoxExportVideo.Checked && chkBoxExportAudio.Checked)
-                {
-                    // video and audio
-                    this.opts = String.Format("-f {0}+{1}/best {2} -i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames {2} {3} {4} {5} -o {6} {7}", videoFormatId, audioFormatId, (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : ""), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), filePathTemplate, url);
-                    this.type = "video+audio";
-                }
-                else if (chkBoxExportVideo.Checked && !chkBoxExportAudio.Checked)
-                {
-                    // video only
-                    this.opts = String.Format("-f {0}+{1}/best {2} -i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames {2} {3} {4} {5} -o {6} {7}", videoFormatId, audioFormatId, (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : ""), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), filePathTemplate, url);
-                    this.type = "video";
-                }
-                else if (!chkBoxExportVideo.Checked && chkBoxExportAudio.Checked)
-                {
-                    // audio only
-                    this.opts = String.Format("-f {0} -x --audio-format {1} --audio-quality 0 -i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames {2} {3} {4} -o {5} {6}", audioFormatId, cbAudioEncoder.Text.Trim(), (chkBoxWriteMetadata.Checked ? "--add-metadata" : ""), (chkBoxIncludeAds.Checked ? "--include-ads" : ""), (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : ""), filePathTemplate, url);
-                    this.type = "audio";
-                }
-
-                this.title = labelTitle.Text.Trim();
+                generateDownloadCommand();
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             else
             {
-                // TODO
+                // TODO?
             }
         }
 
@@ -302,7 +261,7 @@ namespace JackTheVideoRipper
         private void buttonLocationBrowse_Click(object sender, EventArgs e)
         {
             var d = new SaveFileDialog();
-            d.InitialDirectory = YouTubeDL.defaultDownloadPath;
+            d.InitialDirectory = FrameMain.settings.defaultDownloadPath;
             d.Filter = "All files (*.*)|*.*";
 
             var result = d.ShowDialog();
@@ -355,6 +314,8 @@ namespace JackTheVideoRipper
                 cbVideoFormat.Enabled = false;
                 cbVideoEncoder.Enabled = false;
                 cbAudioEncoder.Enabled = true;
+
+                tabImportType.SelectedTab = tabPageAudio;
             }
         }
 
@@ -410,6 +371,76 @@ namespace JackTheVideoRipper
                 filePath = String.Format("{0}{1}", filePath.Substring(0, filePath.LastIndexOf('.') + 1), cbAudioEncoder.Text.Trim());
                 textLocation.Text = filePath;
             }
+        }
+
+        private void buttonGetCommand_Click(object sender, EventArgs e)
+        {
+            if (!String.IsNullOrEmpty(textUrl.Text.Trim()))
+            {
+                generateDownloadCommand();
+                Clipboard.SetText(String.Format("youtube-dl.exe {0}", this.opts));
+                MessageBox.Show("Command copied to clipboard!", "Generate Command", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                // TODO?
+            }
+        }
+
+        private void generateDownloadCommand()
+        {
+            this.url = textUrl.Text.Trim();
+            this.filePath = textLocation.Text.Trim();
+
+            if (chkBoxEmbedThumbnail.Checked)
+            {
+                if (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 && cbVideoEncoder.Text.Trim() != "mp4")
+                {
+                    MessageBox.Show("Can not embed thumbnails in non mp4 containers!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                else if (cbAudioEncoder.Enabled && cbAudioEncoder.SelectedIndex > 0 && (cbAudioEncoder.Text.Trim() != "mp3" && cbAudioEncoder.Text.Trim() != "m4a"))
+                {
+                    MessageBox.Show("Can only embed thumbnails in mp3 and m4a containers!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            string videoFormatId = videoIdLookupTable[cbVideoFormat.Text];
+            string audioFormatId = audioIdLookupTable[cbAudioFormat.Text];
+
+            int k = this.filePath.LastIndexOf('.');
+            string fileNameFormatted = this.filePath;
+            if (k > -1)
+            {
+                fileNameFormatted = this.filePath.Substring(0, k);
+            }
+            string filePathTemplate = String.Format("{0}.%(ext)s", fileNameFormatted); // youtube-dl doesn't like it when you provide --audio-format and extension in -o together
+            string optAuth = "";
+            if (!String.IsNullOrEmpty(textUsername.Text) && !String.IsNullOrEmpty(textPassword.Text))
+            {
+                optAuth = String.Format("--username {0} --password {1}", textUsername.Text, textPassword.Text);
+            }
+            string optEncode = (cbVideoEncoder.Enabled && cbVideoEncoder.SelectedIndex > 0 ? "--recode-video " + cbVideoEncoder.Text.Trim() : "");
+            string optMetadata = (chkBoxWriteMetadata.Checked ? "--add-metadata" : "");
+            string optAds = (chkBoxIncludeAds.Checked ? "--include-ads" : "");
+            string optEmbedThumbnail = (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : "");
+            string optGeneral = "-i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames";
+            if ((chkBoxExportVideo.Checked && chkBoxExportAudio.Checked) || (chkBoxExportVideo.Checked && !chkBoxExportAudio.Checked))
+            {
+                // video and audio
+                // TODO: split video/audio and video only
+                this.opts = String.Format("-f {0}+{1}/best {2} {3} {4} {5} {6} {7} -o {8} {9}", videoFormatId, audioFormatId, optEncode, optGeneral, optMetadata, optEmbedThumbnail, optAds, optAuth, filePathTemplate, url);
+                this.type = "video"; // TODO: +audio"; ?
+            }
+            else if (!chkBoxExportVideo.Checked && chkBoxExportAudio.Checked)
+            {
+                // audio only
+                this.opts = String.Format("-f {0} -x --audio-format {1} --audio-quality 0 {2} {3} {4} -o {4} {5}", audioFormatId, cbAudioEncoder.Text.Trim(), optGeneral, optMetadata, optAds, filePathTemplate, url);
+                this.type = "audio";
+            }
+
+            this.title = labelTitle.Text.Trim();
         }
     }
 }

@@ -47,7 +47,7 @@ namespace JackTheVideoRipper
                     startInfo.RedirectStandardOutput = true;
                     startInfo.CreateNoWindow = true;
                     process.StartInfo = startInfo;
-                    process.Start();
+                    //process.Start(); // TODO: remove?
                 }
                 catch (Exception ex)
                 {

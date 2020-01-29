@@ -60,12 +60,19 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.buttonLocationBrowse = new System.Windows.Forms.Button();
             this.textLocation = new System.Windows.Forms.TextBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.textUsername = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.textPassword = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.buttonGetCommand = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.tabImportType.SuspendLayout();
             this.tabPageVideo.SuspendLayout();
             this.tabPageAudio.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -137,10 +144,10 @@
             // 
             this.tabImportType.Controls.Add(this.tabPageVideo);
             this.tabImportType.Controls.Add(this.tabPageAudio);
-            this.tabImportType.Location = new System.Drawing.Point(17, 295);
+            this.tabImportType.Location = new System.Drawing.Point(12, 305);
             this.tabImportType.Name = "tabImportType";
             this.tabImportType.SelectedIndex = 0;
-            this.tabImportType.Size = new System.Drawing.Size(662, 391);
+            this.tabImportType.Size = new System.Drawing.Size(662, 233);
             this.tabImportType.TabIndex = 7;
             // 
             // tabPageVideo
@@ -152,7 +159,7 @@
             this.tabPageVideo.Location = new System.Drawing.Point(4, 29);
             this.tabPageVideo.Name = "tabPageVideo";
             this.tabPageVideo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageVideo.Size = new System.Drawing.Size(654, 358);
+            this.tabPageVideo.Size = new System.Drawing.Size(654, 200);
             this.tabPageVideo.TabIndex = 0;
             this.tabPageVideo.Text = "Video";
             this.tabPageVideo.UseVisualStyleBackColor = true;
@@ -409,6 +416,62 @@
             this.textLocation.Size = new System.Drawing.Size(378, 26);
             this.textLocation.TabIndex = 0;
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.textPassword);
+            this.groupBox3.Controls.Add(this.label9);
+            this.groupBox3.Controls.Add(this.textUsername);
+            this.groupBox3.Controls.Add(this.label5);
+            this.groupBox3.Location = new System.Drawing.Point(12, 544);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(662, 142);
+            this.groupBox3.TabIndex = 15;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Authentication";
+            // 
+            // textUsername
+            // 
+            this.textUsername.Location = new System.Drawing.Point(102, 30);
+            this.textUsername.Name = "textUsername";
+            this.textUsername.Size = new System.Drawing.Size(554, 26);
+            this.textUsername.TabIndex = 3;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(10, 33);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(87, 20);
+            this.label5.TabIndex = 2;
+            this.label5.Text = "Username:";
+            // 
+            // textPassword
+            // 
+            this.textPassword.Location = new System.Drawing.Point(102, 71);
+            this.textPassword.Name = "textPassword";
+            this.textPassword.PasswordChar = '•';
+            this.textPassword.Size = new System.Drawing.Size(554, 26);
+            this.textPassword.TabIndex = 5;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(10, 74);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(82, 20);
+            this.label9.TabIndex = 4;
+            this.label9.Text = "Password:";
+            // 
+            // buttonGetCommand
+            // 
+            this.buttonGetCommand.Location = new System.Drawing.Point(12, 692);
+            this.buttonGetCommand.Name = "buttonGetCommand";
+            this.buttonGetCommand.Size = new System.Drawing.Size(133, 38);
+            this.buttonGetCommand.TabIndex = 16;
+            this.buttonGetCommand.Text = "Get Command";
+            this.buttonGetCommand.UseVisualStyleBackColor = true;
+            this.buttonGetCommand.Click += new System.EventHandler(this.buttonGetCommand_Click);
+            // 
             // FrameNewMedia
             // 
             this.AcceptButton = this.buttonDownload;
@@ -416,6 +479,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(1188, 742);
+            this.Controls.Add(this.buttonGetCommand);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.groupBox1);
@@ -447,6 +512,8 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -485,5 +552,11 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button buttonLocationBrowse;
         private System.Windows.Forms.TextBox textLocation;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TextBox textPassword;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox textUsername;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button buttonGetCommand;
     }
 }
