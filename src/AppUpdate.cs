@@ -28,8 +28,9 @@ namespace JackTheVideoRipper
                     var serverVersion = reader.ReadToEnd().Replace("\n", "");
                     model.version = serverVersion;
                     
-                    var dstVersion = new Version(serverVersion);
-                    var localVersion = new Version(Common.getAppVersion());
+                    // substring(1) used to removed "v" from versions to compare
+                    var dstVersion = new Version(serverVersion.Substring(1));
+                    var localVersion = new Version(Common.getAppVersion().Substring(1));
 
                     var result = dstVersion.CompareTo(localVersion);
                     if (result > 0)
