@@ -22,8 +22,7 @@ namespace JackTheVideoRipper
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            ProcessStartInfo sInfo = new ProcessStartInfo(projectUrl);
-            Process.Start(sInfo);
+            Process.Start(new ProcessStartInfo(projectUrl) { UseShellExecute = true });
         }
 
         private void FrameAbout_Load(object sender, EventArgs e)
@@ -35,7 +34,7 @@ namespace JackTheVideoRipper
                 var lines = "* " + YouTubeDL.getExtractors().Replace("\n", "\r\n* ");
                 textExtractors.Text = lines;
 
-                labelYouTubeDL.Text = String.Format("youtube-dl {0}", YouTubeDL.getVersion());
+                labelYouTubeDL.Text = String.Format("yt-dlp {0}", YouTubeDL.getVersion());
             }
             catch (Exception ex)
             {

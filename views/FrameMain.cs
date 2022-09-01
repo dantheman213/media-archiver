@@ -25,7 +25,7 @@ namespace JackTheVideoRipper
         {
             if (!YouTubeDL.isInstalled())
             {
-                var result = MessageBox.Show("youtube-dl is required. Install?", "Install Core Component", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                var result = MessageBox.Show("yt-dlp is required. Install?", "Install Core Component", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result == DialogResult.Yes)
                 {
                     var f = new FrameYTDLDependencyInstall();
@@ -339,7 +339,7 @@ namespace JackTheVideoRipper
                     {
                         if (File.Exists(filePath))
                         {
-                            Process.Start(filePath);
+                            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
                         }
                     }
                 }
@@ -401,22 +401,22 @@ namespace JackTheVideoRipper
         
         private void downloadFFmpegToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://www.ffmpeg.org/download.html");
+            Process.Start(new ProcessStartInfo("https://www.ffmpeg.org/download.html") { UseShellExecute = true });
         }
 
         private void downloadHandbrakeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://handbrake.fr/downloads.php");
+            Process.Start(new ProcessStartInfo("https://handbrake.fr/downloads.php") { UseShellExecute = true });
         }
 
         private void downloadVLCPlayerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://www.videolan.org/vlc/");
+            Process.Start(new ProcessStartInfo("https://www.videolan.org/vlc") { UseShellExecute = true });
         }
         
         private void downloadAtomicParsleyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("http://atomicparsley.sourceforge.net/");
+            Process.Start(new ProcessStartInfo("http://atomicparsley.sourceforge.net") { UseShellExecute = true });
         }
 
         private void timerStatusBar_Tick(object sender, EventArgs e)
@@ -428,21 +428,24 @@ namespace JackTheVideoRipper
 
         private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string versionResult = AppUpdate.checkForNewAppVersion();
-            if (!String.IsNullOrEmpty(versionResult))
+            // if sender obj is bool then version being checked on startup passively and dont show dialog that it's up to date
+            var result = AppUpdate.checkForNewAppVersion();
+            if (result != null)
             {
-                var result = MessageBox.Show(String.Format("New Version JackTheVideoRipper {0} Available! View Download Page?", versionResult), "New Version Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                if (result == DialogResult.Yes)
+                if (result.isNewerVersionAvailable)
                 {
-                    Process.Start("https://github.com/dantheman213/JackTheVideoRipper/releases");
+                    var dialogResponse = MessageBox.Show(String.Format("New Version JackTheVideoRipper {0} Available! View Download Page?", result.version), "New Version Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                    if (dialogResponse == DialogResult.Yes)
+                    {
+                        Process.Start(new ProcessStartInfo("https://github.com/dantheman213/JackTheVideoRipper/releases") { UseShellExecute = true });
+                    }
                 }
-            }
-            else if (versionResult == "" && !sender.GetType().Equals(typeof(bool)))
-            {
-                // if object sender is bool then it's silent
-                MessageBox.Show("App is currently up to date!", "Version Current", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else if (versionResult == null)
+                else if (!result.isNewerVersionAvailable && !sender.GetType().Equals(typeof(bool)))
+                {
+                    MessageBox.Show("App is currently up to date!", "Version Current", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            } 
+            else if (result == null && !sender.GetType().Equals(typeof(bool)))
             {
                 MessageBox.Show("Unable to communicate with Github!", "Can't download version manifest", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -460,7 +463,7 @@ namespace JackTheVideoRipper
 
         private void downloadVS2010RedistributableToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://www.microsoft.com/en-us/download/confirmation.aspx?id=5555");
+            Process.Start(new ProcessStartInfo("https://www.microsoft.com/en-us/download/confirmation.aspx?id=5555") { UseShellExecute = true });
         }
 
         private void openDownloadFolderToolStripMenuItem_Click(object sender, EventArgs e)

@@ -29,7 +29,7 @@ Download the latest version in the [release](https://github.com/dantheman213/Jac
 All required dependencies are installed, updated, and maintained automatically for you.
 
 * [vcredist-x86](https://www.microsoft.com/en-us/download/confirmation.aspx?id=5555)
-* [youtube-dl](https://github.com/ytdl-org/youtube-dl)
+* [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 * [ffmpeg](https://www.ffmpeg.org/download.html#build-windows)
 * [AtomicParsley](http://atomicparsley.sourceforge.net)
 
@@ -41,7 +41,7 @@ It is recommended that you [download and run the Windows Installer](https://gith
 
 ##### What streaming providers are supported?
 
-A list of support services is available within the app; navigate to the menu and go to Help > About. `youtube-dl` will dictate which services are supported.
+A list of support services is available within the app; navigate to the menu and go to Help > About. `yt-dlp` will dictate which services are supported.
 
 ##### The downloaded file doesn't play on my computer, what's wrong?
 
@@ -55,6 +55,10 @@ The best free easy-to-use GUI tool is [Handbrake](https://handbrake.fr/).
 
 This app is currently in pre-release and not everything will work correctly. Please standby for further updates.
 
-##### Why is `youtube-dl` not bundled but rather downloaded when Windows Installer runs?
+##### Why is `yt-dlp` not bundled but rather downloaded when Windows Installer runs?
 
-This has to do with `youtube-dl`'s features and functionality. `youtube-dl` is constantly evolving and updating to make sure it is working with the latest changes made by streaming providers. Because of the ever changing nature bundling the current version of `youtube-dl` doesn't make sense. It will likely be out of date already by the time a user runs the installer. Most other software, like bundled apps `vcredist-x86` or `ffmpeg`, are extremely stable and do not need to be altered frequently to work correctly.
+This has to do with `yt-dlp`'s features and functionality. `yt-dlp` is constantly evolving and updating to make sure it is working with the latest changes made by streaming providers. Because of the ever changing nature bundling the current version of `yt-dlp` doesn't make sense. It will likely be out of date already by the time a user runs the installer. Most other software, like bundled apps `vcredist-x86` or `ffmpeg`, are extremely stable and do not need to be altered frequently to work correctly.
+
+##### Why are you using `yt-dlp` over `youtube-dl`?
+
+`youtube-dl` isn't being actively developed. The last release, as of this writing, was in December of 2021. `yt-dlp` is an excellent fork of `youtube-dl` with lots of updates and bug fixes.

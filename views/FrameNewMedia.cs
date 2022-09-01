@@ -79,7 +79,7 @@ namespace JackTheVideoRipper
                     var info = YouTubeDL.getMediaData(url);
                     string thumbnailFilePath = YouTubeDL.downloadThumbnail(info.thumbnail);
                     pbPreview.ImageLocation = thumbnailFilePath;
-
+                  
                     labelTitle.Text = info.title;
                     labelDescription.Text = info.description;
                     // TODO: may need to be revised now that using --restrict-filenames flag in youtube-dl

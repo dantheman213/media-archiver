@@ -21,5 +21,10 @@ namespace JackTheVideoRipper
 
             return false;
         }
+
+        public static void convertImageToJpg(string inputPath, string outputPath)
+        {
+            CLI.runCommand(String.Format("{0} -i {1} -vf \"scale=1920:-1\" {2}", binPath, inputPath, outputPath));
+        }
     }
 }
