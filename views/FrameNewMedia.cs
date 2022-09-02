@@ -396,7 +396,10 @@ namespace JackTheVideoRipper
             if (!String.IsNullOrEmpty(textUrl.Text.Trim()))
             {
                 generateDownloadCommand();
-                Clipboard.SetText(String.Format("youtube-dl.exe {0}", this.opts));
+               
+                var command = String.Format("{0} {1}", YouTubeDL.binPath, this.opts);
+                Clipboard.SetText(command);
+
                 MessageBox.Show("Command copied to clipboard!", "Generate Command", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
@@ -443,12 +446,13 @@ namespace JackTheVideoRipper
             string optMetadata = (chkBoxWriteMetadata.Checked ? "--add-metadata" : "");
             string optAds = (chkBoxIncludeAds.Checked ? "--include-ads" : "");
             string optEmbedThumbnail = (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : "");
+            var optEmbedSubs = (chkEmbedSubs.Checked ? "--embed-subs" : "");
             string optGeneral = "-i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames";
             if ((chkBoxExportVideo.Checked && chkBoxExportAudio.Checked) || (chkBoxExportVideo.Checked && !chkBoxExportAudio.Checked))
             {
                 // video and audio
                 // TODO: split video/audio and video only
-                this.opts = String.Format("-f {0}+{1}/best {2} {3} {4} {5} {6} {7} -o {8} {9}", videoFormatId, audioFormatId, optEncode, optGeneral, optMetadata, optEmbedThumbnail, optAds, optAuth, filePathTemplate, url);
+                this.opts = String.Format("-f {0}+{1}/best {2} {3} {4} {5} {6} {7} {8} -o {9} {10}", videoFormatId, audioFormatId, optEncode, optGeneral, optMetadata, optEmbedThumbnail, optEmbedSubs, optAds, optAuth, filePathTemplate, url);
                 this.type = "video"; // TODO: +audio"; ?
             }
             else if (!chkBoxExportVideo.Checked && chkBoxExportAudio.Checked)

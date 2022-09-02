@@ -2,7 +2,7 @@
 
 * Download [NSIS](https://nsis.sourceforge.io/Main_Page)
 * Download Dependencies and place them into deps/
-  - [ffmpeg.exe](https://www.ffmpeg.org/download.html#build-windows)
+  - [ffmpeg.exe and ffprobe.exe](https://www.ffmpeg.org/download.html#build-windows)
   - [AtomicParsley.exe](http://atomicparsley.sourceforge.net/)
   - [vcredist_x86.exe](https://www.microsoft.com/en-us/download/details.aspx?id=5555)
   - [windowsdesktop-runtime-6.0.8-win-x64.exe](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)

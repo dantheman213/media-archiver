@@ -26,7 +26,7 @@ namespace JackTheVideoRipper
         {
             if (!YouTubeDL.isInstalled())
             {
-                var result = MessageBox.Show("yt-dlp is required. Install?", "Install Core Component", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                var result = MessageBox.Show("yt-dlp is required and is not bundled with the installer as it is updated frequently. Install?", "Install Core Component", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result == DialogResult.Yes)
                 {
                     var f = new FrameYTDLDependencyInstall();
@@ -652,6 +652,22 @@ namespace JackTheVideoRipper
         private void statusBar_DoubleClick(object sender, EventArgs e)
         {
             openTaskManagerToolStripMenuItem_Click(sender, e);
+        }
+
+        private void downloadYtdlpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("https://github.com/yt-dlp/yt-dlp") { UseShellExecute = true });
+        }
+
+        private void openDependenciesFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                Arguments = YouTubeDL.installPath,
+                FileName = "explorer.exe"
+            };
+
+            Process.Start(startInfo);
         }
     }
 }

@@ -81,7 +81,7 @@
             this.textExtractors.Name = "textExtractors";
             this.textExtractors.ReadOnly = true;
             this.textExtractors.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textExtractors.Size = new System.Drawing.Size(816, 536);
+            this.textExtractors.Size = new System.Drawing.Size(816, 638);
             this.textExtractors.TabIndex = 3;
             // 
             // label2
@@ -96,7 +96,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 729);
+            this.label3.Location = new System.Drawing.Point(13, 849);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(127, 25);
             this.label3.TabIndex = 6;
@@ -105,15 +105,16 @@
             // textDependencies
             // 
             this.textDependencies.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.textDependencies.Location = new System.Drawing.Point(13, 762);
+            this.textDependencies.Location = new System.Drawing.Point(13, 883);
             this.textDependencies.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.textDependencies.Multiline = true;
             this.textDependencies.Name = "textDependencies";
             this.textDependencies.ReadOnly = true;
             this.textDependencies.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textDependencies.Size = new System.Drawing.Size(816, 285);
+            this.textDependencies.Size = new System.Drawing.Size(816, 164);
             this.textDependencies.TabIndex = 5;
-            this.textDependencies.Text = "* Visual C++ 2010 Redistributable (x86)\r\n* yt-dlp\r\n* ffmpeg\r\n* AtomicParsley";
+            this.textDependencies.Text = "* Visual C++ 2010 Redistributable (x86)\r\n* yt-dlp\r\n* ffmpeg\r\n* ffprobe\r\n* AtomicP" +
+    "arsley";
             // 
             // labelYouTubeDL
             // 

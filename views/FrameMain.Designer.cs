@@ -68,6 +68,9 @@
             this.downloadVS2010RedistributableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadFFmpegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadAtomicParsleyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.downloadYtdlpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.openDependenciesFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuListItems = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.convertMediaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
@@ -302,7 +305,10 @@
             this.toolStripSeparator4,
             this.downloadVS2010RedistributableToolStripMenuItem,
             this.downloadFFmpegToolStripMenuItem,
-            this.downloadAtomicParsleyToolStripMenuItem});
+            this.downloadAtomicParsleyToolStripMenuItem,
+            this.downloadYtdlpToolStripMenuItem,
+            this.toolStripSeparator7,
+            this.openDependenciesFolderToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(65, 29);
             this.helpToolStripMenuItem.Text = "Help";
@@ -382,6 +388,25 @@
             this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
             this.downloadAtomicParsleyToolStripMenuItem.Text = "Download AtomicParsley";
             this.downloadAtomicParsleyToolStripMenuItem.Click += new System.EventHandler(this.downloadAtomicParsleyToolStripMenuItem_Click);
+            // 
+            // downloadYtdlpToolStripMenuItem
+            // 
+            this.downloadYtdlpToolStripMenuItem.Name = "downloadYtdlpToolStripMenuItem";
+            this.downloadYtdlpToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
+            this.downloadYtdlpToolStripMenuItem.Text = "Download yt-dlp";
+            this.downloadYtdlpToolStripMenuItem.Click += new System.EventHandler(this.downloadYtdlpToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(387, 6);
+            // 
+            // openDependenciesFolderToolStripMenuItem
+            // 
+            this.openDependenciesFolderToolStripMenuItem.Name = "openDependenciesFolderToolStripMenuItem";
+            this.openDependenciesFolderToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
+            this.openDependenciesFolderToolStripMenuItem.Text = "Open Dependencies Folder";
+            this.openDependenciesFolderToolStripMenuItem.Click += new System.EventHandler(this.openDependenciesFolderToolStripMenuItem_Click);
             // 
             // contextMenuListItems
             // 
@@ -627,6 +652,9 @@
         private ImageList imgList;
         private ToolStripSeparator toolStripSeparator6;
         private ToolStripMenuItem openTaskManagerToolStripMenuItem;
+        private ToolStripMenuItem downloadYtdlpToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator7;
+        private ToolStripMenuItem openDependenciesFolderToolStripMenuItem;
     }
 }
 

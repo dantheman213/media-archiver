@@ -97,6 +97,7 @@ SetShellVarContext all
 SetOutPath "${INSTDIR_DATA}"
 File "deps\AtomicParsley.exe"
 File "deps\ffmpeg.exe"
+File "deps\ffprobe.exe"
 File "deps\vcredist_x86.exe"
 File "deps\windowsdesktop-runtime-6.0.8-win-x64.exe"
 
@@ -170,6 +171,7 @@ RmDir "$INSTDIR"
 !ifndef NEVER_UNINSTALL
 Delete "${INSTDIR_DATA}\AtomicParsley.exe"
 Delete "${INSTDIR_DATA}\ffmpeg.exe"
+Delete "${INSTDIR_DATA}\ffprobe.exe"
 Delete "${INSTDIR_DATA}\vcredist_x86.exe"
 Delete "${INSTDIR_DATA}\windowsdesktop-runtime-6.0.8-win-x64.exe"
  
