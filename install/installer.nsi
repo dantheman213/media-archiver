@@ -6,9 +6,9 @@
 !define APP_NAME "JackTheVideoRipper"
 !define COMP_NAME "dantheman213"
 !define WEB_SITE "https://github.com/dantheman213/JackTheVideoRipper"
-!define VERSION "0.7.0"
-!define COPYRIGHT "Dan  � 2020"
-!define DESCRIPTION "Download YouTube videos easily with a few point and clicks."
+!define VERSION "0.8.0"
+!define COPYRIGHT "Dan  � 2022"
+!define DESCRIPTION "Download media easily with a few point and clicks."
 !define LICENSE_TXT "..\LICENSE"
 !define MAIN_APP_EXE "JackTheVideoRipper.exe"
 !define INSTALL_TYPE "SetShellVarContext current"
@@ -82,11 +82,11 @@ Section -MainProgram
 ${INSTALL_TYPE}
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR"
-File "..\JackTheVideoRipper\bin\Release\JackTheVideoRipper.exe"
-File "..\JackTheVideoRipper\bin\Release\Newtonsoft.Json.dll"
-File "..\JackTheVideoRipper\bin\Release\Newtonsoft.Json.xml"
-File "..\JackTheVideoRipper\bin\Release\System.IO.Compression.dll"
-File "..\JackTheVideoRipper\bin\Release\System.IO.Compression.ZipFile.dll"
+File "..\bin\Release\net6.0-windows\JackTheVideoRipper.exe"
+File "..\bin\Release\net6.0-windows\Newtonsoft.Json.dll"
+File "..\bin\Release\net6.0-windows\System.Management.dll"
+File "..\bin\Release\net6.0-windows\JackTheVideoRipper.dll"
+File "..\bin\Release\net6.0-windows\JackTheVideoRipper.runtimeconfig.json"
 SectionEnd
 
 ######################################################################
@@ -97,7 +97,9 @@ SetShellVarContext all
 SetOutPath "${INSTDIR_DATA}"
 File "deps\AtomicParsley.exe"
 File "deps\ffmpeg.exe"
+File "deps\ffprobe.exe"
 File "deps\vcredist_x86.exe"
+File "deps\windowsdesktop-runtime-6.0.8-win-x64.exe"
 
 # Download latest version of youtube-dl for end-user
 # TODO: This currently runs in background and silently. On computers with slow or spotty Internet connections may be an issue
@@ -106,6 +108,7 @@ nsExec::ExecToStack 'powershell.exe -Command "(new-object System.Net.WebClient).
 
 # Run external installer
 ExecWait "${INSTDIR_DATA}\vcredist_x86.exe"
+ExecWait "${INSTDIR_DATA}\windowsdesktop-runtime-6.0.8-win-x64.exe"
 
 SectionEnd
 
@@ -168,7 +171,9 @@ RmDir "$INSTDIR"
 !ifndef NEVER_UNINSTALL
 Delete "${INSTDIR_DATA}\AtomicParsley.exe"
 Delete "${INSTDIR_DATA}\ffmpeg.exe"
+Delete "${INSTDIR_DATA}\ffprobe.exe"
 Delete "${INSTDIR_DATA}\vcredist_x86.exe"
+Delete "${INSTDIR_DATA}\windowsdesktop-runtime-6.0.8-win-x64.exe"
  
 RmDir "$TEMP\${APP_NAME}"
 !endif

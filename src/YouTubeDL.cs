@@ -12,10 +12,10 @@ namespace JackTheVideoRipper
     class YouTubeDL
     {
         public static string defaultDownloadPath = Path.Combine(Environment.ExpandEnvironmentVariables("%userprofile%"), "Downloads");
-        private static string binName = "youtube-dl.exe";
-        private static string installPath = String.Format("{0}\\JackTheVideoRipper\\bin", Environment.GetFolderPath(SpecialFolder.CommonApplicationData));
+        private static string binName = "yt-dlp.exe";
+        public static string installPath = String.Format("{0}\\JackTheVideoRipper\\bin", Environment.GetFolderPath(SpecialFolder.CommonApplicationData));
         public static string binPath = String.Format("{0}\\{1}", installPath, binName);
-        private static string downloadURL = "https://yt-dl.org/downloads/latest/youtube-dl.exe";
+        private static string downloadURL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
 
         public static bool isInstalled()
         {
@@ -67,17 +67,44 @@ namespace JackTheVideoRipper
             if (Common.isValidURL(thumbnailUrl))
             {
                 string tmpDir = Path.GetTempPath();
-                string tmpFileName = String.Format("jtvr_thumbnail_{0}.jpg", DateTime.Now.ToString("yyyyMMddhmmsstt"));
-                string tmpFilePath = tmpDir + "\\" + tmpFileName;
-
-                if (File.Exists(tmpFilePath))
+                var urlExt = thumbnailUrl.Substring(thumbnailUrl.LastIndexOf(".") + 1).ToLower();
+                // allow jpg and png but don't allow webp since we'll convert that below
+                if (urlExt == "webp")
                 {
-                    File.Delete(tmpFilePath);
+                    urlExt = "jpg";
                 }
-
-                using (WebClient c = new WebClient())
+                string tmpFileName = String.Format("jtvr_thumbnail_{0}.{1}", DateTime.Now.ToString("yyyyMMddhmmsstt"), urlExt); // TODO: get extension from URL rather than hard coding
+                string tmpFilePath = tmpDir + tmpFileName;
+                
+                // popular format for saving thumbnails these days but PictureBox in WinForms can't handle it :( so we'll convert to jpg
+                if (thumbnailUrl.EndsWith("webp"))
                 {
-                    c.DownloadFile(thumbnailUrl, tmpFilePath);
+                    var tmpWebpFileName = String.Format("jtvr_thumbnail_{0}.webp", DateTime.Now.ToString("yyyyMMddhmmsstt"));
+                    var tmpWebpFilePath = tmpDir + tmpWebpFileName;
+
+                    if (File.Exists(tmpWebpFilePath))
+                    {
+                        File.Delete(tmpWebpFilePath);
+                    }
+
+                    using (WebClient c = new WebClient())
+                    {
+                        c.DownloadFile(thumbnailUrl, tmpWebpFilePath);
+                    }
+
+                    FFmpeg.convertImageToJpg(tmpWebpFilePath, tmpFilePath);
+                }
+                else
+                {
+                    if (File.Exists(tmpFilePath))
+                    {
+                        File.Delete(tmpFilePath);
+                    }
+
+                    using (WebClient c = new WebClient())
+                    {
+                        c.DownloadFile(thumbnailUrl, tmpFilePath);
+                    }
                 }
 
                 return tmpFilePath;

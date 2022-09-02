@@ -77,9 +77,9 @@ namespace JackTheVideoRipper
                     Application.DoEvents();
 
                     var info = YouTubeDL.getMediaData(url);
-                    string thumbnailFilePath = YouTubeDL.downloadThumbnail(info.thumbnail);
+                    var thumbnailFilePath = YouTubeDL.downloadThumbnail(info.thumbnail);
                     pbPreview.ImageLocation = thumbnailFilePath;
-
+                  
                     labelTitle.Text = info.title;
                     labelDescription.Text = info.description;
                     // TODO: may need to be revised now that using --restrict-filenames flag in youtube-dl
@@ -156,6 +156,7 @@ namespace JackTheVideoRipper
                             }
                         }
 
+                        cbVideoFormat.Items.Add("Resolution / Bitrate / Format / Type / Additional Info");
                         if (!String.IsNullOrEmpty(recommendedVideoFormat))
                         {
                             cbVideoFormat.Items.Add(recommendedVideoFormat);
@@ -175,6 +176,9 @@ namespace JackTheVideoRipper
                             cbVideoFormat.Items.Add(item);
                         }
 
+                        // audio
+                        cbAudioFormat.Items.Add("Bitrate / Sample Rate / Format / Codec");
+
                         if (!String.IsNullOrEmpty(recommendedAudioFormat))
                         {
                             cbAudioFormat.Items.Add(recommendedAudioFormat);
@@ -190,21 +194,24 @@ namespace JackTheVideoRipper
                         }
 
                         audioFormatList.Reverse(); // TODO: optimze this out
+
                         foreach (var item in audioFormatList)
                         {
                             cbAudioFormat.Items.Add(item);
                         }
 
-                        if (cbVideoFormat.Items.Count < 1)
+                        if (cbVideoFormat.Items.Count < 2)
                         {
                             cbVideoFormat.Items.Add("(no video metadata could be extracted)");
                         }
-                        cbVideoFormat.SelectedIndex = 0;
-                        if (cbAudioFormat.Items.Count < 1)
+                        cbVideoFormat.SelectedIndex = 1;
+                        if (cbAudioFormat.Items.Count < 2)
                         {
                             cbAudioFormat.Items.Add("(no audio metadata could be extracted)");
                         }
-                        cbAudioFormat.SelectedIndex = 0;
+                        cbAudioFormat.SelectedIndex = 1;
+
+                        // -- 
                         if (cbVideoEncoder.Items.Count > 0)
                         {
                             cbVideoEncoder.SelectedIndex = 0;
@@ -260,9 +267,20 @@ namespace JackTheVideoRipper
 
         private void buttonLocationBrowse_Click(object sender, EventArgs e)
         {
+            if (textUrl.Text.Trim() == "" || textLocation.Text.Trim() == "") 
+            { 
+                return; 
+            }
+
+            var dir = textLocation.Text.Substring(0, textLocation.Text.LastIndexOf("\\"));
+            var fileName = textLocation.Text.Substring(textLocation.Text.LastIndexOf("\\") + 1);
+            var ext = fileName.Substring(fileName.LastIndexOf(".") + 1);
+
             var d = new SaveFileDialog();
-            d.InitialDirectory = FrameMain.settings.defaultDownloadPath;
-            d.Filter = "All files (*.*)|*.*";
+            //d.InitialDirectory = FrameMain.settings.defaultDownloadPath;
+            d.InitialDirectory = dir;            
+            d.FileName = fileName;
+            d.Filter = String.Format("{0} file|*.{1}|All files (*.*)|*.*", ext, ext);
 
             var result = d.ShowDialog();
             if (result == DialogResult.OK)
@@ -378,7 +396,10 @@ namespace JackTheVideoRipper
             if (!String.IsNullOrEmpty(textUrl.Text.Trim()))
             {
                 generateDownloadCommand();
-                Clipboard.SetText(String.Format("youtube-dl.exe {0}", this.opts));
+               
+                var command = String.Format("{0} {1}", YouTubeDL.binPath, this.opts);
+                Clipboard.SetText(command);
+
                 MessageBox.Show("Command copied to clipboard!", "Generate Command", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
@@ -425,12 +446,13 @@ namespace JackTheVideoRipper
             string optMetadata = (chkBoxWriteMetadata.Checked ? "--add-metadata" : "");
             string optAds = (chkBoxIncludeAds.Checked ? "--include-ads" : "");
             string optEmbedThumbnail = (chkBoxEmbedThumbnail.Checked ? "--embed-thumbnail" : "");
+            var optEmbedSubs = (chkEmbedSubs.Checked ? "--embed-subs" : "");
             string optGeneral = "-i --no-check-certificate --prefer-ffmpeg --no-warnings --restrict-filenames";
             if ((chkBoxExportVideo.Checked && chkBoxExportAudio.Checked) || (chkBoxExportVideo.Checked && !chkBoxExportAudio.Checked))
             {
                 // video and audio
                 // TODO: split video/audio and video only
-                this.opts = String.Format("-f {0}+{1}/best {2} {3} {4} {5} {6} {7} -o {8} {9}", videoFormatId, audioFormatId, optEncode, optGeneral, optMetadata, optEmbedThumbnail, optAds, optAuth, filePathTemplate, url);
+                this.opts = String.Format("-f {0}+{1}/best {2} {3} {4} {5} {6} {7} {8} -o {9} {10}", videoFormatId, audioFormatId, optEncode, optGeneral, optMetadata, optEmbedThumbnail, optEmbedSubs, optAds, optAuth, filePathTemplate, url);
                 this.type = "video"; // TODO: +audio"; ?
             }
             else if (!chkBoxExportVideo.Checked && chkBoxExportAudio.Checked)
@@ -441,6 +463,22 @@ namespace JackTheVideoRipper
             }
 
             this.title = labelTitle.Text.Trim();
+        }
+
+        private void cbVideoFormat_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbVideoFormat.SelectedIndex == 0)
+            {
+                cbVideoFormat.SelectedIndex = 1;
+            }
+        }
+
+        private void cbAudioFormat_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbAudioFormat.SelectedIndex == 0)
+            {
+                cbAudioFormat.SelectedIndex = 1;
+            }
         }
     }
 }

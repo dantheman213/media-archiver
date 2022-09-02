@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Update="views\FrameAbout.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="views\FrameCheckMetadata.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="views\FrameConvert.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="views\FrameImportPlaylist.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="views\FrameMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="views\FrameNewMedia.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="views\FrameNewMediaBatch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="views\FrameSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="views\FrameYTDLDependencyInstall.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>

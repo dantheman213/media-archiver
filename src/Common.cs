@@ -72,7 +72,15 @@ namespace JackTheVideoRipper
         {
             if (cpuCounter == null)
             {
-                cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+                try
+                {
+                    cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+                } catch(Exception ex)
+                {
+                    // TBA
+                    return "Unable to get CPU usage...";
+                }
+
             }
             return cpuCounter.NextValue().ToString("0.00") + "%";
         }
@@ -82,7 +90,15 @@ namespace JackTheVideoRipper
         {
             if (ramCounter == null)
             {
-                ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+                try
+                {
+                    ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+                }
+                catch (Exception ex)
+                {
+                    return "Unable to get RAM usage...";
+                }
+               
             }
             return ramCounter.NextValue() + "MB";
         }
@@ -90,33 +106,40 @@ namespace JackTheVideoRipper
         private static List<PerformanceCounter> networkCounters;
         public static string getNetworkTransfer()
         {
-            // get the network transfer in kbps or mbps automatically
-
-            if (networkCounters == null)
+            try
             {
-                networkCounters = new List<PerformanceCounter>();
+                // get the network transfer in kbps or mbps automatically
 
-                PerformanceCounterCategory pcg = new PerformanceCounterCategory("Network Interface");
-                foreach (var instance in pcg.GetInstanceNames())
+                if (networkCounters == null)
                 {
-                    networkCounters.Add(new PerformanceCounter("Network Interface", "Bytes Received/sec", instance));
+                    networkCounters = new List<PerformanceCounter>();
+
+                    PerformanceCounterCategory pcg = new PerformanceCounterCategory("Network Interface");
+                    foreach (var instance in pcg.GetInstanceNames())
+                    {
+                        networkCounters.Add(new PerformanceCounter("Network Interface", "Bytes Received/sec", instance));
+                    }
                 }
-            }
 
-            double count = 0;
-            foreach(var counter in networkCounters)
-            {
-                count += Math.Round(counter.NextValue() / 1024, 2);
-            }
+                double count = 0;
+                foreach (var counter in networkCounters)
+                {
+                    count += Math.Round(counter.NextValue() / 1024, 2);
+                }
 
-            string suffix = "kbps";
-            if (count >= 1000)
-            {
-                suffix = "mbps";
-                count = Math.Round(count / 1000, 2);
+                string suffix = "kbps";
+                if (count >= 1000)
+                {
+                    suffix = "mbps";
+                    count = Math.Round(count / 1000, 2);
+                }
+
+                return String.Format("{0} {1}", count, suffix);
             }
-            
-            return String.Format("{0} {1}", count, suffix);
+            catch (Exception ex)
+            {
+                return "Unable to get network transfer...";
+            }           
         }
 
         public static bool IsAdministrator()
