@@ -114,7 +114,7 @@
             this.listItems.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.listItems.MultiSelect = false;
             this.listItems.Name = "listItems";
-            this.listItems.Size = new System.Drawing.Size(1529, 778);
+            this.listItems.Size = new System.Drawing.Size(1529, 769);
             this.listItems.SmallImageList = this.imgList;
             this.listItems.TabIndex = 0;
             this.listItems.UseCompatibleStateImageBehavior = false;
@@ -414,14 +414,13 @@
             // 
             // toolBar
             // 
-            this.toolBar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolBar.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.toolBar.ImageScalingSize = new System.Drawing.Size(34, 39);
             this.toolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButtonDownloadVideo,
             this.toolStripButtonDownloadAudio});
             this.toolBar.Location = new System.Drawing.Point(0, 33);
             this.toolBar.Name = "toolBar";
-            this.toolBar.Size = new System.Drawing.Size(1529, 39);
+            this.toolBar.Size = new System.Drawing.Size(1529, 48);
             this.toolBar.TabIndex = 2;
             this.toolBar.Text = "toolStrip1";
             // 
@@ -431,7 +430,7 @@
             this.toolStripButtonDownloadVideo.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonDownloadVideo.Image")));
             this.toolStripButtonDownloadVideo.ImageTransparentColor = System.Drawing.Color.Black;
             this.toolStripButtonDownloadVideo.Name = "toolStripButtonDownloadVideo";
-            this.toolStripButtonDownloadVideo.Size = new System.Drawing.Size(34, 34);
+            this.toolStripButtonDownloadVideo.Size = new System.Drawing.Size(38, 43);
             this.toolStripButtonDownloadVideo.ToolTipText = "Download Media as Video";
             this.toolStripButtonDownloadVideo.Click += new System.EventHandler(this.toolStripButtonDownloadVideo_Click);
             // 
@@ -441,7 +440,7 @@
             this.toolStripButtonDownloadAudio.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonDownloadAudio.Image")));
             this.toolStripButtonDownloadAudio.ImageTransparentColor = System.Drawing.Color.Black;
             this.toolStripButtonDownloadAudio.Name = "toolStripButtonDownloadAudio";
-            this.toolStripButtonDownloadAudio.Size = new System.Drawing.Size(34, 34);
+            this.toolStripButtonDownloadAudio.Size = new System.Drawing.Size(38, 43);
             this.toolStripButtonDownloadAudio.ToolTipText = "Download Media as Audio";
             this.toolStripButtonDownloadAudio.Click += new System.EventHandler(this.toolStripButtonDownloadAudio_Click);
             // 
@@ -504,7 +503,7 @@
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 72);
+            this.splitContainer1.Location = new System.Drawing.Point(0, 81);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -515,8 +514,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.statusBar);
-            this.splitContainer1.Size = new System.Drawing.Size(1529, 822);
-            this.splitContainer1.SplitterDistance = 778;
+            this.splitContainer1.Size = new System.Drawing.Size(1529, 813);
+            this.splitContainer1.SplitterDistance = 769;
             this.splitContainer1.TabIndex = 4;
             // 
             // FrameMain

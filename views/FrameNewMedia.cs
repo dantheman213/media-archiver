@@ -156,6 +156,7 @@ namespace JackTheVideoRipper
                             }
                         }
 
+                        cbVideoFormat.Items.Add("Resolution / Bitrate / Format / Type / Additional Info");
                         if (!String.IsNullOrEmpty(recommendedVideoFormat))
                         {
                             cbVideoFormat.Items.Add(recommendedVideoFormat);
@@ -175,6 +176,9 @@ namespace JackTheVideoRipper
                             cbVideoFormat.Items.Add(item);
                         }
 
+                        // audio
+                        cbAudioFormat.Items.Add("Bitrate / Sample Rate / Format / Codec");
+
                         if (!String.IsNullOrEmpty(recommendedAudioFormat))
                         {
                             cbAudioFormat.Items.Add(recommendedAudioFormat);
@@ -190,21 +194,24 @@ namespace JackTheVideoRipper
                         }
 
                         audioFormatList.Reverse(); // TODO: optimze this out
+
                         foreach (var item in audioFormatList)
                         {
                             cbAudioFormat.Items.Add(item);
                         }
 
-                        if (cbVideoFormat.Items.Count < 1)
+                        if (cbVideoFormat.Items.Count < 2)
                         {
                             cbVideoFormat.Items.Add("(no video metadata could be extracted)");
                         }
-                        cbVideoFormat.SelectedIndex = 0;
-                        if (cbAudioFormat.Items.Count < 1)
+                        cbVideoFormat.SelectedIndex = 1;
+                        if (cbAudioFormat.Items.Count < 2)
                         {
                             cbAudioFormat.Items.Add("(no audio metadata could be extracted)");
                         }
-                        cbAudioFormat.SelectedIndex = 0;
+                        cbAudioFormat.SelectedIndex = 1;
+
+                        // -- 
                         if (cbVideoEncoder.Items.Count > 0)
                         {
                             cbVideoEncoder.SelectedIndex = 0;
@@ -441,6 +448,22 @@ namespace JackTheVideoRipper
             }
 
             this.title = labelTitle.Text.Trim();
+        }
+
+        private void cbVideoFormat_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbVideoFormat.SelectedIndex == 0)
+            {
+                cbVideoFormat.SelectedIndex = 1;
+            }
+        }
+
+        private void cbAudioFormat_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbAudioFormat.SelectedIndex == 0)
+            {
+                cbAudioFormat.SelectedIndex = 1;
+            }
         }
     }
 }
