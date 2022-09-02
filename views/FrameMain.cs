@@ -637,5 +637,21 @@ namespace JackTheVideoRipper
                 queueBatchDownloads();
             }
         }
+
+        private void openTaskManagerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo(); //a processstartinfo object
+            startInfo.CreateNoWindow = false; //just hides the window if set to true
+            startInfo.UseShellExecute = true; //use shell (current programs privillage)
+            startInfo.FileName = System.IO.Path.Combine(Environment.SystemDirectory, "taskmgr.exe"); //The file path and file name
+            startInfo.Arguments = ""; //Add your arguments here
+
+            Process.Start(startInfo);
+        }
+
+        private void statusBar_DoubleClick(object sender, EventArgs e)
+        {
+            openTaskManagerToolStripMenuItem_Click(sender, e);
+        }
     }
 }

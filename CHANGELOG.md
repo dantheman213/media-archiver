@@ -11,3 +11,4 @@
 * Fixed blurry text on some screens with DPI scaling
 * added info to format selector
 * improved issue with ingestion file save dialog
+* added task manager link to help menu and also runs when you double click the status bar

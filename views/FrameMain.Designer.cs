@@ -59,6 +59,8 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.openTaskManagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.downloadVLCPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadHandbrakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -292,6 +294,8 @@
             this.aboutToolStripMenuItem,
             this.toolStripSeparator1,
             this.checkForUpdatesToolStripMenuItem,
+            this.toolStripSeparator6,
+            this.openTaskManagerToolStripMenuItem,
             this.toolStripSeparator2,
             this.downloadVLCPlayerToolStripMenuItem,
             this.downloadHandbrakeToolStripMenuItem,
@@ -321,6 +325,18 @@
             this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
             this.checkForUpdatesToolStripMenuItem.Text = "Check For Updates";
             this.checkForUpdatesToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdatesToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(387, 6);
+            // 
+            // openTaskManagerToolStripMenuItem
+            // 
+            this.openTaskManagerToolStripMenuItem.Name = "openTaskManagerToolStripMenuItem";
+            this.openTaskManagerToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
+            this.openTaskManagerToolStripMenuItem.Text = "Open Task Manager";
+            this.openTaskManagerToolStripMenuItem.Click += new System.EventHandler(this.openTaskManagerToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
@@ -459,6 +475,7 @@
             this.statusBar.Size = new System.Drawing.Size(1529, 40);
             this.statusBar.TabIndex = 3;
             this.statusBar.Text = "statusStrip1";
+            this.statusBar.DoubleClick += new System.EventHandler(this.statusBar_DoubleClick);
             // 
             // toolbarLabelStatus
             // 
@@ -608,6 +625,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private SplitContainer splitContainer1;
         private ImageList imgList;
+        private ToolStripSeparator toolStripSeparator6;
+        private ToolStripMenuItem openTaskManagerToolStripMenuItem;
     }
 }
 
