@@ -7,3 +7,4 @@
 * Updated app icon
 * Updated toolbar icons
 * Updated documentation
+* Fixed a bug that prevented thumbnail to be shown

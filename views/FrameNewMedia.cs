@@ -77,7 +77,7 @@ namespace JackTheVideoRipper
                     Application.DoEvents();
 
                     var info = YouTubeDL.getMediaData(url);
-                    string thumbnailFilePath = YouTubeDL.downloadThumbnail(info.thumbnail);
+                    var thumbnailFilePath = YouTubeDL.downloadThumbnail(info.thumbnail);
                     pbPreview.ImageLocation = thumbnailFilePath;
                   
                     labelTitle.Text = info.title;

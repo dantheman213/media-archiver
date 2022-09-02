@@ -11,7 +11,7 @@
     <AssemblyVersion>0.8.0</AssemblyVersion>
     <FileVersion>0.8.0</FileVersion>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <Content Include="assets\app.ico" />
   </ItemGroup>

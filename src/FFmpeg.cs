@@ -25,6 +25,7 @@ namespace JackTheVideoRipper
         public static void convertImageToJpg(string inputPath, string outputPath)
         {
             CLI.runCommand(String.Format("{0} -i {1} -vf \"scale=1920:-1\" {2}", binPath, inputPath, outputPath));
+            Thread.Sleep(1000); // allow the file to exist in the OS before querying for it otherwise sometimes its missed by app...
         }
     }
 }

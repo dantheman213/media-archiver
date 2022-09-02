@@ -31,18 +31,20 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrameMain));
             this.listItems = new System.Windows.Forms.ListView();
-            this.cTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cProgress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cDownloadSpeed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cETA = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cURL = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cTitle = new System.Windows.Forms.ColumnHeader();
+            this.cStatus = new System.Windows.Forms.ColumnHeader();
+            this.cType = new System.Windows.Forms.ColumnHeader();
+            this.cSize = new System.Windows.Forms.ColumnHeader();
+            this.cProgress = new System.Windows.Forms.ColumnHeader();
+            this.cDownloadSpeed = new System.Windows.Forms.ColumnHeader();
+            this.cETA = new System.Windows.Forms.ColumnHeader();
+            this.cURL = new System.Windows.Forms.ColumnHeader();
+            this.cPath = new System.Windows.Forms.ColumnHeader();
             this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.youTubeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.downloadVideoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -81,12 +83,15 @@
             this.timerStatusBar = new System.Windows.Forms.Timer(this.components);
             this.timerCheckForUpdates = new System.Windows.Forms.Timer(this.components);
             this.timerProcessLimit = new System.Windows.Forms.Timer(this.components);
-            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
             this.statusBar.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // listItems
@@ -103,14 +108,13 @@
             this.cURL,
             this.cPath});
             this.listItems.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listItems.Font = new System.Drawing.Font("Arial", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.listItems.Font = new System.Drawing.Font("Arial", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.listItems.FullRowSelect = true;
-            this.listItems.HideSelection = false;
-            this.listItems.Location = new System.Drawing.Point(0, 84);
-            this.listItems.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.listItems.Location = new System.Drawing.Point(0, 0);
+            this.listItems.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.listItems.MultiSelect = false;
             this.listItems.Name = "listItems";
-            this.listItems.Size = new System.Drawing.Size(2900, 1526);
+            this.listItems.Size = new System.Drawing.Size(1529, 770);
             this.listItems.SmallImageList = this.imgList;
             this.listItems.TabIndex = 0;
             this.listItems.UseCompatibleStateImageBehavior = false;
@@ -164,6 +168,7 @@
             // 
             // imgList
             // 
+            this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
             this.imgList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imgList.ImageStream")));
             this.imgList.TransparentColor = System.Drawing.Color.Transparent;
             this.imgList.Images.SetKeyName(0, "movie.ico");
@@ -171,7 +176,6 @@
             // 
             // menuStrip
             // 
-            this.menuStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.menuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
@@ -179,8 +183,8 @@
             this.helpToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
-            this.menuStrip.Size = new System.Drawing.Size(2900, 42);
+            this.menuStrip.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
+            this.menuStrip.Size = new System.Drawing.Size(1529, 33);
             this.menuStrip.TabIndex = 1;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -191,13 +195,25 @@
             this.toolStripSeparator5,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(72, 38);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(54, 29);
             this.fileToolStripMenuItem.Text = "&File";
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(178, 34);
+            this.settingsToolStripMenuItem.Text = "&Settings";
+            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(175, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(178, 34);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -210,20 +226,20 @@
             this.toolStripSeparator3,
             this.openDownloadFolderToolStripMenuItem});
             this.youTubeToolStripMenuItem.Name = "youTubeToolStripMenuItem";
-            this.youTubeToolStripMenuItem.Size = new System.Drawing.Size(102, 38);
+            this.youTubeToolStripMenuItem.Size = new System.Drawing.Size(77, 29);
             this.youTubeToolStripMenuItem.Text = "&Media";
             // 
             // downloadVideoToolStripMenuItem
             // 
             this.downloadVideoToolStripMenuItem.Name = "downloadVideoToolStripMenuItem";
-            this.downloadVideoToolStripMenuItem.Size = new System.Drawing.Size(397, 44);
+            this.downloadVideoToolStripMenuItem.Size = new System.Drawing.Size(300, 34);
             this.downloadVideoToolStripMenuItem.Text = "Download &Video";
             this.downloadVideoToolStripMenuItem.Click += new System.EventHandler(this.downloadVideoToolStripMenuItem_Click);
             // 
             // downloadAudioToolStripMenuItem
             // 
             this.downloadAudioToolStripMenuItem.Name = "downloadAudioToolStripMenuItem";
-            this.downloadAudioToolStripMenuItem.Size = new System.Drawing.Size(397, 44);
+            this.downloadAudioToolStripMenuItem.Size = new System.Drawing.Size(300, 34);
             this.downloadAudioToolStripMenuItem.Text = "Download &Audio";
             this.downloadAudioToolStripMenuItem.Click += new System.EventHandler(this.downloadAudioToolStripMenuItem_Click);
             // 
@@ -234,39 +250,39 @@
             this.downloadBatchDocumentToolStripMenuItem,
             this.downloadBatchYouTubePlaylistlToolStripMenuItem});
             this.batchToolStripMenuItem.Name = "batchToolStripMenuItem";
-            this.batchToolStripMenuItem.Size = new System.Drawing.Size(397, 44);
+            this.batchToolStripMenuItem.Size = new System.Drawing.Size(300, 34);
             this.batchToolStripMenuItem.Text = "Download &Batch";
             // 
             // downloadBatchManualToolStripMenuItem
             // 
             this.downloadBatchManualToolStripMenuItem.Name = "downloadBatchManualToolStripMenuItem";
-            this.downloadBatchManualToolStripMenuItem.Size = new System.Drawing.Size(322, 44);
+            this.downloadBatchManualToolStripMenuItem.Size = new System.Drawing.Size(241, 34);
             this.downloadBatchManualToolStripMenuItem.Text = "&Manual";
             this.downloadBatchManualToolStripMenuItem.Click += new System.EventHandler(this.downloadBatchManualToolStripMenuItem_Click);
             // 
             // downloadBatchDocumentToolStripMenuItem
             // 
             this.downloadBatchDocumentToolStripMenuItem.Name = "downloadBatchDocumentToolStripMenuItem";
-            this.downloadBatchDocumentToolStripMenuItem.Size = new System.Drawing.Size(322, 44);
+            this.downloadBatchDocumentToolStripMenuItem.Size = new System.Drawing.Size(241, 34);
             this.downloadBatchDocumentToolStripMenuItem.Text = "Document";
             this.downloadBatchDocumentToolStripMenuItem.Click += new System.EventHandler(this.downloadBatchDocumentToolStripMenuItem_Click);
             // 
             // downloadBatchYouTubePlaylistlToolStripMenuItem
             // 
             this.downloadBatchYouTubePlaylistlToolStripMenuItem.Name = "downloadBatchYouTubePlaylistlToolStripMenuItem";
-            this.downloadBatchYouTubePlaylistlToolStripMenuItem.Size = new System.Drawing.Size(322, 44);
+            this.downloadBatchYouTubePlaylistlToolStripMenuItem.Size = new System.Drawing.Size(241, 34);
             this.downloadBatchYouTubePlaylistlToolStripMenuItem.Text = "YouTube Playlist";
             this.downloadBatchYouTubePlaylistlToolStripMenuItem.Click += new System.EventHandler(this.downloadBatchYouTubePlaylistlToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(394, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(297, 6);
             // 
             // openDownloadFolderToolStripMenuItem
             // 
             this.openDownloadFolderToolStripMenuItem.Name = "openDownloadFolderToolStripMenuItem";
-            this.openDownloadFolderToolStripMenuItem.Size = new System.Drawing.Size(397, 44);
+            this.openDownloadFolderToolStripMenuItem.Size = new System.Drawing.Size(300, 34);
             this.openDownloadFolderToolStripMenuItem.Text = "&Open Download Folder";
             this.openDownloadFolderToolStripMenuItem.Click += new System.EventHandler(this.openDownloadFolderToolStripMenuItem_Click);
             // 
@@ -284,70 +300,70 @@
             this.downloadFFmpegToolStripMenuItem,
             this.downloadAtomicParsleyToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(85, 38);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(65, 29);
             this.helpToolStripMenuItem.Text = "Help";
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(517, 44);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(514, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(387, 6);
             // 
             // checkForUpdatesToolStripMenuItem
             // 
             this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(517, 44);
+            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
             this.checkForUpdatesToolStripMenuItem.Text = "Check For Updates";
             this.checkForUpdatesToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdatesToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(514, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(387, 6);
             // 
             // downloadVLCPlayerToolStripMenuItem
             // 
             this.downloadVLCPlayerToolStripMenuItem.Name = "downloadVLCPlayerToolStripMenuItem";
-            this.downloadVLCPlayerToolStripMenuItem.Size = new System.Drawing.Size(517, 44);
+            this.downloadVLCPlayerToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
             this.downloadVLCPlayerToolStripMenuItem.Text = "Download VLC Player";
             this.downloadVLCPlayerToolStripMenuItem.Click += new System.EventHandler(this.downloadVLCPlayerToolStripMenuItem_Click);
             // 
             // downloadHandbrakeToolStripMenuItem
             // 
             this.downloadHandbrakeToolStripMenuItem.Name = "downloadHandbrakeToolStripMenuItem";
-            this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(517, 44);
+            this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
             this.downloadHandbrakeToolStripMenuItem.Text = "Download Handbrake";
             this.downloadHandbrakeToolStripMenuItem.Click += new System.EventHandler(this.downloadHandbrakeToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(514, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(387, 6);
             // 
             // downloadVS2010RedistributableToolStripMenuItem
             // 
             this.downloadVS2010RedistributableToolStripMenuItem.Name = "downloadVS2010RedistributableToolStripMenuItem";
-            this.downloadVS2010RedistributableToolStripMenuItem.Size = new System.Drawing.Size(517, 44);
+            this.downloadVS2010RedistributableToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
             this.downloadVS2010RedistributableToolStripMenuItem.Text = "Download VS 2010 Redistributable";
             this.downloadVS2010RedistributableToolStripMenuItem.Click += new System.EventHandler(this.downloadVS2010RedistributableToolStripMenuItem_Click);
             // 
             // downloadFFmpegToolStripMenuItem
             // 
             this.downloadFFmpegToolStripMenuItem.Name = "downloadFFmpegToolStripMenuItem";
-            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(517, 44);
+            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
             this.downloadFFmpegToolStripMenuItem.Text = "Download FFmpeg";
             this.downloadFFmpegToolStripMenuItem.Click += new System.EventHandler(this.downloadFFmpegToolStripMenuItem_Click);
             // 
             // downloadAtomicParsleyToolStripMenuItem
             // 
             this.downloadAtomicParsleyToolStripMenuItem.Name = "downloadAtomicParsleyToolStripMenuItem";
-            this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(517, 44);
+            this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
             this.downloadAtomicParsleyToolStripMenuItem.Text = "Download AtomicParsley";
             this.downloadAtomicParsleyToolStripMenuItem.Click += new System.EventHandler(this.downloadAtomicParsleyToolStripMenuItem_Click);
             // 
@@ -361,51 +377,51 @@
             this.openURLInBrowserToolStripMenuItem,
             this.openMediaInPlayerToolStripMenuItem});
             this.contextMenuListItems.Name = "contextMenuListItems";
-            this.contextMenuListItems.Size = new System.Drawing.Size(322, 162);
+            this.contextMenuListItems.Size = new System.Drawing.Size(255, 138);
             // 
             // convertMediaToolStripMenuItem
             // 
             this.convertMediaToolStripMenuItem.Name = "convertMediaToolStripMenuItem";
-            this.convertMediaToolStripMenuItem.Size = new System.Drawing.Size(321, 38);
+            this.convertMediaToolStripMenuItem.Size = new System.Drawing.Size(254, 32);
             this.convertMediaToolStripMenuItem.Text = "Convert Media";
             this.convertMediaToolStripMenuItem.Click += new System.EventHandler(this.convertMediaToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(318, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(251, 6);
             // 
             // openFolderToolStripMenuItem
             // 
             this.openFolderToolStripMenuItem.Name = "openFolderToolStripMenuItem";
-            this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(321, 38);
+            this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(254, 32);
             this.openFolderToolStripMenuItem.Text = "Open Folder";
             this.openFolderToolStripMenuItem.Click += new System.EventHandler(this.openFolderToolStripMenuItem_Click);
             // 
             // openURLInBrowserToolStripMenuItem
             // 
             this.openURLInBrowserToolStripMenuItem.Name = "openURLInBrowserToolStripMenuItem";
-            this.openURLInBrowserToolStripMenuItem.Size = new System.Drawing.Size(321, 38);
+            this.openURLInBrowserToolStripMenuItem.Size = new System.Drawing.Size(254, 32);
             this.openURLInBrowserToolStripMenuItem.Text = "Open URL In Browser";
             this.openURLInBrowserToolStripMenuItem.Click += new System.EventHandler(this.openURLInBrowserToolStripMenuItem_Click);
             // 
             // openMediaInPlayerToolStripMenuItem
             // 
             this.openMediaInPlayerToolStripMenuItem.Name = "openMediaInPlayerToolStripMenuItem";
-            this.openMediaInPlayerToolStripMenuItem.Size = new System.Drawing.Size(321, 38);
+            this.openMediaInPlayerToolStripMenuItem.Size = new System.Drawing.Size(254, 32);
             this.openMediaInPlayerToolStripMenuItem.Text = "Open Media In Player";
             this.openMediaInPlayerToolStripMenuItem.Click += new System.EventHandler(this.openMediaInPlayerToolStripMenuItem_Click);
             // 
             // toolBar
             // 
-            this.toolBar.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.toolBar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolBar.ImageScalingSize = new System.Drawing.Size(25, 30);
             this.toolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButtonDownloadVideo,
             this.toolStripButtonDownloadAudio});
-            this.toolBar.Location = new System.Drawing.Point(0, 42);
+            this.toolBar.Location = new System.Drawing.Point(0, 33);
             this.toolBar.Name = "toolBar";
-            this.toolBar.Padding = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this.toolBar.Size = new System.Drawing.Size(2900, 42);
+            this.toolBar.Size = new System.Drawing.Size(1529, 48);
             this.toolBar.TabIndex = 2;
             this.toolBar.Text = "toolStrip1";
             // 
@@ -415,8 +431,8 @@
             this.toolStripButtonDownloadVideo.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonDownloadVideo.Image")));
             this.toolStripButtonDownloadVideo.ImageTransparentColor = System.Drawing.Color.Black;
             this.toolStripButtonDownloadVideo.Name = "toolStripButtonDownloadVideo";
-            this.toolStripButtonDownloadVideo.Size = new System.Drawing.Size(46, 36);
-            this.toolStripButtonDownloadVideo.ToolTipText = "Download Video";
+            this.toolStripButtonDownloadVideo.Size = new System.Drawing.Size(38, 43);
+            this.toolStripButtonDownloadVideo.ToolTipText = "Download Media as Video";
             this.toolStripButtonDownloadVideo.Click += new System.EventHandler(this.toolStripButtonDownloadVideo_Click);
             // 
             // toolStripButtonDownloadAudio
@@ -425,47 +441,48 @@
             this.toolStripButtonDownloadAudio.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonDownloadAudio.Image")));
             this.toolStripButtonDownloadAudio.ImageTransparentColor = System.Drawing.Color.Black;
             this.toolStripButtonDownloadAudio.Name = "toolStripButtonDownloadAudio";
-            this.toolStripButtonDownloadAudio.Size = new System.Drawing.Size(46, 36);
-            this.toolStripButtonDownloadAudio.ToolTipText = "Download Audio";
+            this.toolStripButtonDownloadAudio.Size = new System.Drawing.Size(38, 43);
+            this.toolStripButtonDownloadAudio.ToolTipText = "Download Media as Audio";
             this.toolStripButtonDownloadAudio.Click += new System.EventHandler(this.toolStripButtonDownloadAudio_Click);
             // 
             // statusBar
             // 
+            this.statusBar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.statusBar.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolbarLabelStatus,
             this.toolBarLabelCpu,
             this.toolBarLabelMemory,
             this.toolBarLabelNetwork});
-            this.statusBar.Location = new System.Drawing.Point(0, 1568);
+            this.statusBar.Location = new System.Drawing.Point(0, 0);
             this.statusBar.Name = "statusBar";
-            this.statusBar.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
-            this.statusBar.Size = new System.Drawing.Size(2900, 42);
+            this.statusBar.Padding = new System.Windows.Forms.Padding(1, 0, 16, 0);
+            this.statusBar.Size = new System.Drawing.Size(1529, 39);
             this.statusBar.TabIndex = 3;
             this.statusBar.Text = "statusStrip1";
             // 
             // toolbarLabelStatus
             // 
             this.toolbarLabelStatus.Name = "toolbarLabelStatus";
-            this.toolbarLabelStatus.Size = new System.Drawing.Size(96, 32);
+            this.toolbarLabelStatus.Size = new System.Drawing.Size(72, 32);
             this.toolbarLabelStatus.Text = "Waiting";
             // 
             // toolBarLabelCpu
             // 
             this.toolBarLabelCpu.Name = "toolBarLabelCpu";
-            this.toolBarLabelCpu.Size = new System.Drawing.Size(113, 32);
+            this.toolBarLabelCpu.Size = new System.Drawing.Size(86, 32);
             this.toolBarLabelCpu.Text = "CPU: N/A";
             // 
             // toolBarLabelMemory
             // 
             this.toolBarLabelMemory.Name = "toolBarLabelMemory";
-            this.toolBarLabelMemory.Size = new System.Drawing.Size(262, 32);
+            this.toolBarLabelMemory.Size = new System.Drawing.Size(196, 32);
             this.toolBarLabelMemory.Text = "Available Memory: N/A";
             // 
             // toolBarLabelNetwork
             // 
             this.toolBarLabelNetwork.Name = "toolBarLabelNetwork";
-            this.toolBarLabelNetwork.Size = new System.Drawing.Size(241, 32);
+            this.toolBarLabelNetwork.Size = new System.Drawing.Size(182, 32);
             this.toolBarLabelNetwork.Text = "Network Ingress: N/A";
             // 
             // timerStatusBar
@@ -484,30 +501,35 @@
             this.timerProcessLimit.Interval = 3500;
             this.timerProcessLimit.Tick += new System.EventHandler(this.timerProcessLimit_Tick);
             // 
-            // settingsToolStripMenuItem
+            // splitContainer1
             // 
-            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
-            this.settingsToolStripMenuItem.Text = "&Settings";
-            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 81);
+            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
-            // toolStripSeparator5
+            // splitContainer1.Panel1
             // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(356, 6);
+            this.splitContainer1.Panel1.Controls.Add(this.listItems);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.statusBar);
+            this.splitContainer1.Size = new System.Drawing.Size(1529, 813);
+            this.splitContainer1.SplitterDistance = 770;
+            this.splitContainer1.TabIndex = 4;
             // 
             // FrameMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2900, 1610);
-            this.Controls.Add(this.statusBar);
-            this.Controls.Add(this.listItems);
+            this.ClientSize = new System.Drawing.Size(1529, 894);
+            this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.toolBar);
             this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "FrameMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "JackTheVideoRipper";
@@ -521,6 +543,11 @@
             this.toolBar.PerformLayout();
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -581,6 +608,7 @@
         private System.Windows.Forms.Timer timerProcessLimit;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private SplitContainer splitContainer1;
     }
 }
 
