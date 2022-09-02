@@ -168,11 +168,11 @@
             // 
             // imgList
             // 
-            this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
             this.imgList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imgList.ImageStream")));
             this.imgList.TransparentColor = System.Drawing.Color.Transparent;
-            this.imgList.Images.SetKeyName(0, "movie.ico");
-            this.imgList.Images.SetKeyName(1, "song.ico");
+            this.imgList.Images.SetKeyName(0, "movie-medium.ico");
+            this.imgList.Images.SetKeyName(1, "song-medium.ico");
             // 
             // menuStrip
             // 
@@ -576,7 +576,6 @@
         private System.Windows.Forms.ToolStripMenuItem convertMediaToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ColumnHeader cStatus;
-        private System.Windows.Forms.ImageList imgList;
         private System.Windows.Forms.ToolStripMenuItem openURLInBrowserToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openMediaInPlayerToolStripMenuItem;
         private System.Windows.Forms.ToolStrip toolBar;
@@ -608,6 +607,7 @@
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private SplitContainer splitContainer1;
+        private ImageList imgList;
     }
 }
 

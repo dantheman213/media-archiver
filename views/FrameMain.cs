@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Policy;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -70,7 +71,6 @@ namespace JackTheVideoRipper
             
             this.Text = String.Format("JackTheVideoRipper {0}", Common.getAppVersion());
             listItemRowsUpdateTimer = new System.Threading.Timer(updateListItemRows, null, 0, 800);
-            
             timerStatusBar_Tick(sender, e);
             timerStatusBar.Enabled = true;
         }
