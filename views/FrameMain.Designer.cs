@@ -114,7 +114,7 @@
             this.listItems.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.listItems.MultiSelect = false;
             this.listItems.Name = "listItems";
-            this.listItems.Size = new System.Drawing.Size(1529, 770);
+            this.listItems.Size = new System.Drawing.Size(1529, 778);
             this.listItems.SmallImageList = this.imgList;
             this.listItems.TabIndex = 0;
             this.listItems.UseCompatibleStateImageBehavior = false;
@@ -415,13 +415,13 @@
             // toolBar
             // 
             this.toolBar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolBar.ImageScalingSize = new System.Drawing.Size(25, 30);
+            this.toolBar.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.toolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButtonDownloadVideo,
             this.toolStripButtonDownloadAudio});
             this.toolBar.Location = new System.Drawing.Point(0, 33);
             this.toolBar.Name = "toolBar";
-            this.toolBar.Size = new System.Drawing.Size(1529, 48);
+            this.toolBar.Size = new System.Drawing.Size(1529, 39);
             this.toolBar.TabIndex = 2;
             this.toolBar.Text = "toolStrip1";
             // 
@@ -431,7 +431,7 @@
             this.toolStripButtonDownloadVideo.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonDownloadVideo.Image")));
             this.toolStripButtonDownloadVideo.ImageTransparentColor = System.Drawing.Color.Black;
             this.toolStripButtonDownloadVideo.Name = "toolStripButtonDownloadVideo";
-            this.toolStripButtonDownloadVideo.Size = new System.Drawing.Size(38, 43);
+            this.toolStripButtonDownloadVideo.Size = new System.Drawing.Size(34, 34);
             this.toolStripButtonDownloadVideo.ToolTipText = "Download Media as Video";
             this.toolStripButtonDownloadVideo.Click += new System.EventHandler(this.toolStripButtonDownloadVideo_Click);
             // 
@@ -441,7 +441,7 @@
             this.toolStripButtonDownloadAudio.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonDownloadAudio.Image")));
             this.toolStripButtonDownloadAudio.ImageTransparentColor = System.Drawing.Color.Black;
             this.toolStripButtonDownloadAudio.Name = "toolStripButtonDownloadAudio";
-            this.toolStripButtonDownloadAudio.Size = new System.Drawing.Size(38, 43);
+            this.toolStripButtonDownloadAudio.Size = new System.Drawing.Size(34, 34);
             this.toolStripButtonDownloadAudio.ToolTipText = "Download Media as Audio";
             this.toolStripButtonDownloadAudio.Click += new System.EventHandler(this.toolStripButtonDownloadAudio_Click);
             // 
@@ -457,32 +457,32 @@
             this.statusBar.Location = new System.Drawing.Point(0, 0);
             this.statusBar.Name = "statusBar";
             this.statusBar.Padding = new System.Windows.Forms.Padding(1, 0, 16, 0);
-            this.statusBar.Size = new System.Drawing.Size(1529, 39);
+            this.statusBar.Size = new System.Drawing.Size(1529, 40);
             this.statusBar.TabIndex = 3;
             this.statusBar.Text = "statusStrip1";
             // 
             // toolbarLabelStatus
             // 
             this.toolbarLabelStatus.Name = "toolbarLabelStatus";
-            this.toolbarLabelStatus.Size = new System.Drawing.Size(72, 32);
+            this.toolbarLabelStatus.Size = new System.Drawing.Size(72, 33);
             this.toolbarLabelStatus.Text = "Waiting";
             // 
             // toolBarLabelCpu
             // 
             this.toolBarLabelCpu.Name = "toolBarLabelCpu";
-            this.toolBarLabelCpu.Size = new System.Drawing.Size(86, 32);
+            this.toolBarLabelCpu.Size = new System.Drawing.Size(86, 33);
             this.toolBarLabelCpu.Text = "CPU: N/A";
             // 
             // toolBarLabelMemory
             // 
             this.toolBarLabelMemory.Name = "toolBarLabelMemory";
-            this.toolBarLabelMemory.Size = new System.Drawing.Size(196, 32);
+            this.toolBarLabelMemory.Size = new System.Drawing.Size(196, 33);
             this.toolBarLabelMemory.Text = "Available Memory: N/A";
             // 
             // toolBarLabelNetwork
             // 
             this.toolBarLabelNetwork.Name = "toolBarLabelNetwork";
-            this.toolBarLabelNetwork.Size = new System.Drawing.Size(182, 32);
+            this.toolBarLabelNetwork.Size = new System.Drawing.Size(182, 33);
             this.toolBarLabelNetwork.Text = "Network Ingress: N/A";
             // 
             // timerStatusBar
@@ -504,7 +504,7 @@
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 81);
+            this.splitContainer1.Location = new System.Drawing.Point(0, 72);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -515,8 +515,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.statusBar);
-            this.splitContainer1.Size = new System.Drawing.Size(1529, 813);
-            this.splitContainer1.SplitterDistance = 770;
+            this.splitContainer1.Size = new System.Drawing.Size(1529, 822);
+            this.splitContainer1.SplitterDistance = 778;
             this.splitContainer1.TabIndex = 4;
             // 
             // FrameMain

@@ -20,6 +20,9 @@ namespace JackTheVideoRipper
             {
                 if (firstRun)
                 {
+                    if (Environment.OSVersion.Version.Major >= 6)
+                        SetProcessDPIAware(); // fixes blurry text on some screens
+
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
                     Application.Run(new FrameMain());
@@ -29,5 +32,8 @@ namespace JackTheVideoRipper
                 }
             }
         }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetProcessDPIAware();
     }
 }
