@@ -6,9 +6,9 @@
 !define APP_NAME "JackTheVideoRipper"
 !define COMP_NAME "dantheman213"
 !define WEB_SITE "https://github.com/dantheman213/JackTheVideoRipper"
-!define VERSION "0.7.0"
-!define COPYRIGHT "Dan  � 2020"
-!define DESCRIPTION "Download YouTube videos easily with a few point and clicks."
+!define VERSION "0.8.0"
+!define COPYRIGHT "Dan  � 2022"
+!define DESCRIPTION "Download media easily with a few point and clicks."
 !define LICENSE_TXT "..\LICENSE"
 !define MAIN_APP_EXE "JackTheVideoRipper.exe"
 !define INSTALL_TYPE "SetShellVarContext current"
@@ -82,11 +82,10 @@ Section -MainProgram
 ${INSTALL_TYPE}
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR"
-File "..\JackTheVideoRipper\bin\Release\JackTheVideoRipper.exe"
-File "..\JackTheVideoRipper\bin\Release\Newtonsoft.Json.dll"
-File "..\JackTheVideoRipper\bin\Release\Newtonsoft.Json.xml"
-File "..\JackTheVideoRipper\bin\Release\System.IO.Compression.dll"
-File "..\JackTheVideoRipper\bin\Release\System.IO.Compression.ZipFile.dll"
+File "..\JackTheVideoRipper\bin\Release\net6.0-windows\JackTheVideoRipper.exe"
+File "..\JackTheVideoRipper\bin\Release\net6.0-windows\Newtonsoft.Json.dll"
+File "..\JackTheVideoRipper\bin\Release\net6.0-windows\System.Management.dll"
+File "..\JackTheVideoRipper\bin\Release\net6.0-windows\JackTheVideoRipper.dll"
 SectionEnd
 
 ######################################################################
