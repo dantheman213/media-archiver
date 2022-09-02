@@ -8,6 +8,7 @@
 * Added Get Command feature to list after media ingestion has started
 * Added write subs to file option
 * Updated authentication section UI in ingestion dialog
+* Fix uninstaller missing some files
 
 # v0.8.0
 
