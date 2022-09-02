@@ -82,10 +82,10 @@ Section -MainProgram
 ${INSTALL_TYPE}
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR"
-File "..\JackTheVideoRipper\bin\Release\net6.0-windows\JackTheVideoRipper.exe"
-File "..\JackTheVideoRipper\bin\Release\net6.0-windows\Newtonsoft.Json.dll"
-File "..\JackTheVideoRipper\bin\Release\net6.0-windows\System.Management.dll"
-File "..\JackTheVideoRipper\bin\Release\net6.0-windows\JackTheVideoRipper.dll"
+File "..\bin\Release\net6.0-windows\JackTheVideoRipper.exe"
+File "..\bin\Release\net6.0-windows\Newtonsoft.Json.dll"
+File "..\bin\Release\net6.0-windows\System.Management.dll"
+File "..\bin\Release\net6.0-windows\JackTheVideoRipper.dll"
 SectionEnd
 
 ######################################################################
