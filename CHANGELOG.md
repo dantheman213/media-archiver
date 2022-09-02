@@ -10,6 +10,7 @@
 * Updated authentication section UI in ingestion dialog
 * Fix uninstaller missing some files'
 * Add video thumbnail as icon in list items when downloading or transcoding
+* Fixed issue with media not opening when double clicking item after it's completed
 
 # v0.8.0
 
