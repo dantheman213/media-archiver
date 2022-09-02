@@ -1,5 +1,9 @@
 ## Info
 
+### IDE
+
+Developed with Visual Studio 2022 Community Edition
+
 ### Assets Dir
 
 This path stores the dependencies and settings:
