@@ -267,9 +267,20 @@ namespace JackTheVideoRipper
 
         private void buttonLocationBrowse_Click(object sender, EventArgs e)
         {
+            if (textUrl.Text.Trim() == "" || textLocation.Text.Trim() == "") 
+            { 
+                return; 
+            }
+
+            var dir = textLocation.Text.Substring(0, textLocation.Text.LastIndexOf("\\"));
+            var fileName = textLocation.Text.Substring(textLocation.Text.LastIndexOf("\\") + 1);
+            var ext = fileName.Substring(fileName.LastIndexOf(".") + 1);
+
             var d = new SaveFileDialog();
-            d.InitialDirectory = FrameMain.settings.defaultDownloadPath;
-            d.Filter = "All files (*.*)|*.*";
+            //d.InitialDirectory = FrameMain.settings.defaultDownloadPath;
+            d.InitialDirectory = dir;            
+            d.FileName = fileName;
+            d.Filter = String.Format("{0} file|*.{1}|All files (*.*)|*.*", ext, ext);
 
             var result = d.ShowDialog();
             if (result == DialogResult.OK)

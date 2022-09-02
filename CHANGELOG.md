@@ -10,3 +10,4 @@
 * Fixed a bug that prevented thumbnail to be shown
 * Fixed blurry text on some screens with DPI scaling
 * added info to format selector
+* improved issue with ingestion file save dialog
