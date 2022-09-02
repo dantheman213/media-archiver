@@ -12,6 +12,8 @@
 * Add video thumbnail as icon in list items when downloading or transcoding
 * Fixed issue with media not opening when double clicking item after it's completed
 * Fixed update check issue when app starts up
+* Use workspace area for files still being downloaded or transcoded
+* Improved media ingestion format selection UI/UX
 
 # v0.8.0
 
