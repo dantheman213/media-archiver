@@ -8,7 +8,8 @@
 * Added Get Command feature to list after media ingestion has started
 * Added write subs to file option
 * Updated authentication section UI in ingestion dialog
-* Fix uninstaller missing some files
+* Fix uninstaller missing some files'
+* Add video thumbnail as icon in list items when downloading or transcoding
 
 # v0.8.0
 
