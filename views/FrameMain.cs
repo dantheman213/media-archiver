@@ -323,7 +323,7 @@ namespace JackTheVideoRipper
                 string url = listItems.SelectedItems[0].SubItems[7].Text;
                 if (!String.IsNullOrEmpty(url))
                 {
-                    Process.Start(url);
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
                 }
             }
         }
