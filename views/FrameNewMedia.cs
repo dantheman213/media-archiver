@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JackTheVideoRipper.src;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -83,7 +84,7 @@ namespace JackTheVideoRipper
                     labelTitle.Text = info.title;
                     labelDescription.Text = info.description;
                     // TODO: may need to be revised now that using --restrict-filenames flag in youtube-dl
-                    textLocation.Text = FrameMain.settings.defaultDownloadPath + "\\" + String.Format("{0}{1}", Common.stripIllegalFileNameChars(info.filename.Substring(0, info.filename.LastIndexOf('.'))), info.filename.Substring(info.filename.LastIndexOf('.')));
+                    textLocation.Text = Settings.Data.defaultDownloadPath + "\\" + String.Format("{0}{1}", Common.stripIllegalFileNameChars(info.filename.Substring(0, info.filename.LastIndexOf('.'))), info.filename.Substring(info.filename.LastIndexOf('.')));
 
                     if (info.formats != null && info.formats.Count > 0)
                     {
@@ -162,14 +163,17 @@ namespace JackTheVideoRipper
                             cbVideoFormat.Items.Add(recommendedVideoFormat);
                         }
 
-                        try
-                        {
-                            videoFormatList.Sort((x, y) => Int32.Parse(x.Trim().Split(' ')[0]).CompareTo(Int32.Parse(y.Trim().Split(' ')[0])));
-                        }
-                        catch (FormatException ex)
-                        {
-                            Console.WriteLine(ex);
-                        }
+                        //try
+                        //{
+                            // attempt to sort by bitrate but not sure it's necessary
+                            //videoFormatList.Sort((x, y) => Int32.Parse(Common.RemoveAllNonNumericValuesFromString(x.Trim().Split('/')[0].Trim()))
+                            //                    .CompareTo(Int32.Parse(Common.RemoveAllNonNumericValuesFromString(y.Trim().Split('/')[1].Trim()))
+                            //                ));
+                        //}
+                        //catch (FormatException ex)
+                        //{
+                        //    Console.WriteLine(ex);
+                        //}
                         videoFormatList.Reverse(); // TODO: optimze this out
                         foreach (var item in videoFormatList)
                         {
@@ -186,7 +190,7 @@ namespace JackTheVideoRipper
 
                         try
                         {
-                            audioFormatList.Sort((x, y) => Int32.Parse(x.Trim().Split(' ')[0]).CompareTo(Int32.Parse(y.Trim().Split(' ')[0])));
+                            audioFormatList.Sort((x, y) => Double.Parse(x.Trim().Split(' ')[0]).CompareTo(Double.Parse(y.Trim().Split(' ')[0])));
                         }
                         catch (Exception ex)
                         {

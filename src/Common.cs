@@ -46,7 +46,8 @@ namespace JackTheVideoRipper
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             string version = fvi.FileVersion;
-            return String.Format("v{0}", version.Substring(0, version.LastIndexOf(".")));
+
+            return String.Format("v{0}", version);
         }
 
         public static bool isValidURL(string URL)
@@ -197,6 +198,17 @@ namespace JackTheVideoRipper
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static string RemoveAllNonNumericValuesFromString(string str)
+        {
+            var nums = Regex.Replace(str, @"[^\d]", String.Empty);
+            if (nums == "")
+            {
+                nums = "0";
+            }
+
+            return nums;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Security.AccessControl;
+using JackTheVideoRipper.src;
 using Newtonsoft.Json;
 using static System.Environment;
 
@@ -53,7 +54,23 @@ namespace JackTheVideoRipper
         {
             if (isInstalled())
             {
-                CLI.runCommand(binName + " -U");
+                CLI.runCommand(binName + " -U", YouTubeDL.installPath);
+                var previousVersion = Settings.Data.lastVersionYouTubeDL;
+                var currentVersion = getVersion();
+
+                if (previousVersion == "")
+                {
+                    Settings.Data.lastVersionYouTubeDL = currentVersion;
+                    Settings.Save();
+                    return;
+                }
+
+                if (previousVersion != currentVersion)
+                {
+                    Settings.Data.lastVersionYouTubeDL = currentVersion;
+                    Settings.Save();
+                    MessageBox.Show(String.Format("Dependency yt-dlp has been upgraded from {0} to {1}!", previousVersion, currentVersion), "yt-dlp update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 

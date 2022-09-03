@@ -29,7 +29,7 @@ namespace JackTheVideoRipper
                     model.version = serverVersion;
                     
                     // substring(1) used to removed "v" from versions to compare
-                    var dstVersion = new Version(serverVersion.Substring(1));
+                    var dstVersion = new Version(model.version.Substring(1));
                     var localVersion = new Version(Common.getAppVersion().Substring(1));
 
                     var result = dstVersion.CompareTo(localVersion);

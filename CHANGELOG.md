@@ -1,13 +1,28 @@
-# v0.9.0 - upcoming release
+# v0.9.0 - updating release
 
 * Add transcoding options to media ingestion
 * Transcoding status update fixes
-* Add visual progress bar for download and transcoding
 * Remove old separate ingestion dialog choice
 * Updated app icon
 * Added Get Command feature to list after media ingestion has started
 * Added write subs to file option
+* Add video thumbnail as icon in list items when downloading or transcoding
+* Fixed issue with media not opening when double clicking item after it's completed
+* Use workspace area for files still being downloaded or transcoded
+* Improved media ingestion format selection UI/UX
+* Add visual progress bar for download and transcoding
 * Updated authentication section UI in ingestion dialog
+
+# v0.8.1
+
+* Fixed issue with yt-dlp not auto updating
+* Added dialog when yt-dlp is automatically updated
+* Moved Settings into a centralized place and out of WinForms
+* Improved menu item organization
+* Updated location for vcredist_x86.exe dependency
+* Fixed update check issue when app starts up
+* Fix uninstaller missing some files
+* Fixed installer not attempting to install yt-dlp.exe
 
 # v0.8.0
 

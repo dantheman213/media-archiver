@@ -6,7 +6,7 @@
 !define APP_NAME "JackTheVideoRipper"
 !define COMP_NAME "dantheman213"
 !define WEB_SITE "https://github.com/dantheman213/JackTheVideoRipper"
-!define VERSION "0.8.0"
+!define VERSION "0.8.1"
 !define COPYRIGHT "Dan  � 2022"
 !define DESCRIPTION "Download media easily with a few point and clicks."
 !define LICENSE_TXT "..\LICENSE"
@@ -93,8 +93,9 @@ SectionEnd
 
 Section -Additional
 SetShellVarContext all
-!define INSTDIR_DATA "$APPDATA\${APP_NAME}\bin"
-SetOutPath "${INSTDIR_DATA}"
+!define INSTDIR_DATA_BASE "$APPDATA\${APP_NAME}"
+!define INSTDIR_DATA_BIN "$APPDATA\${APP_NAME}\bin"
+SetOutPath "${INSTDIR_DATA_BIN}"
 File "deps\AtomicParsley.exe"
 File "deps\ffmpeg.exe"
 File "deps\ffprobe.exe"
@@ -104,11 +105,11 @@ File "deps\windowsdesktop-runtime-6.0.8-win-x64.exe"
 # Download latest version of youtube-dl for end-user
 # TODO: This currently runs in background and silently. On computers with slow or spotty Internet connections may be an issue
 # This should wait until finished before continuing...
-nsExec::ExecToStack 'powershell.exe -Command "(new-object System.Net.WebClient).DownloadFile(\"https://yt-dl.org/downloads/latest/youtube-dl.exe\", \"${INSTDIR_DATA}\youtube-dl.exe\")"'
+nsExec::ExecToStack 'powershell.exe -Command "(new-object System.Net.WebClient).DownloadFile(\"https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe\", \"${INSTDIR_DATA_BIN}\yt-dlp.exe\")"'
 
 # Run external installer
-ExecWait "${INSTDIR_DATA}\vcredist_x86.exe"
-ExecWait "${INSTDIR_DATA}\windowsdesktop-runtime-6.0.8-win-x64.exe"
+ExecWait "${INSTDIR_DATA_BIN}\vcredist_x86.exe"
+ExecWait "${INSTDIR_DATA_BIN}\windowsdesktop-runtime-6.0.8-win-x64.exe"
 
 SectionEnd
 
@@ -157,26 +158,25 @@ SectionEnd
 Section Uninstall
 ${INSTALL_TYPE}
 Delete "$INSTDIR\JackTheVideoRipper.exe"
+Delete "$INSTDIR\JackTheVideoRipper.dll"
+Delete "$INSTDIR\JackTheVideoRipper.runtimeconfig.json"
 Delete "$INSTDIR\Newtonsoft.Json.dll"
-Delete "$INSTDIR\Newtonsoft.Json.xml"
-Delete "$INSTDIR\System.IO.Compression.dll"
-Delete "$INSTDIR\System.IO.Compression.ZipFile.dll"
+Delete "$INSTDIR\System.Management.dll"
 Delete "$INSTDIR\uninstall.exe"
 !ifdef WEB_SITE
 Delete "$INSTDIR\${APP_NAME} website.url"
 !endif
 
-RmDir "$INSTDIR"
+RmDir /r "$INSTDIR"
 
-!ifndef NEVER_UNINSTALL
-Delete "${INSTDIR_DATA}\AtomicParsley.exe"
-Delete "${INSTDIR_DATA}\ffmpeg.exe"
-Delete "${INSTDIR_DATA}\ffprobe.exe"
-Delete "${INSTDIR_DATA}\vcredist_x86.exe"
-Delete "${INSTDIR_DATA}\windowsdesktop-runtime-6.0.8-win-x64.exe"
+Delete "${INSTDIR_DATA_BIN}\AtomicParsley.exe"
+Delete "${INSTDIR_DATA_BIN}\ffmpeg.exe"
+Delete "${INSTDIR_DATA_BIN}\ffprobe.exe"
+Delete "${INSTDIR_DATA_BIN}\vcredist_x86.exe"
+Delete "${INSTDIR_DATA_BIN}\windowsdesktop-runtime-6.0.8-win-x64.exe"
  
-RmDir "$TEMP\${APP_NAME}"
-!endif
+RmDir /r "${INSTDIR_DATA_BASE}"
+RmDir /r "$TEMP\${APP_NAME}"
 
 !ifdef REG_START_MENU
 !insertmacro MUI_STARTMENU_GETFOLDER "Application" $SM_Folder

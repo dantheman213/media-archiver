@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using JackTheVideoRipper.src;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,17 +33,14 @@ namespace JackTheVideoRipper
 
         private void FrameSettings_Load(object sender, EventArgs e)
         {
-            var s = FrameMain.settings;
-
-            numMaxConcurrent.Value = s.maxConcurrentDownloads;
-            textLocation.Text = s.defaultDownloadPath;
+            numMaxConcurrent.Value = Settings.Data.maxConcurrentDownloads;
+            textLocation.Text = Settings.Data.defaultDownloadPath;
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
         {
-            var s = FrameMain.settings;
-            s.maxConcurrentDownloads = (int)numMaxConcurrent.Value;
-            s.defaultDownloadPath = textLocation.Text.Trim();
+            Settings.Data.maxConcurrentDownloads = (int)numMaxConcurrent.Value;
+            Settings.Data.defaultDownloadPath = textLocation.Text.Trim();
             save();
 
             this.Close();
@@ -50,7 +48,7 @@ namespace JackTheVideoRipper
 
         private void save()
         {
-            File.WriteAllText(Settings.filePath, JsonConvert.SerializeObject(FrameMain.settings));
+            Settings.Save();
         }
     }
 }
