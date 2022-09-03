@@ -163,14 +163,17 @@ namespace JackTheVideoRipper
                             cbVideoFormat.Items.Add(recommendedVideoFormat);
                         }
 
-                        try
-                        {
-                            videoFormatList.Sort((x, y) => Int32.Parse(x.Trim().Split(' ')[0]).CompareTo(Int32.Parse(y.Trim().Split(' ')[0])));
-                        }
-                        catch (FormatException ex)
-                        {
-                            Console.WriteLine(ex);
-                        }
+                        //try
+                        //{
+                            // attempt to sort by bitrate but not sure it's necessary
+                            //videoFormatList.Sort((x, y) => Int32.Parse(Common.RemoveAllNonNumericValuesFromString(x.Trim().Split('/')[0].Trim()))
+                            //                    .CompareTo(Int32.Parse(Common.RemoveAllNonNumericValuesFromString(y.Trim().Split('/')[1].Trim()))
+                            //                ));
+                        //}
+                        //catch (FormatException ex)
+                        //{
+                        //    Console.WriteLine(ex);
+                        //}
                         videoFormatList.Reverse(); // TODO: optimze this out
                         foreach (var item in videoFormatList)
                         {
@@ -187,7 +190,7 @@ namespace JackTheVideoRipper
 
                         try
                         {
-                            audioFormatList.Sort((x, y) => Int32.Parse(x.Trim().Split(' ')[0]).CompareTo(Int32.Parse(y.Trim().Split(' ')[0])));
+                            audioFormatList.Sort((x, y) => Double.Parse(x.Trim().Split(' ')[0]).CompareTo(Double.Parse(y.Trim().Split(' ')[0])));
                         }
                         catch (Exception ex)
                         {

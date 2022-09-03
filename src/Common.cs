@@ -199,5 +199,16 @@ namespace JackTheVideoRipper
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
+
+        public static string RemoveAllNonNumericValuesFromString(string str)
+        {
+            var nums = Regex.Replace(str, @"[^\d]", String.Empty);
+            if (nums == "")
+            {
+                nums = "0";
+            }
+
+            return nums;
+        }
     }
 }
