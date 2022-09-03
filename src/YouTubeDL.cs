@@ -58,6 +58,13 @@ namespace JackTheVideoRipper
                 var previousVersion = Settings.Data.lastVersionYouTubeDL;
                 var currentVersion = getVersion();
 
+                if (previousVersion == "")
+                {
+                    Settings.Data.lastVersionYouTubeDL = currentVersion;
+                    Settings.Save();
+                    return;
+                }
+
                 if (previousVersion != currentVersion)
                 {
                     Settings.Data.lastVersionYouTubeDL = currentVersion;
