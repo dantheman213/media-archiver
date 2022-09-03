@@ -3,6 +3,7 @@
 * Fixed issue with yt-dlp not auto updating
 * Added dialog when yt-dlp is automatically updated
 * Moved Settings into a centralized place and out of WinForms
+* Improved menu item organization
 * Add transcoding options to media ingestion
 * Transcoding status update fixes
 * Add visual progress bar for download and transcoding

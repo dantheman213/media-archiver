@@ -62,14 +62,7 @@
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.openTaskManagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.downloadVLCPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadHandbrakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.downloadVS2010RedistributableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadFFmpegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadAtomicParsleyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downloadYtdlpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.openDependenciesFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuListItems = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.convertMediaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -89,6 +82,14 @@
             this.timerCheckForUpdates = new System.Windows.Forms.Timer(this.components);
             this.timerProcessLimit = new System.Windows.Forms.Timer(this.components);
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.recommendedUtilitiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.vlcPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.handbrakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bundledUtilitiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.vS2010RedistributableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fFmpegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.atomicParsleyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ytdlpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.contextMenuListItems.SuspendLayout();
             this.toolBar.SuspendLayout();
@@ -298,17 +299,12 @@
             this.toolStripSeparator1,
             this.checkForUpdatesToolStripMenuItem,
             this.toolStripSeparator6,
-            this.openTaskManagerToolStripMenuItem,
+            this.openDependenciesFolderToolStripMenuItem,
             this.toolStripSeparator2,
-            this.downloadVLCPlayerToolStripMenuItem,
-            this.downloadHandbrakeToolStripMenuItem,
+            this.recommendedUtilitiesToolStripMenuItem,
+            this.bundledUtilitiesToolStripMenuItem,
             this.toolStripSeparator4,
-            this.downloadVS2010RedistributableToolStripMenuItem,
-            this.downloadFFmpegToolStripMenuItem,
-            this.downloadAtomicParsleyToolStripMenuItem,
-            this.downloadYtdlpToolStripMenuItem,
-            this.toolStripSeparator7,
-            this.openDependenciesFolderToolStripMenuItem});
+            this.openTaskManagerToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(65, 29);
             this.helpToolStripMenuItem.Text = "Help";
@@ -316,95 +312,48 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(329, 34);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(387, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(326, 6);
             // 
             // checkForUpdatesToolStripMenuItem
             // 
             this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
+            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(329, 34);
             this.checkForUpdatesToolStripMenuItem.Text = "Check For Updates";
             this.checkForUpdatesToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdatesToolStripMenuItem_Click);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(387, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(326, 6);
             // 
             // openTaskManagerToolStripMenuItem
             // 
             this.openTaskManagerToolStripMenuItem.Name = "openTaskManagerToolStripMenuItem";
-            this.openTaskManagerToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
+            this.openTaskManagerToolStripMenuItem.Size = new System.Drawing.Size(329, 34);
             this.openTaskManagerToolStripMenuItem.Text = "Open Task Manager";
             this.openTaskManagerToolStripMenuItem.Click += new System.EventHandler(this.openTaskManagerToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(387, 6);
-            // 
-            // downloadVLCPlayerToolStripMenuItem
-            // 
-            this.downloadVLCPlayerToolStripMenuItem.Name = "downloadVLCPlayerToolStripMenuItem";
-            this.downloadVLCPlayerToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
-            this.downloadVLCPlayerToolStripMenuItem.Text = "Download VLC Player";
-            this.downloadVLCPlayerToolStripMenuItem.Click += new System.EventHandler(this.downloadVLCPlayerToolStripMenuItem_Click);
-            // 
-            // downloadHandbrakeToolStripMenuItem
-            // 
-            this.downloadHandbrakeToolStripMenuItem.Name = "downloadHandbrakeToolStripMenuItem";
-            this.downloadHandbrakeToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
-            this.downloadHandbrakeToolStripMenuItem.Text = "Download Handbrake";
-            this.downloadHandbrakeToolStripMenuItem.Click += new System.EventHandler(this.downloadHandbrakeToolStripMenuItem_Click);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(326, 6);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(387, 6);
-            // 
-            // downloadVS2010RedistributableToolStripMenuItem
-            // 
-            this.downloadVS2010RedistributableToolStripMenuItem.Name = "downloadVS2010RedistributableToolStripMenuItem";
-            this.downloadVS2010RedistributableToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
-            this.downloadVS2010RedistributableToolStripMenuItem.Text = "Download VS 2010 Redistributable";
-            this.downloadVS2010RedistributableToolStripMenuItem.Click += new System.EventHandler(this.downloadVS2010RedistributableToolStripMenuItem_Click);
-            // 
-            // downloadFFmpegToolStripMenuItem
-            // 
-            this.downloadFFmpegToolStripMenuItem.Name = "downloadFFmpegToolStripMenuItem";
-            this.downloadFFmpegToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
-            this.downloadFFmpegToolStripMenuItem.Text = "Download FFmpeg";
-            this.downloadFFmpegToolStripMenuItem.Click += new System.EventHandler(this.downloadFFmpegToolStripMenuItem_Click);
-            // 
-            // downloadAtomicParsleyToolStripMenuItem
-            // 
-            this.downloadAtomicParsleyToolStripMenuItem.Name = "downloadAtomicParsleyToolStripMenuItem";
-            this.downloadAtomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
-            this.downloadAtomicParsleyToolStripMenuItem.Text = "Download AtomicParsley";
-            this.downloadAtomicParsleyToolStripMenuItem.Click += new System.EventHandler(this.downloadAtomicParsleyToolStripMenuItem_Click);
-            // 
-            // downloadYtdlpToolStripMenuItem
-            // 
-            this.downloadYtdlpToolStripMenuItem.Name = "downloadYtdlpToolStripMenuItem";
-            this.downloadYtdlpToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
-            this.downloadYtdlpToolStripMenuItem.Text = "Download yt-dlp";
-            this.downloadYtdlpToolStripMenuItem.Click += new System.EventHandler(this.downloadYtdlpToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(387, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(326, 6);
             // 
             // openDependenciesFolderToolStripMenuItem
             // 
             this.openDependenciesFolderToolStripMenuItem.Name = "openDependenciesFolderToolStripMenuItem";
-            this.openDependenciesFolderToolStripMenuItem.Size = new System.Drawing.Size(390, 34);
+            this.openDependenciesFolderToolStripMenuItem.Size = new System.Drawing.Size(329, 34);
             this.openDependenciesFolderToolStripMenuItem.Text = "Open Dependencies Folder";
             this.openDependenciesFolderToolStripMenuItem.Click += new System.EventHandler(this.openDependenciesFolderToolStripMenuItem_Click);
             // 
@@ -560,6 +509,68 @@
             this.splitContainer1.SplitterDistance = 769;
             this.splitContainer1.TabIndex = 4;
             // 
+            // recommendedUtilitiesToolStripMenuItem
+            // 
+            this.recommendedUtilitiesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.vlcPlayerToolStripMenuItem,
+            this.handbrakeToolStripMenuItem});
+            this.recommendedUtilitiesToolStripMenuItem.Name = "recommendedUtilitiesToolStripMenuItem";
+            this.recommendedUtilitiesToolStripMenuItem.Size = new System.Drawing.Size(329, 34);
+            this.recommendedUtilitiesToolStripMenuItem.Text = "Recommended Utilities";
+            // 
+            // vlcPlayerToolStripMenuItem
+            // 
+            this.vlcPlayerToolStripMenuItem.Name = "vlcPlayerToolStripMenuItem";
+            this.vlcPlayerToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.vlcPlayerToolStripMenuItem.Text = "VLC Player";
+            this.vlcPlayerToolStripMenuItem.Click += new System.EventHandler(this.downloadVLCPlayerToolStripMenuItem_Click);
+            // 
+            // handbrakeToolStripMenuItem
+            // 
+            this.handbrakeToolStripMenuItem.Name = "handbrakeToolStripMenuItem";
+            this.handbrakeToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.handbrakeToolStripMenuItem.Text = "Handbrake";
+            this.handbrakeToolStripMenuItem.Click += new System.EventHandler(this.downloadHandbrakeToolStripMenuItem_Click);
+            // 
+            // bundledUtilitiesToolStripMenuItem
+            // 
+            this.bundledUtilitiesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.vS2010RedistributableToolStripMenuItem,
+            this.fFmpegToolStripMenuItem,
+            this.atomicParsleyToolStripMenuItem,
+            this.ytdlpToolStripMenuItem});
+            this.bundledUtilitiesToolStripMenuItem.Name = "bundledUtilitiesToolStripMenuItem";
+            this.bundledUtilitiesToolStripMenuItem.Size = new System.Drawing.Size(329, 34);
+            this.bundledUtilitiesToolStripMenuItem.Text = "Bundled Utilities";
+            // 
+            // vS2010RedistributableToolStripMenuItem
+            // 
+            this.vS2010RedistributableToolStripMenuItem.Name = "vS2010RedistributableToolStripMenuItem";
+            this.vS2010RedistributableToolStripMenuItem.Size = new System.Drawing.Size(303, 34);
+            this.vS2010RedistributableToolStripMenuItem.Text = "VS 2010 Redistributable";
+            this.vS2010RedistributableToolStripMenuItem.Click += new System.EventHandler(this.downloadVS2010RedistributableToolStripMenuItem_Click);
+            // 
+            // fFmpegToolStripMenuItem
+            // 
+            this.fFmpegToolStripMenuItem.Name = "fFmpegToolStripMenuItem";
+            this.fFmpegToolStripMenuItem.Size = new System.Drawing.Size(303, 34);
+            this.fFmpegToolStripMenuItem.Text = "FFmpeg";
+            this.fFmpegToolStripMenuItem.Click += new System.EventHandler(this.downloadFFmpegToolStripMenuItem_Click);
+            // 
+            // atomicParsleyToolStripMenuItem
+            // 
+            this.atomicParsleyToolStripMenuItem.Name = "atomicParsleyToolStripMenuItem";
+            this.atomicParsleyToolStripMenuItem.Size = new System.Drawing.Size(303, 34);
+            this.atomicParsleyToolStripMenuItem.Text = "AtomicParsley";
+            this.atomicParsleyToolStripMenuItem.Click += new System.EventHandler(this.downloadAtomicParsleyToolStripMenuItem_Click);
+            // 
+            // ytdlpToolStripMenuItem
+            // 
+            this.ytdlpToolStripMenuItem.Name = "ytdlpToolStripMenuItem";
+            this.ytdlpToolStripMenuItem.Size = new System.Drawing.Size(303, 34);
+            this.ytdlpToolStripMenuItem.Text = "yt-dlp";
+            this.ytdlpToolStripMenuItem.Click += new System.EventHandler(this.downloadYtdlpToolStripMenuItem_Click);
+            // 
             // FrameMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -624,9 +635,6 @@
         private System.Windows.Forms.ToolStripButton toolStripButtonDownloadVideo;
         private System.Windows.Forms.ToolStripButton toolStripButtonDownloadAudio;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem downloadFFmpegToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem downloadHandbrakeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem downloadVLCPlayerToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusBar;
         private System.Windows.Forms.ToolStripStatusLabel toolbarLabelStatus;
         private System.Windows.Forms.ToolStripStatusLabel toolBarLabelCpu;
@@ -634,9 +642,7 @@
         private System.Windows.Forms.Timer timerStatusBar;
         private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripMenuItem downloadAtomicParsleyToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel toolBarLabelNetwork;
-        private System.Windows.Forms.ToolStripMenuItem downloadVS2010RedistributableToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem openDownloadFolderToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
@@ -652,9 +658,15 @@
         private ImageList imgList;
         private ToolStripSeparator toolStripSeparator6;
         private ToolStripMenuItem openTaskManagerToolStripMenuItem;
-        private ToolStripMenuItem downloadYtdlpToolStripMenuItem;
-        private ToolStripSeparator toolStripSeparator7;
         private ToolStripMenuItem openDependenciesFolderToolStripMenuItem;
+        private ToolStripMenuItem recommendedUtilitiesToolStripMenuItem;
+        private ToolStripMenuItem vlcPlayerToolStripMenuItem;
+        private ToolStripMenuItem handbrakeToolStripMenuItem;
+        private ToolStripMenuItem bundledUtilitiesToolStripMenuItem;
+        private ToolStripMenuItem vS2010RedistributableToolStripMenuItem;
+        private ToolStripMenuItem fFmpegToolStripMenuItem;
+        private ToolStripMenuItem atomicParsleyToolStripMenuItem;
+        private ToolStripMenuItem ytdlpToolStripMenuItem;
     }
 }
 
