@@ -10,6 +10,8 @@
 * Fixed issue with media not opening when double clicking item after it's completed
 * Use workspace area for files still being downloaded or transcoded
 * Improved media ingestion format selection UI/UX
+* Add visual progress bar for download and transcoding
+* Updated authentication section UI in ingestion dialog
 
 # v0.8.1
 
@@ -21,8 +23,6 @@
 * Fixed update check issue when app starts up
 * Fix uninstaller missing some files
 * Fixed installer not attempting to install yt-dlp.exe
-* Add visual progress bar for download and transcoding
-* Updated authentication section UI in ingestion dialog
 
 # v0.8.0
 
