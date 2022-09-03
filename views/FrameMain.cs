@@ -455,7 +455,7 @@ namespace JackTheVideoRipper
 
         private void downloadVS2010RedistributableToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start(new ProcessStartInfo("https://www.microsoft.com/en-us/download/confirmation.aspx?id=5555") { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo("https://www.microsoft.com/en-us/download/details.aspx?id=26999") { UseShellExecute = true });
         }
 
         private void openDownloadFolderToolStripMenuItem_Click(object sender, EventArgs e)
