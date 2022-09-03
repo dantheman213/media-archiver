@@ -1,4 +1,4 @@
-# v0.9.0 - upcoming release
+# v0.9.0
 
 * Fixed issue with yt-dlp not auto updating
 * Added dialog when yt-dlp is automatically updated
