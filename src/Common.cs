@@ -46,7 +46,8 @@ namespace JackTheVideoRipper
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             string version = fvi.FileVersion;
-            return String.Format("v{0}", version.Substring(0, version.LastIndexOf(".")));
+
+            return String.Format("v{0}", version);
         }
 
         public static bool isValidURL(string URL)

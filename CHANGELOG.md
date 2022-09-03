@@ -5,6 +5,8 @@
 * Moved Settings into a centralized place and out of WinForms
 * Improved menu item organization
 * Updated location for vcredist_x86.exe dependency
+* Fixed update check issue when app starts up
+
 * Add transcoding options to media ingestion
 * Transcoding status update fixes
 * Add visual progress bar for download and transcoding
@@ -16,7 +18,6 @@
 * Fix uninstaller missing some files'
 * Add video thumbnail as icon in list items when downloading or transcoding
 * Fixed issue with media not opening when double clicking item after it's completed
-* Fixed update check issue when app starts up
 * Use workspace area for files still being downloaded or transcoded
 * Improved media ingestion format selection UI/UX
 
