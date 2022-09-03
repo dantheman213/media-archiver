@@ -6,7 +6,7 @@
 !define APP_NAME "JackTheVideoRipper"
 !define COMP_NAME "dantheman213"
 !define WEB_SITE "https://github.com/dantheman213/JackTheVideoRipper"
-!define VERSION "0.8.0"
+!define VERSION "0.8.1"
 !define COPYRIGHT "Dan  � 2022"
 !define DESCRIPTION "Download media easily with a few point and clicks."
 !define LICENSE_TXT "..\LICENSE"
