@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JackTheVideoRipper.src;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -83,7 +84,7 @@ namespace JackTheVideoRipper
                     labelTitle.Text = info.title;
                     labelDescription.Text = info.description;
                     // TODO: may need to be revised now that using --restrict-filenames flag in youtube-dl
-                    textLocation.Text = FrameMain.settings.defaultDownloadPath + "\\" + String.Format("{0}{1}", Common.stripIllegalFileNameChars(info.filename.Substring(0, info.filename.LastIndexOf('.'))), info.filename.Substring(info.filename.LastIndexOf('.')));
+                    textLocation.Text = Settings.Data.defaultDownloadPath + "\\" + String.Format("{0}{1}", Common.stripIllegalFileNameChars(info.filename.Substring(0, info.filename.LastIndexOf('.'))), info.filename.Substring(info.filename.LastIndexOf('.')));
 
                     if (info.formats != null && info.formats.Count > 0)
                     {

@@ -17,6 +17,9 @@
 
 # v0.8.0
 
+* Fixed issue with yt-dlp not auto updating
+* Added dialog when yt-dlp is automatically updated
+* Moved Settings into a centralized place and out of WinForms
 * Upgraded .NET framework to 6.x from 4.x.
 * Fixed various bugs in order to improve stability
 * Upgraded ffmpeg from 4.2.1 to 5.1

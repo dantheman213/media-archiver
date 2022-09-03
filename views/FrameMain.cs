@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using JackTheVideoRipper.src;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,8 +13,6 @@ namespace JackTheVideoRipper
 {
     public partial class FrameMain : Form
     {
-        public static Settings settings;
-
         private static Dictionary<string, ProcessUpdateRow> dict = new Dictionary<string, ProcessUpdateRow>();
         private static System.Threading.Timer listItemRowsUpdateTimer;
 
@@ -55,14 +54,7 @@ namespace JackTheVideoRipper
         
         private void loadConfig()
         {
-            if (!Settings.Exists())
-            {
-                Directory.CreateDirectory(Settings.dir);
-                File.WriteAllText(Settings.filePath, JsonConvert.SerializeObject(Settings.generateDefaultSettings()));
-            }
-
-            var json = File.ReadAllText(Settings.filePath);
-            settings = JsonConvert.DeserializeObject<Settings>(json);
+            Settings.Load();
         }
 
         private void FrameMain_Load(object sender, EventArgs e)
@@ -281,7 +273,7 @@ namespace JackTheVideoRipper
 
             // couldn't find folder, rolling back to just the folder with no select
             Console.WriteLine(String.Format("couldn't find file to open at {0}", filePath));
-            Common.openFolder(settings.defaultDownloadPath);
+            Common.openFolder(Settings.Data.defaultDownloadPath);
         }
 
         private void listItems_MouseClick(object sender, MouseEventArgs e)
@@ -468,7 +460,7 @@ namespace JackTheVideoRipper
 
         private void openDownloadFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Common.openFolder(settings.defaultDownloadPath);
+            Common.openFolder(Settings.Data.defaultDownloadPath);
         }
         
         private void downloadBatchManualToolStripMenuItem_Click(object sender, EventArgs e)
@@ -498,7 +490,7 @@ namespace JackTheVideoRipper
 
         private void queueBatchDownloads()
         {
-            for (int i = 0; i < settings.maxConcurrentDownloads; i++)
+            for (int i = 0; i < Settings.Data.maxConcurrentDownloads; i++)
             {
                 Application.DoEvents();
                 System.Threading.Thread.Sleep(300);
@@ -509,7 +501,7 @@ namespace JackTheVideoRipper
         private void downloadBatchDocumentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var d = new OpenFileDialog();
-            d.InitialDirectory = settings.defaultDownloadPath;
+            d.InitialDirectory = Settings.Data.defaultDownloadPath;
             d.Filter = "All Files (*.*)|*.*";
 
             if (d.ShowDialog() == DialogResult.OK)
@@ -583,7 +575,7 @@ namespace JackTheVideoRipper
 
                 if (total - done > 0)
                 {
-                    if (active < settings.maxConcurrentDownloads)
+                    if (active < Settings.Data.maxConcurrentDownloads)
                     {
                         foreach (var pur in dict.Values)
                         {

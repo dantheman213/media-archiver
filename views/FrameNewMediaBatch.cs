@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JackTheVideoRipper.src;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -40,7 +41,7 @@ namespace JackTheVideoRipper
                 textUrls.Text = this.startUrls;
             }
 
-            textLocation.Text = FrameMain.settings.defaultDownloadPath;
+            textLocation.Text = Settings.Data.defaultDownloadPath;
 
             cbAudioQuality.SelectedIndex = 0;
             cbAudioEncoder.SelectedIndex = 0;
