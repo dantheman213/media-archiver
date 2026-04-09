@@ -1,139 +1,77 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
-  import { listen } from "@tauri-apps/api/event";
-  import { open } from "@tauri-apps/plugin-dialog";
+  import { binaryCheckState, binaryErrorMsg, binaryInstallProgress, autoInstallBinaries, saveManualBinaries } from '../stores/binaries';
 
-  let { onComplete } = $props<{ onComplete: () => void }>();
-
-  let status = $state("checking"); // checking, prompt, installing, manual, done
-  let errorMsg = $state("");
-  let installProgress: Record<string, number> = $state({ "yt-dlp": 0, ffmpeg: 0, "ffmpeg-extract": 0 });
-  
   let customYtDlp = $state("");
   let customFfmpeg = $state("");
 
-  async function checkBinaries() {
-    try {
-      let res: any = await invoke("check_binaries");
-      if (res.yt_dlp_found && res.ffmpeg_found) {
-        status = "done";
-        onComplete();
-      } else {
-        status = "prompt";
-      }
-    } catch (e) {
-      errorMsg = String(e);
-      status = "prompt";
-    }
-  }
-
-  async function autoInstall() {
-    status = "installing";
-    errorMsg = "";
-    
-    const unlisten = await listen("download-progress", (event: any) => {
-      const { component, progress } = event.payload;
-      installProgress[component] = progress;
-    });
-
-    try {
-      await invoke("install_binaries");
-      status = "done";
-      onComplete();
-    } catch (e) {
-      errorMsg = String(e);
-      status = "prompt";
-    } finally {
-      unlisten();
-    }
-  }
-
-  async function saveManual() {
-    errorMsg = "";
-    try {
-      await invoke("set_binary_paths", { 
-        ytDlpPath: customYtDlp || null, 
-        ffmpegPath: customFfmpeg || null 
-      });
-      await checkBinaries();
-      if (status !== "done") {
-        errorMsg = "Binaries not found at provided paths.";
-      }
-    } catch (e) {
-      errorMsg = String(e);
-    }
-  }
-  
   async function selectPath(type: "yt-dlp" | "ffmpeg") {
-    const selected = await open({
-      multiple: false,
-      directory: false,
-    });
-    if (selected && typeof selected === 'string') {
-      if (type === "yt-dlp") {
-        customYtDlp = selected;
-      } else {
-        customFfmpeg = selected;
+    try {
+      const selected = await invoke<string | null>("pick_file");
+      if (selected) {
+        if (type === "yt-dlp") {
+          customYtDlp = selected;
+        } else {
+          customFfmpeg = selected;
+        }
       }
+    } catch (e) {
+      console.error("Failed to pick file:", e);
     }
   }
 
-  // Use a timeout or onMount so it doesn't run during SSR or block initial render
-  import { onMount } from "svelte";
-  onMount(() => {
-    checkBinaries();
-  });
+  function handleSaveManual() {
+    saveManualBinaries(customYtDlp, customFfmpeg);
+  }
 </script>
 
-{#if status !== "done"}
+{#if $binaryCheckState === "prompt" || $binaryCheckState === "installing" || $binaryCheckState === "manual"}
 <div class="onboarding-overlay">
   <div class="onboarding-modal">
     <h1>Binary Setup</h1>
     <p>Media Archiver needs <code>yt-dlp</code> and <code>ffmpeg</code> to function.</p>
 
-    {#if errorMsg}
-      <div class="error">{errorMsg}</div>
+    {#if $binaryErrorMsg}
+      <div class="error">{$binaryErrorMsg}</div>
     {/if}
 
-    {#if status === "checking"}
-      <p>Checking system for binaries...</p>
-    {:else if status === "prompt"}
+    {#if $binaryCheckState === "prompt"}
       <div class="options">
         <div class="option-card">
           <h2>Auto-Install (Recommended)</h2>
           <p>We will securely download the required binaries directly from their official sources to your local app data folder.</p>
-          <button onclick={autoInstall} class="btn-primary">Download & Install</button>
+          <button onclick={autoInstallBinaries} class="btn-primary">Download & Install</button>
         </div>
         <div class="option-card">
           <h2>Manual Setup (Advanced)</h2>
           <p>If you already have them installed, you can provide the paths to the executables.</p>
-          <button onclick={() => status = "manual"} class="btn-secondary">Setup Manually</button>
+          <button onclick={() => $binaryCheckState = "manual"} class="btn-secondary">Setup Manually</button>
         </div>
       </div>
-    {:else if status === "installing"}
+    {:else if $binaryCheckState === "installing"}
       <div class="progress-section">
         <h2>Downloading Binaries...</h2>
         
         <div class="progress-item">
           <span>yt-dlp</span>
-          <progress value={installProgress["yt-dlp"]} max="1"></progress>
-          <span>{Math.round(installProgress["yt-dlp"] * 100)}%</span>
+          <progress value={$binaryInstallProgress["yt-dlp"]} max="1"></progress>
+          <span>{Math.round($binaryInstallProgress["yt-dlp"] * 100)}%</span>
         </div>
         
         <div class="progress-item">
           <span>ffmpeg archive</span>
-          <progress value={installProgress["ffmpeg"]} max="1"></progress>
-          <span>{Math.round(installProgress["ffmpeg"] * 100)}%</span>
+          <progress value={$binaryInstallProgress["ffmpeg"]} max="1"></progress>
+          <span>{Math.round($binaryInstallProgress["ffmpeg"] * 100)}%</span>
         </div>
         
-        {#if installProgress["ffmpeg"] >= 1 && installProgress["ffmpeg-extract"] < 1}
+        {#if $binaryInstallProgress["ffmpeg"] >= 1 && $binaryInstallProgress["ffmpeg-extract"] < 1}
           <div class="progress-item">
             <span>Extracting ffmpeg...</span>
-            <progress value={installProgress["ffmpeg-extract"]} max="1"></progress>
+            <progress value={$binaryInstallProgress["ffmpeg-extract"]} max="1"></progress>
           </div>
         {/if}
       </div>
-    {:else if status === "manual"}
+    {:else if $binaryCheckState === "manual"}
       <div class="manual-section">
         <h2>Manual Setup</h2>
         
@@ -154,8 +92,8 @@
         </div>
 
         <div class="actions">
-          <button onclick={() => status = "prompt"} class="btn-secondary">Back</button>
-          <button onclick={saveManual} class="btn-primary">Save & Continue</button>
+          <button onclick={() => $binaryCheckState = "prompt"} class="btn-secondary">Back</button>
+          <button onclick={handleSaveManual} class="btn-primary">Save & Continue</button>
         </div>
       </div>
     {/if}
@@ -170,8 +108,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--bg-color, #1a1a1a);
-    color: var(--text-color, #eee);
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -179,20 +116,23 @@
   }
 
   .onboarding-modal {
-    background-color: #2a2a2a;
+    background-color: var(--bg-surface);
+    color: var(--text-color);
     padding: 2rem;
     border-radius: 8px;
     max-width: 600px;
     width: 100%;
     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    border: 1px solid var(--border-color);
   }
 
   .error {
-    background-color: #ffcccc;
-    color: #cc0000;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--error-color);
     padding: 0.5rem;
     border-radius: 4px;
     margin-bottom: 1rem;
+    border: 1px solid var(--error-color);
   }
 
   .options {
@@ -203,12 +143,13 @@
 
   .option-card {
     flex: 1;
-    background-color: #333;
+    background-color: var(--bg-surface-hover);
     padding: 1.5rem;
     border-radius: 6px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    border: 1px solid var(--border-color);
   }
 
   .option-card h2 {
@@ -226,13 +167,21 @@
   }
 
   .btn-primary {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--primary-hover);
   }
 
   .btn-secondary {
-    background-color: #555;
+    background-color: var(--secondary-color);
     color: white;
+  }
+  
+  .btn-secondary:hover {
+    opacity: 0.9;
   }
 
   .progress-section {
@@ -272,10 +221,14 @@
   .path-input input {
     flex: 1;
     padding: 0.5rem;
-    border: 1px solid #555;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    background-color: #222;
-    color: white;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+
+  .path-input button {
+    margin-top: 0;
   }
 
   .actions {
