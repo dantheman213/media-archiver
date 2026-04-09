@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "Media Archiver",
         "width": 800,
         "height": 600
@@ -23,14 +24,13 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "nsis-portable"],
+    "targets": ["nsis"],
     "windows": {
       "nsis": {
         "license": "../LICENSE",
         "installMode": "both",
         "languages": ["English"],
-        "displayLanguageSelector": false,
-        "template": "nsis/installer.nsi"
+        "displayLanguageSelector": false
       }
     },
     "icon": [
