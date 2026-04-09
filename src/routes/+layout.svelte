@@ -1,6 +1,15 @@
 <script lang="ts">
   import '../app.css';
+  import Onboarding from '../components/Onboarding.svelte';
+  
   let { children } = $props();
+  let onboardingComplete = $state(false);
 </script>
 
-{@render children()}
+{#if !onboardingComplete}
+  <Onboarding onComplete={() => onboardingComplete = true} />
+{/if}
+
+{#if onboardingComplete}
+  {@render children()}
+{/if}
