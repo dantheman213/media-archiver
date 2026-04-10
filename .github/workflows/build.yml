@@ -22,7 +22,7 @@ jobs:
             rust-target: aarch64-apple-darwin
             artifact-name: Media-Archiver-macOS-arm64
             artifact-glob: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
-          - platform: macos-13
+          - platform: macos-latest
             rust-target: x86_64-apple-darwin
             artifact-name: Media-Archiver-macOS-x64
             artifact-glob: src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
