@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - main
@@ -32,24 +34,30 @@ jobs:
         with:
           targets: x86_64-pc-windows-msvc
 
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+      - name: cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            src-tauri/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       - name: install frontend dependencies
-        run: npm install
+        run: npm ci
 
       - name: build tauri app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: "Media Archiver v__VERSION__"
+          tagName: ${{ startsWith(github.ref, 'refs/tags/v') && 'app-v__VERSION__' || '' }}
+          releaseName: ${{ startsWith(github.ref, 'refs/tags/v') && 'Media Archiver v__VERSION__' || '' }}
           releaseBody: "See the assets below to download the latest version of Media Archiver."
-          releaseDraft: true
+          releaseDraft: ${{ startsWith(github.ref, 'refs/tags/v') && 'true' || 'false' }}
           prerelease: false
           args: --target x86_64-pc-windows-msvc
 
