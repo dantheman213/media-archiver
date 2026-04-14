@@ -18,23 +18,35 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [windows-latest]
+        include:
+          - platform: windows-latest
+            rust-target: x86_64-pc-windows-msvc
+            artifact-name: Media-Archiver-Windows-x64
+            artifact-glob: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+          - platform: macos-latest
+            rust-target: aarch64-apple-darwin
+            artifact-name: Media-Archiver-macOS-arm64
+            artifact-glob: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+          - platform: macos-latest
+            rust-target: x86_64-apple-darwin
+            artifact-name: Media-Archiver-macOS-x64
+            artifact-glob: src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
 
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
-      - name: install Rust stable
+      - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-pc-windows-msvc
+          targets: ${{ matrix.rust-target }}
 
-      - name: cache cargo registry
+      - name: Cache cargo registry
         uses: actions/cache@v4
         with:
           path: |
@@ -42,11 +54,11 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             src-tauri/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-${{ matrix.rust-target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-
+            ${{ runner.os }}-${{ matrix.rust-target }}-cargo-
 
-      - name: install frontend dependencies
+      - name: Install frontend dependencies
         run: npm ci
 
       - name: Sync version from tag
@@ -56,21 +68,20 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/v}
           node scripts/sync-version.js $VERSION
 
-      - name: build tauri app
+      - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ startsWith(github.ref, 'refs/tags/v') && 'app-v__VERSION__' || '' }}
-          releaseName: ${{ startsWith(github.ref, 'refs/tags/v') && 'Media Archiver v__VERSION__' || '' }}
+          tagName: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '' }}
+          releaseName: ${{ startsWith(github.ref, 'refs/tags/v') && format('Media Archiver {0}', github.ref_name) || '' }}
           releaseBody: "See the assets below to download the latest version of Media Archiver."
-          releaseDraft: ${{ startsWith(github.ref, 'refs/tags/v') && 'true' || 'false' }}
+          releaseDraft: false
           prerelease: false
-          args: --target x86_64-pc-windows-msvc
+          args: --target ${{ matrix.rust-target }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Media-Archiver-Windows
-          path: |
-            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-glob }}

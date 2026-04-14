@@ -24,9 +24,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": [
-      "nsis"
-    ],
+    "targets": "all",
     "windows": {
       "nsis": {
         "installMode": "both",
@@ -35,6 +33,9 @@
         ],
         "displayLanguageSelector": false
       }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.15"
     },
     "icon": [
       "icons/32x32.png",
