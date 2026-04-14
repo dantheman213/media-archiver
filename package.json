@@ -1,6 +1,6 @@
 {
   "name": "media-archiver",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Local media archiving application built with Tauri and SvelteKit.",
   "type": "module",
   "scripts": {
