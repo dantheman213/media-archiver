@@ -13,12 +13,17 @@ pub struct BinaryStatus {
     pub ffmpeg_found: bool,
     pub ffmpeg_path: Option<String>,
     pub ffmpeg_version: Option<String>,
+    pub atomic_parsley_found: bool,
+    pub atomic_parsley_path: Option<String>,
+    pub atomic_parsley_version: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct BinaryPaths {
     pub yt_dlp_path: Option<String>,
     pub ffmpeg_path: Option<String>,
+    #[serde(default)]
+    pub atomic_parsley_path: Option<String>,
 }
 
 #[derive(Clone, Serialize)]
@@ -57,6 +62,7 @@ fn load_custom_paths(app: &AppHandle) -> BinaryPaths {
     BinaryPaths {
         yt_dlp_path: None,
         ffmpeg_path: None,
+        atomic_parsley_path: None,
     }
 }
 
@@ -131,6 +137,8 @@ pub fn check_binaries(app: AppHandle) -> BinaryStatus {
 
     let (yt_dlp_found, yt_dlp_path) = check_executable("yt-dlp", &paths.yt_dlp_path, &bin_dir);
     let (ffmpeg_found, ffmpeg_path) = check_executable("ffmpeg", &paths.ffmpeg_path, &bin_dir);
+    let (atomic_parsley_found, atomic_parsley_path) =
+        check_executable("AtomicParsley", &paths.atomic_parsley_path, &bin_dir);
 
     let yt_dlp_version = yt_dlp_path
         .as_ref()
@@ -140,6 +148,10 @@ pub fn check_binaries(app: AppHandle) -> BinaryStatus {
         .as_ref()
         .and_then(|p| get_version(p, &["-version"]));
 
+    let atomic_parsley_version = atomic_parsley_path
+        .as_ref()
+        .and_then(|p| get_version(p, &["--version"]));
+
     BinaryStatus {
         yt_dlp_found,
         yt_dlp_path,
@@ -147,6 +159,9 @@ pub fn check_binaries(app: AppHandle) -> BinaryStatus {
         ffmpeg_found,
         ffmpeg_path,
         ffmpeg_version,
+        atomic_parsley_found,
+        atomic_parsley_path,
+        atomic_parsley_version,
     }
 }
 
@@ -155,10 +170,12 @@ pub fn set_binary_paths(
     app: AppHandle,
     yt_dlp_path: Option<String>,
     ffmpeg_path: Option<String>,
+    atomic_parsley_path: Option<String>,
 ) -> Result<(), String> {
     let paths = BinaryPaths {
         yt_dlp_path,
         ffmpeg_path,
+        atomic_parsley_path,
     };
     let config_path = get_config_path(&app);
 
@@ -377,5 +394,103 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
         },
     );
 
+    // Download AtomicParsley
+    #[cfg(target_os = "windows")]
+    let atomicparsley_url =
+        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyWindows.zip";
+    #[cfg(target_os = "macos")]
+    let atomicparsley_url =
+        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyMacOS.zip";
+    #[cfg(target_os = "linux")]
+    let atomicparsley_url =
+        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyLinux.zip";
+
+    let atomicparsley_dest = bin_dir.join(if cfg!(target_os = "windows") {
+        "AtomicParsley.exe"
+    } else {
+        "AtomicParsley"
+    });
+    let atomicparsley_archive = bin_dir.join("atomicparsley.zip");
+
+    download_file(&app, atomicparsley_url, &atomicparsley_archive, "atomicparsley").await?;
+
+    {
+        let target_name = if cfg!(target_os = "windows") {
+            "AtomicParsley.exe"
+        } else {
+            "AtomicParsley"
+        };
+        let file = fs::File::open(&atomicparsley_archive).map_err(|e| e.to_string())?;
+        let mut archive = zip::ZipArchive::new(file).map_err(|e| e.to_string())?;
+        for i in 0..archive.len() {
+            let mut entry = archive.by_index(i).map_err(|e| e.to_string())?;
+            if let Some(path) = entry.enclosed_name() {
+                if path.file_name().and_then(|n| n.to_str()) == Some(target_name) {
+                    let mut out =
+                        fs::File::create(&atomicparsley_dest).map_err(|e| e.to_string())?;
+                    std::io::copy(&mut entry, &mut out).map_err(|e| e.to_string())?;
+                    break;
+                }
+            }
+        }
+    }
+
+    let _ = fs::remove_file(atomicparsley_archive);
+
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        if let Ok(metadata) = fs::metadata(&atomicparsley_dest) {
+            let mut perms = metadata.permissions();
+            perms.set_mode(0o755);
+            let _ = fs::set_permissions(&atomicparsley_dest, perms);
+        }
+    }
+
     Ok(())
+}
+
+#[derive(Serialize, Clone)]
+pub struct YtDlpUpdateInfo {
+    pub current_version: String,
+    pub latest_version: String,
+    pub update_available: bool,
+}
+
+#[tauri::command]
+pub async fn check_ytdlp_update(app: AppHandle) -> Result<Option<YtDlpUpdateInfo>, String> {
+    let status = check_binaries(app.clone());
+    let current_version = match status.yt_dlp_version {
+        Some(v) => v,
+        None => return Ok(None),
+    };
+
+    let client = reqwest::Client::builder()
+        .user_agent("media-archiver")
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let json: serde_json::Value = client
+        .get("https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest")
+        .send()
+        .await
+        .map_err(|e| e.to_string())?
+        .json()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let latest_version = json["tag_name"]
+        .as_str()
+        .unwrap_or("")
+        .to_string();
+
+    if latest_version.is_empty() {
+        return Ok(None);
+    }
+
+    Ok(Some(YtDlpUpdateInfo {
+        update_available: current_version != latest_version,
+        current_version,
+        latest_version,
+    }))
 }

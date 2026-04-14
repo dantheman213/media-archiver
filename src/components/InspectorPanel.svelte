@@ -2,6 +2,8 @@
   import type { MediaJob, JobConfig } from '../types';
   import { updateJobConfig, updateJobStatus, removeJob } from '../stores/queue';
   import { binaryCheckState } from '../stores/binaries';
+  import { isValidTimeString, parseTimeString, formatTime } from '../lib/timeUtils';
+  import ToggleSwitch from './ToggleSwitch.svelte';
 
   let { job, onclose }: {
     job: MediaJob;
@@ -34,10 +36,31 @@
     trimEnd = job.config.trim?.end ?? '';
   });
 
-  const qualityLabels: Record<string, string> = {
-    best: 'Best Quality',
-    balanced: 'Balanced',
-    small_size: 'Smaller File',
+  // Human-friendly quality labels with descriptions
+  const videoQualityOptions: { value: string; label: string; desc: string }[] = [
+    { value: 'best', label: 'Maximum Quality', desc: 'Largest file, visually lossless' },
+    { value: 'balanced', label: 'Recommended', desc: 'Great quality, reasonable size' },
+    { value: 'small_size', label: 'Compact', desc: 'Smaller file, reduced quality' },
+  ];
+
+  const audioQualityOptions: { value: string; label: string; desc: string }[] = [
+    { value: 'best', label: 'Maximum Quality', desc: 'Highest fidelity audio' },
+    { value: 'balanced', label: 'Recommended', desc: 'Great quality, smaller file' },
+    { value: 'small_size', label: 'Compact', desc: 'Smallest file, lower fidelity' },
+  ];
+
+  // Format descriptions
+  const videoFormatDescs: Record<string, string> = {
+    mp4: 'Most compatible \u2014 plays everywhere',
+    mkv: 'Best for archiving \u2014 supports all features',
+    webm: 'Open format \u2014 web optimized',
+  };
+
+  const audioFormatDescs: Record<string, string> = {
+    mp3: 'Universal audio \u2014 works on all devices',
+    m4a: 'Better quality than MP3 at the same size',
+    wav: 'Uncompressed studio quality \u2014 very large',
+    flac: 'Lossless compression \u2014 perfect quality, large files',
   };
 
   function formatDuration(seconds: number): string {
@@ -118,22 +141,22 @@
 
     <!-- Workflow selection -->
     <fieldset class="config-section">
-      <legend>Workflow</legend>
+      <legend>What to Save</legend>
       <div class="workflow-options">
         <label class="radio-card" class:active={workflow === 'video_best'}>
           <input type="radio" name="workflow" value="video_best" bind:group={workflow} />
-          <span class="radio-label">Video (Best)</span>
-          <span class="radio-desc">Download best video + audio</span>
+          <span class="radio-label">Save Video</span>
+          <span class="radio-desc">Download the best available video and audio</span>
         </label>
         <label class="radio-card" class:active={workflow === 'audio_only'}>
           <input type="radio" name="workflow" value="audio_only" bind:group={workflow} />
-          <span class="radio-label">Audio Only</span>
-          <span class="radio-desc">Extract or download audio</span>
+          <span class="radio-label">Save Audio</span>
+          <span class="radio-desc">Extract just the audio track</span>
         </label>
         <label class="radio-card" class:active={workflow === 'custom'}>
           <input type="radio" name="workflow" value="custom" bind:group={workflow} />
-          <span class="radio-label">Custom</span>
-          <span class="radio-desc">Pick format and quality</span>
+          <span class="radio-label">Advanced</span>
+          <span class="radio-desc">Choose specific format and quality settings</span>
         </label>
       </div>
     </fieldset>
@@ -143,21 +166,23 @@
       <fieldset class="config-section">
         <legend>Video Settings</legend>
         <div class="config-row">
-          <label for="target-format">Target Format</label>
+          <label for="target-format">Format</label>
           <select id="target-format" bind:value={targetFormat}>
             <option value="mp4">MP4</option>
             <option value="mkv">MKV</option>
             <option value="webm">WebM</option>
           </select>
         </div>
+        <div class="format-hint">{videoFormatDescs[targetFormat]}</div>
         <div class="config-row">
           <label for="video-quality">Quality</label>
           <select id="video-quality" bind:value={videoQuality}>
-            <option value="best">{qualityLabels.best}</option>
-            <option value="balanced">{qualityLabels.balanced}</option>
-            <option value="small_size">{qualityLabels.small_size}</option>
+            {#each videoQualityOptions as opt}
+              <option value={opt.value}>{opt.label}</option>
+            {/each}
           </select>
         </div>
+        <div class="format-hint">{videoQualityOptions.find(o => o.value === videoQuality)?.desc}</div>
       </fieldset>
     {/if}
 
@@ -174,32 +199,40 @@
             <option value="flac">FLAC</option>
           </select>
         </div>
+        <div class="format-hint">{audioFormatDescs[audioFormat]}</div>
         <div class="config-row">
           <label for="audio-quality">Quality</label>
           <select id="audio-quality" bind:value={audioQuality}>
-            <option value="best">{qualityLabels.best}</option>
-            <option value="balanced">{qualityLabels.balanced}</option>
-            <option value="small_size">{qualityLabels.small_size}</option>
+            {#each audioQualityOptions as opt}
+              <option value={opt.value}>{opt.label}</option>
+            {/each}
           </select>
         </div>
+        <div class="format-hint">{audioQualityOptions.find(o => o.value === audioQuality)?.desc}</div>
       </fieldset>
     {/if}
 
     <!-- Embed options -->
     <fieldset class="config-section">
-      <legend>Embed Options</legend>
-      <label class="toggle-row">
-        <input type="checkbox" bind:checked={embedSubtitles} />
-        <span>Subtitles</span>
-      </label>
-      <label class="toggle-row">
-        <input type="checkbox" bind:checked={embedMetadata} />
-        <span>Metadata</span>
-      </label>
-      <label class="toggle-row">
-        <input type="checkbox" bind:checked={embedThumbnail} />
-        <span>Thumbnail</span>
-      </label>
+      <legend>Include in File</legend>
+      <ToggleSwitch
+        label="Subtitles"
+        description="Include subtitle tracks inside the file"
+        checked={embedSubtitles}
+        onchange={(v) => embedSubtitles = v}
+      />
+      <ToggleSwitch
+        label="Metadata"
+        description="Save title, artist, and description in the file"
+        checked={embedMetadata}
+        onchange={(v) => embedMetadata = v}
+      />
+      <ToggleSwitch
+        label="Thumbnail"
+        description="Set the video thumbnail as cover art"
+        checked={embedThumbnail}
+        onchange={(v) => embedThumbnail = v}
+      />
     </fieldset>
 
     <!-- Trim -->
@@ -207,12 +240,41 @@
       <legend>Trim (optional)</legend>
       <div class="config-row">
         <label for="trim-start">Start</label>
-        <input id="trim-start" type="text" placeholder="HH:MM:SS" bind:value={trimStart} />
+        <input
+          id="trim-start"
+          type="text"
+          placeholder="0:00"
+          class:input-error={trimStart && !isValidTimeString(trimStart)}
+          bind:value={trimStart}
+        />
       </div>
       <div class="config-row">
         <label for="trim-end">End</label>
-        <input id="trim-end" type="text" placeholder="HH:MM:SS" bind:value={trimEnd} />
+        <input
+          id="trim-end"
+          type="text"
+          placeholder="0:00"
+          class:input-error={trimEnd && !isValidTimeString(trimEnd)}
+          bind:value={trimEnd}
+        />
       </div>
+      {#if trimStart && !isValidTimeString(trimStart)}
+        <div class="trim-error">Use format MM:SS or HH:MM:SS</div>
+      {:else if trimEnd && !isValidTimeString(trimEnd)}
+        <div class="trim-error">Use format MM:SS or HH:MM:SS</div>
+      {:else if trimStart && trimEnd && isValidTimeString(trimStart) && isValidTimeString(trimEnd)}
+        {@const startSec = parseTimeString(trimStart)}
+        {@const endSec = parseTimeString(trimEnd)}
+        {#if startSec !== null && endSec !== null}
+          {#if startSec >= endSec}
+            <div class="trim-error">Start must be before end</div>
+          {:else}
+            <div class="trim-summary">Trimming from {trimStart} to {trimEnd} ({formatTime(endSec - startSec)} selected)</div>
+          {/if}
+        {/if}
+      {:else if (trimStart || trimEnd) && job.metadata && job.metadata.durationSeconds > 0}
+        <div class="trim-hint">Full duration: {formatTime(job.metadata.durationSeconds)}</div>
+      {/if}
     </fieldset>
   </div>
 
@@ -400,17 +462,35 @@
     border-color: var(--primary-color);
   }
 
-  /* Toggle rows */
-  .toggle-row {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: var(--font-size-sm);
-    cursor: pointer;
+  /* Format hint text below selects */
+  .format-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding-left: var(--spacing-xs);
+    margin-top: -4px;
   }
 
-  .toggle-row input[type="checkbox"] {
-    accent-color: var(--primary-color);
+  /* Trim validation */
+  .input-error {
+    border-color: var(--error-color) !important;
+  }
+
+  .trim-error {
+    font-size: 0.75rem;
+    color: var(--error-color);
+    padding-left: var(--spacing-xs);
+  }
+
+  .trim-summary {
+    font-size: 0.75rem;
+    color: var(--success-color);
+    padding-left: var(--spacing-xs);
+  }
+
+  .trim-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding-left: var(--spacing-xs);
   }
 
   /* Footer */

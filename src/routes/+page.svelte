@@ -13,7 +13,9 @@
   } from '../stores/queue';
   import { settings } from '../stores/settings';
   import { binaryCheckState } from '../stores/binaries';
-  import type { MediaJob, MediaMetadata } from '../types';
+  import { addHistoryRecord } from '../stores/history';
+  import { getCachedMetadata, cacheMetadata } from '../stores/metadataCache';
+  import type { MediaJob, MediaMetadata, HistoryRecord } from '../types';
   import MediaCard from '../components/MediaCard.svelte';
   import InspectorPanel from '../components/InspectorPanel.svelte';
 
@@ -21,6 +23,65 @@
     job_id: string;
     event_type: string;
     payload: string;
+  }
+
+  // Track resolved file paths emitted by yt-dlp (via --print after_move:filepath)
+  const resolvedFilePaths = new Map<string, string>();
+
+  // Track locally cached thumbnail paths
+  const cachedThumbnailPaths = new Map<string, string>();
+
+  /** Build a human-readable format label from job config */
+  function buildFormatLabel(job: MediaJob): string {
+    if (job.config.workflow === 'audio_only') {
+      const fmt = (job.config.audioOnlyConfig?.format ?? 'mp3').toUpperCase();
+      const q = job.config.audioOnlyConfig?.quality ?? 'balanced';
+      const qLabel = q === 'best' ? 'Maximum Quality' : q === 'balanced' ? 'Recommended' : 'Compact';
+      return `${fmt} - ${qLabel}`;
+    }
+    const fmt = (job.config.videoTranscode?.targetFormat ?? 'mp4').toUpperCase();
+    const q = job.config.videoTranscode?.quality ?? 'balanced';
+    const qLabel = q === 'best' ? 'Maximum Quality' : q === 'balanced' ? 'Recommended' : 'Compact';
+    return `${fmt} - ${qLabel}`;
+  }
+
+  /** Create a HistoryRecord from a completed job */
+  function buildHistoryRecord(job: MediaJob): HistoryRecord {
+    return {
+      id: job.id,
+      url: job.url,
+      title: job.metadata?.title ?? job.url,
+      uploader: job.metadata?.uploader ?? '',
+      thumbnailUrl: job.metadata?.thumbnailUrl ?? '',
+      cachedThumbnailPath: cachedThumbnailPaths.get(job.id),
+      durationSeconds: job.metadata?.durationSeconds ?? 0,
+      extractor: job.metadata?.extractor ?? '',
+      filePath: resolvedFilePaths.get(job.id) ?? '',
+      completedAt: new Date().toISOString(),
+      workflow: job.config.workflow,
+      formatLabel: buildFormatLabel(job),
+    };
+  }
+
+  // Comprehensive error message humanization
+  const errorMappings: { match: string; message: string }[] = [
+    { match: 'is not a valid URL', message: "This link doesn't appear to be a valid URL." },
+    { match: 'HTTP Error 403', message: 'This content is restricted or unavailable in your region.' },
+    { match: 'HTTP Error 404', message: 'This content was not found. It may have been removed.' },
+    { match: 'Private video', message: 'This content is private and cannot be accessed.' },
+    { match: 'Sign in', message: 'This content requires a login to access.' },
+    { match: 'age-restricted', message: 'This content is age-restricted.' },
+    { match: 'copyright', message: 'This content was removed due to a copyright claim.' },
+    { match: 'No video formats', message: 'No downloadable media was found at this URL.' },
+    { match: 'Unsupported URL', message: 'This website is not currently supported.' },
+    { match: 'unavailable', message: 'This content is currently unavailable.' },
+  ];
+
+  function humanizeError(raw: string): string {
+    for (const { match, message } of errorMappings) {
+      if (raw.includes(match)) return message;
+    }
+    return raw.length > 200 ? raw.substring(0, 200) + '...' : raw;
   }
 
   // Map of active process event listeners (jobId -> unlisten fn)
@@ -53,34 +114,33 @@
           updateJobProgress(jobId, { currentStep: 'Merging streams...' });
           updateJobStatus(jobId, 'processing');
         }
+
+        // Capture resolved file path from --print after_move:filepath
+        // yt-dlp prints the absolute path as a plain line (e.g., C:\...\file.mp4 or /home/.../file.mp4)
+        const trimmed = payload.trim();
+        if (trimmed && !trimmed.includes('%') && !trimmed.startsWith('[') &&
+            (trimmed.match(/^[A-Z]:\\/) || trimmed.startsWith('/'))) {
+          resolvedFilePaths.set(jobId, trimmed);
+        }
       } else if (event_type === 'exit') {
         updateJobProgress(jobId, { percentage: 100, currentStep: '' });
         updateJobStatus(jobId, 'completed');
+        // Save to persistent history
+        const completedJob = $jobs.find(j => j.id === jobId);
+        if (completedJob) {
+          addHistoryRecord(buildHistoryRecord(completedJob));
+        }
+        resolvedFilePaths.delete(jobId);
+        cachedThumbnailPaths.delete(jobId);
         cleanupListener(jobId);
       } else if (event_type === 'error') {
-        // User-friendly error message
-        let message = payload;
-        if (message.includes('is not a valid URL')) {
-          message = 'The provided URL is not valid or supported.';
-        } else if (message.includes('HTTP Error 403')) {
-          message = 'Video is unavailable or geo-restricted (HTTP 403).';
-        } else if (message.includes('HTTP Error 404')) {
-          message = 'Video not found (HTTP 404). It may have been removed.';
-        } else if (message.includes('Private video')) {
-          message = 'This video is private and cannot be downloaded.';
-        } else if (message.length > 200) {
-          message = message.substring(0, 200) + '...';
-        }
-        updateJobStatus(jobId, 'error', message);
+        updateJobStatus(jobId, 'error', humanizeError(payload));
         cleanupListener(jobId);
       } else if (event_type === 'stderr') {
         // yt-dlp often writes progress to stderr; also capture errors
         if (payload.includes('ERROR')) {
-          let message = payload.replace(/^.*ERROR:\s*/, '');
-          if (message.length > 200) {
-            message = message.substring(0, 200) + '...';
-          }
-          updateJobStatus(jobId, 'error', message);
+          const raw = payload.replace(/^.*ERROR:\s*/, '');
+          updateJobStatus(jobId, 'error', humanizeError(raw));
           cleanupListener(jobId);
         }
       }
@@ -143,10 +203,26 @@
     // Auto-select the new job
     selectedJobId.set(jobId);
 
+    // Check metadata cache first for instant UI population
+    const cached = getCachedMetadata(url);
+    if (cached) {
+      updateJobMetadata(jobId, cached);
+      updateJobStatus(jobId, 'configuring');
+      return;
+    }
+
     try {
       const metadata: MediaMetadata = await invoke('fetch_metadata', { url });
       updateJobMetadata(jobId, metadata);
       updateJobStatus(jobId, 'configuring');
+      // Cache metadata for future use
+      cacheMetadata(url, metadata);
+      // Cache thumbnail in background for history
+      if (metadata.thumbnailUrl) {
+        invoke('cache_thumbnail', { url: metadata.thumbnailUrl, jobId }).then((localPath) => {
+          cachedThumbnailPaths.set(jobId, localPath as string);
+        }).catch(() => { /* non-critical */ });
+      }
     } catch (err) {
       updateJobStatus(jobId, 'error', err instanceof Error ? err.message : String(err));
     }
@@ -248,16 +324,39 @@
 
   let nonCompletedJobs = $derived($jobs.filter((j) => j.status !== 'completed'));
 
-  // Watch for queued jobs and start downloads
-  let prevQueuedIds = new Set<string>();
+  // Queue search/filter
+  let queueSearch = $state('');
+
+  let filteredQueueJobs = $derived.by(() => {
+    let result = nonCompletedJobs;
+    if (queueSearch.trim()) {
+      const q = queueSearch.toLowerCase();
+      result = result.filter(j =>
+        (j.metadata?.title ?? '').toLowerCase().includes(q) ||
+        j.url.toLowerCase().includes(q) ||
+        (j.metadata?.uploader ?? '').toLowerCase().includes(q)
+      );
+    }
+    return result;
+  });
+
+  // Watch for queued jobs and start downloads (respecting concurrent limit)
+  let prevStartedIds = new Set<string>();
   $effect(() => {
-    const queued = $jobs.filter((j) => j.status === 'queued');
-    for (const job of queued) {
-      if (!prevQueuedIds.has(job.id)) {
-        startJobDownload(job);
+    const activeCount = $jobs.filter(
+      j => j.status === 'downloading' || j.status === 'processing'
+    ).length;
+    const queued = $jobs.filter(j => j.status === 'queued');
+    const slots = $settings.concurrentDownloads - activeCount;
+
+    if (slots > 0 && queued.length > 0 && !$settings.globalPaused) {
+      for (const job of queued.slice(0, slots)) {
+        if (!prevStartedIds.has(job.id)) {
+          prevStartedIds.add(job.id);
+          startJobDownload(job);
+        }
       }
     }
-    prevQueuedIds = new Set(queued.map((j) => j.id));
   });
 
   async function startJobDownload(job: MediaJob) {
@@ -351,6 +450,17 @@
       <span class="count">{$activeJobs.length} active</span>
     </header>
 
+    {#if nonCompletedJobs.length > 3}
+      <div class="queue-search">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Filter queue..."
+          bind:value={queueSearch}
+        />
+      </div>
+    {/if}
+
     {#if $jobs.length === 0}
       <div class="empty-state">
         <p>No jobs in the queue.</p>
@@ -358,7 +468,7 @@
       </div>
     {:else}
       <ul class="job-list">
-        {#each nonCompletedJobs as job (job.id)}
+        {#each filteredQueueJobs as job (job.id)}
           <li class="job-list-item">
             <MediaCard
               {job}
@@ -443,6 +553,26 @@
     font-weight: 600;
     font-size: 1rem;
     pointer-events: none;
+  }
+
+  .queue-search {
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .search-input {
+    width: 100%;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-surface);
+    color: var(--text-color);
+    font-size: 0.85rem;
+    transition: border-color 0.15s ease;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
   }
 
   .url-input {

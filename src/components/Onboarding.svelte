@@ -28,8 +28,8 @@
 {#if $binaryCheckState === "prompt" || $binaryCheckState === "installing" || $binaryCheckState === "manual"}
 <div class="onboarding-overlay">
   <div class="onboarding-modal">
-    <h1>Binary Setup</h1>
-    <p>Media Archiver needs <code>yt-dlp</code> and <code>ffmpeg</code> to function.</p>
+    <h1>Getting Started</h1>
+    <p>Media Archiver needs a couple of small helper tools to download and process media. We can set them up for you automatically.</p>
 
     {#if $binaryErrorMsg}
       <div class="error">{$binaryErrorMsg}</div>
@@ -38,35 +38,35 @@
     {#if $binaryCheckState === "prompt"}
       <div class="options">
         <div class="option-card">
-          <h2>Auto-Install (Recommended)</h2>
-          <p>We will securely download the required binaries directly from their official sources to your local app data folder.</p>
-          <button onclick={autoInstallBinaries} class="btn-primary">Download & Install</button>
+          <h2>Automatic Setup (Recommended)</h2>
+          <p>We'll download everything you need. This takes about a minute.</p>
+          <button onclick={autoInstallBinaries} class="btn-primary">Set Up Automatically</button>
         </div>
         <div class="option-card">
-          <h2>Manual Setup (Advanced)</h2>
-          <p>If you already have them installed, you can provide the paths to the executables.</p>
-          <button onclick={() => $binaryCheckState = "manual"} class="btn-secondary">Setup Manually</button>
+          <h2>I Already Have These Tools</h2>
+          <p>If you already have the required tools installed, you can point us to them.</p>
+          <button onclick={() => $binaryCheckState = "manual"} class="btn-secondary">Set Up Manually</button>
         </div>
       </div>
     {:else if $binaryCheckState === "installing"}
       <div class="progress-section">
-        <h2>Downloading Binaries...</h2>
-        
+        <h2>Setting things up...</h2>
+
         <div class="progress-item">
-          <span>yt-dlp</span>
+          <span>Download engine</span>
           <progress value={$binaryInstallProgress["yt-dlp"]} max="1"></progress>
           <span>{Math.round($binaryInstallProgress["yt-dlp"] * 100)}%</span>
         </div>
-        
+
         <div class="progress-item">
-          <span>ffmpeg archive</span>
+          <span>Media processor</span>
           <progress value={$binaryInstallProgress["ffmpeg"]} max="1"></progress>
           <span>{Math.round($binaryInstallProgress["ffmpeg"] * 100)}%</span>
         </div>
-        
+
         {#if $binaryInstallProgress["ffmpeg"] >= 1 && $binaryInstallProgress["ffmpeg-extract"] < 1}
           <div class="progress-item">
-            <span>Extracting ffmpeg...</span>
+            <span>Unpacking media processor...</span>
             <progress value={$binaryInstallProgress["ffmpeg-extract"]} max="1"></progress>
           </div>
         {/if}
@@ -74,19 +74,19 @@
     {:else if $binaryCheckState === "manual"}
       <div class="manual-section">
         <h2>Manual Setup</h2>
-        
+
         <div class="input-group">
-          <label for="ytdlp-path">yt-dlp Executable Path:</label>
+          <label for="ytdlp-path">Download Engine (yt-dlp):</label>
           <div class="path-input">
-            <input id="ytdlp-path" type="text" bind:value={customYtDlp} placeholder="e.g. C:\bin\yt-dlp.exe" />
+            <input id="ytdlp-path" type="text" bind:value={customYtDlp} placeholder="Select the yt-dlp executable..." />
             <button onclick={() => selectPath("yt-dlp")}>Browse</button>
           </div>
         </div>
 
         <div class="input-group">
-          <label for="ffmpeg-path">ffmpeg Executable Path:</label>
+          <label for="ffmpeg-path">Media Processor (ffmpeg):</label>
           <div class="path-input">
-            <input id="ffmpeg-path" type="text" bind:value={customFfmpeg} placeholder="e.g. C:\bin\ffmpeg.exe" />
+            <input id="ffmpeg-path" type="text" bind:value={customFfmpeg} placeholder="Select the ffmpeg executable..." />
             <button onclick={() => selectPath("ffmpeg")}>Browse</button>
           </div>
         </div>
@@ -170,7 +170,7 @@
     background-color: var(--primary-color);
     color: white;
   }
-  
+
   .btn-primary:hover {
     background-color: var(--primary-hover);
   }
@@ -179,7 +179,7 @@
     background-color: var(--secondary-color);
     color: white;
   }
-  
+
   .btn-secondary:hover {
     opacity: 0.9;
   }

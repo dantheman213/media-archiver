@@ -75,4 +75,20 @@ export interface GlobalSettings {
   theme: 'system' | 'light' | 'dark';
 }
 
+export interface HistoryRecord {
+  id: string;                   // Original job UUID
+  url: string;
+  title: string;
+  uploader: string;
+  thumbnailUrl: string;         // Original remote URL
+  cachedThumbnailPath?: string; // Local cached path (future)
+  durationSeconds: number;
+  extractor: string;
+  filePath: string;             // Resolved output file path
+  fileSize?: number;            // Actual bytes
+  completedAt: string;          // ISO 8601 timestamp
+  workflow: string;             // Workflow used: 'video_best', 'audio_only', 'custom'
+  formatLabel: string;          // Human-readable: "MP4 - Best Quality"
+}
+
 export type NavRoute = 'queue' | 'history' | 'settings' | 'binaries';

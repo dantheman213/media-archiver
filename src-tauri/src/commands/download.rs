@@ -53,6 +53,10 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
     args.push("--newline".to_string());
     args.push("--progress".to_string());
 
+    // Print the final file path after all post-processing/moves
+    args.push("--print".to_string());
+    args.push("after_move:filepath".to_string());
+
     // Set ffmpeg location if available
     if let Some(ref ffmpeg) = ffmpeg_path {
         args.push("--ffmpeg-location".to_string());

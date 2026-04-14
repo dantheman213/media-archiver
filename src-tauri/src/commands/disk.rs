@@ -15,18 +15,34 @@ pub fn get_default_download_dir() -> Option<String> {
 
 #[tauri::command]
 pub fn select_directory() -> Result<Option<String>, String> {
-    let folder = rfd::FileDialog::new()
-        .pick_folder()
-        .map(|p| p.to_string_lossy().to_string());
-    Ok(folder)
+    #[cfg(target_os = "windows")]
+    {
+        let folder = rfd::FileDialog::new()
+            .pick_folder()
+            .map(|p| p.to_string_lossy().to_string());
+        Ok(folder)
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        // Stub for now as requested
+        Ok(None)
+    }
 }
 
 #[tauri::command]
 pub fn pick_file() -> Result<Option<String>, String> {
-    let file = rfd::FileDialog::new()
-        .pick_file()
-        .map(|p| p.to_string_lossy().to_string());
-    Ok(file)
+    #[cfg(target_os = "windows")]
+    {
+        let file = rfd::FileDialog::new()
+            .pick_file()
+            .map(|p| p.to_string_lossy().to_string());
+        Ok(file)
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        // Stub for now as requested
+        Ok(None)
+    }
 }
 
 #[tauri::command]

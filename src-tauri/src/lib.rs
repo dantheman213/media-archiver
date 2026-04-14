@@ -39,12 +39,22 @@ pub fn run() {
             commands::binaries::install_binaries,
             commands::binaries::set_binary_paths,
             commands::binaries::update_ytdlp,
+            commands::binaries::check_ytdlp_update,
             commands::metadata::fetch_metadata,
             commands::disk::get_default_download_dir,
             commands::disk::get_disk_space,
             commands::disk::select_directory,
             commands::disk::pick_file,
-            commands::download::start_download
+            commands::download::start_download,
+            commands::storage::save_json,
+            commands::storage::load_json,
+            commands::storage::delete_json,
+            commands::storage::cache_thumbnail,
+            commands::storage::clear_thumbnail_cache,
+            commands::file_ops::open_file,
+            commands::file_ops::show_in_folder,
+            commands::file_ops::check_file_exists,
+            commands::file_ops::get_file_size
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

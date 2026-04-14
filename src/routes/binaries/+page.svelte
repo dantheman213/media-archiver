@@ -28,7 +28,7 @@
 
 <div class="view">
   <header class="view-header">
-    <h2>Binaries Status</h2>
+    <h2>Dependencies</h2>
     <button class="btn-primary" onclick={checkBinaries} disabled={$binaryCheckState === 'checking'}>
       {$binaryCheckState === 'checking' ? 'Checking...' : 'Re-check'}
     </button>
@@ -71,6 +71,17 @@
         {/if}
         {#if $binaryStatus.ffmpeg_path}
           <p class="path">{$binaryStatus.ffmpeg_path}</p>
+        {/if}
+      </div>
+
+      <div class="binary-card" class:found={$binaryStatus.atomic_parsley_found} class:missing={!$binaryStatus.atomic_parsley_found}>
+        <h3>AtomicParsley</h3>
+        <span class="status-badge">{$binaryStatus.atomic_parsley_found ? 'Found' : 'Not Found'}</span>
+        {#if $binaryStatus.atomic_parsley_version}
+          <p class="version">{$binaryStatus.atomic_parsley_version}</p>
+        {/if}
+        {#if $binaryStatus.atomic_parsley_path}
+          <p class="path">{$binaryStatus.atomic_parsley_path}</p>
         {/if}
       </div>
     </div>

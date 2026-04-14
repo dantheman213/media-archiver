@@ -1,13 +1,10 @@
-# v0.9.0 - upcoming release
+# v0.9.2
 
-* Add transcoding options to media ingestion
-* Transcoding status update fixes
-* Add visual progress bar for download and transcoding
-* Remove old separate ingestion dialog choice
-* Updated app icon
-* Added Get Command feature to list after media ingestion has started
-* Added write subs to file option
-* Updated authentication section UI in ingestion dialog
+TBA
+
+# v0.9.0
+
+* Moved to Rust and Tauri
 
 # v0.8.0
 
