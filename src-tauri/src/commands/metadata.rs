@@ -27,11 +27,27 @@ pub async fn fetch_metadata(app: AppHandle, url: String) -> Result<MediaMetadata
         return Err(format!("yt-dlp error: {}", err_msg));
     }
 
+    let stderr_str = String::from_utf8_lossy(&output.stderr);
     let json_str = String::from_utf8_lossy(&output.stdout);
     let first_line = json_str.lines().next().unwrap_or("{}");
 
-    let metadata: MediaMetadata =
-        serde_json::from_str(first_line).map_err(|e| format!("Failed to parse metadata: {}", e))?;
+    let metadata: MediaMetadata = serde_json::from_str(first_line).map_err(|e| {
+        let col = e.column().saturating_sub(1);
+        let start = col.saturating_sub(120);
+        let end = (col + 120).min(first_line.len());
+        let snippet = &first_line[start..end];
+        let pointer = " ".repeat(col.saturating_sub(start)) + "^";
+
+        let mut msg = format!(
+            "Failed to parse metadata: {}\n\nJSON context (col {}):\n{}\n{}",
+            e, e.column(), snippet, pointer
+        );
+        if !stderr_str.trim().is_empty() {
+            msg.push_str(&format!("\n\nyt-dlp stderr:\n{}", stderr_str.trim()));
+        }
+        eprintln!("{}", msg);
+        msg
+    })?;
 
     Ok(metadata)
 }

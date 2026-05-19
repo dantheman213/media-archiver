@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { invoke } from '@tauri-apps/api/core';
+  import { get } from 'svelte/store';
   import type { MediaJob, JobConfig } from '../types';
   import { updateJobConfig, updateJobStatus, removeJob } from '../stores/queue';
   import { binaryCheckState } from '../stores/binaries';
+  import { settings } from '../stores/settings';
   import { isValidTimeString, parseTimeString, formatTime } from '../lib/timeUtils';
   import ToggleSwitch from './ToggleSwitch.svelte';
 
@@ -21,6 +24,7 @@
   let embedThumbnail = $state(true);
   let trimStart = $state('');
   let trimEnd = $state('');
+  let downloadPath = $state('');
 
   // Sync local state when job changes
   $effect(() => {
@@ -34,6 +38,7 @@
     embedThumbnail = job.config.embedThumbnail;
     trimStart = job.config.trim?.start ?? '';
     trimEnd = job.config.trim?.end ?? '';
+    downloadPath = job.config.downloadPath ?? get(settings).downloadPath;
   });
 
   // Human-friendly quality labels with descriptions
@@ -71,15 +76,21 @@
     return `${m}:${String(s).padStart(2, '0')}`;
   }
 
+  async function browseSaveFolder() {
+    const selected = await invoke<string | null>('select_directory');
+    if (selected) downloadPath = selected;
+  }
+
   function buildConfig(): Partial<JobConfig> {
     const cfg: Partial<JobConfig> = {
       workflow,
+      downloadPath: downloadPath || undefined,
       embedSubtitles,
       embedMetadata,
       embedThumbnail,
     };
 
-    if (workflow === 'video_best' || workflow === 'custom') {
+    if (workflow === 'video_best') {
       cfg.videoTranscode = {
         targetFormat,
         quality: videoQuality,
@@ -153,16 +164,11 @@
           <span class="radio-label">Save Audio</span>
           <span class="radio-desc">Extract just the audio track</span>
         </label>
-        <label class="radio-card" class:active={workflow === 'custom'}>
-          <input type="radio" name="workflow" value="custom" bind:group={workflow} />
-          <span class="radio-label">Advanced</span>
-          <span class="radio-desc">Choose specific format and quality settings</span>
-        </label>
       </div>
     </fieldset>
 
     <!-- Video options -->
-    {#if workflow === 'video_best' || workflow === 'custom'}
+    {#if workflow === 'video_best'}
       <fieldset class="config-section">
         <legend>Video Settings</legend>
         <div class="config-row">
@@ -275,6 +281,15 @@
       {:else if (trimStart || trimEnd) && job.metadata && job.metadata.durationSeconds > 0}
         <div class="trim-hint">Full duration: {formatTime(job.metadata.durationSeconds)}</div>
       {/if}
+    </fieldset>
+
+    <!-- Download folder -->
+    <fieldset class="config-section">
+      <legend>Download Folder</legend>
+      <div class="folder-row">
+        <span class="folder-path" title={downloadPath}>{downloadPath || 'Default folder'}</span>
+        <button class="btn-browse" onclick={browseSaveFolder}>Browse</button>
+      </div>
     </fieldset>
   </div>
 
@@ -491,6 +506,39 @@
     font-size: 0.75rem;
     color: var(--text-muted);
     padding-left: var(--spacing-xs);
+  }
+
+  /* Download folder */
+  .folder-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .folder-path {
+    flex: 1;
+    font-size: var(--font-size-sm);
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .btn-browse {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-surface);
+    color: var(--text-color);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-browse:hover {
+    background-color: var(--bg-surface-hover);
   }
 
   /* Footer */

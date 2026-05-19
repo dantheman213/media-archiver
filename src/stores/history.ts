@@ -40,6 +40,24 @@ export async function loadHistory(): Promise<void> {
   }
 }
 
+/** Cache thumbnails for the most recent N records — call at startup so History looks instant */
+export async function preloadRecentThumbnails(count = 10): Promise<void> {
+  const records = get(history);
+  const needsCache = records
+    .filter(r => r.thumbnailUrl && !r.cachedThumbnailPath)
+    .slice(0, count);
+  await Promise.all(
+    needsCache.map(async (r) => {
+      try {
+        const localPath: string = await invoke('cache_thumbnail', { url: r.thumbnailUrl, jobId: r.id });
+        await updateHistoryRecord(r.id, { cachedThumbnailPath: localPath });
+      } catch {
+        // Non-critical
+      }
+    })
+  );
+}
+
 /** Add a completed download to history and persist */
 export async function addHistoryRecord(record: HistoryRecord): Promise<void> {
   history.update(current => [record, ...current]);
@@ -49,6 +67,14 @@ export async function addHistoryRecord(record: HistoryRecord): Promise<void> {
 /** Remove a single history record by id and persist */
 export async function removeHistoryRecord(id: string): Promise<void> {
   history.update(current => current.filter(r => r.id !== id));
+  await persist();
+}
+
+/** Patch fields on an existing history record and persist */
+export async function updateHistoryRecord(id: string, patch: Partial<HistoryRecord>): Promise<void> {
+  history.update(current =>
+    current.map(r => r.id === id ? { ...r, ...patch } : r)
+  );
   await persist();
 }
 

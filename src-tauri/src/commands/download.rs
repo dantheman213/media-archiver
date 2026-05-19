@@ -43,11 +43,13 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
     };
 
     // Output template
+    let output_base = output_path.trim_end_matches('/').trim_end_matches('\\');
     args.push("-o".to_string());
-    args.push(format!(
-        "{}/%(title)s.%(ext)s",
-        output_path.trim_end_matches('/')
-    ));
+    args.push(format!("{}/%(title)s.%(ext)s", output_base));
+
+    // Restrict filenames to characters valid on Windows
+    #[cfg(target_os = "windows")]
+    args.push("--windows-filenames".to_string());
 
     // Progress output for parsing
     args.push("--newline".to_string());

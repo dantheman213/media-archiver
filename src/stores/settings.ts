@@ -14,6 +14,7 @@ const defaultSettings: GlobalSettings = {
   globalPaused: false,
   downloadPath: '',
   theme: 'system',
+  checkForYtDlpUpdates: true,
 };
 
 export const settings = writable<GlobalSettings>({ ...defaultSettings });
@@ -105,6 +106,11 @@ export function setConcurrentDownloads(n: number): void {
 /** Toggle auto-retry */
 export function toggleAutoRetry(): void {
   settings.update((s) => ({ ...s, autoRetry: !s.autoRetry }));
+}
+
+/** Toggle yt-dlp update check on launch */
+export function toggleCheckForYtDlpUpdates(): void {
+  settings.update((s) => ({ ...s, checkForYtDlpUpdates: !s.checkForYtDlpUpdates }));
 }
 
 /** Set the default download path */

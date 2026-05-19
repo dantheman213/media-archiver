@@ -7,7 +7,7 @@
   import { toggleGlobalPause, settings, initializeSettings } from '../stores/settings';
   import { selectedJobId, removeJob, jobs } from '../stores/queue';
   import { checkBinaries, binaryCheckState, checkYtDlpUpdate, performYtDlpUpdate, ytdlpUpdateInfo, ytdlpUpdating } from '../stores/binaries';
-  import { loadHistory } from '../stores/history';
+  import { loadHistory, preloadRecentThumbnails } from '../stores/history';
   import { loadMetadataCache } from '../stores/metadataCache';
   import type { NavRoute } from '../types';
   import { onMount } from 'svelte';
@@ -18,6 +18,7 @@
 
   let appVersion = $state('');
   let updateCheckTriggered = $state(false);
+  let sidebarCollapsed = $state(false);
 
   interface NavItem {
     route: NavRoute;
@@ -58,7 +59,8 @@
   onMount(async () => {
     checkBinaries();
     initializeSettings();
-    loadHistory();
+    await loadHistory();
+    preloadRecentThumbnails(10); // fire-and-forget; makes History tab feel instant
     loadMetadataCache();
     const version = await getVersion();
     appVersion = version;
@@ -66,7 +68,7 @@
   });
 
   $effect(() => {
-    if ($binaryCheckState === 'done' && !updateCheckTriggered) {
+    if ($binaryCheckState === 'done' && !updateCheckTriggered && $settings.checkForYtDlpUpdates) {
       updateCheckTriggered = true;
       checkYtDlpUpdate();
     }
@@ -92,9 +94,14 @@
 <Onboarding />
 
 <div class="app-shell">
-  <aside class="sidebar">
+  <aside class="sidebar" class:collapsed={sidebarCollapsed}>
     <div class="sidebar-header">
-      <h1>Media Archiver</h1>
+      <h1 class="sidebar-title">Media Archiver</h1>
+      <button
+        class="sidebar-toggle"
+        onclick={() => sidebarCollapsed = !sidebarCollapsed}
+        title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+      >☰</button>
     </div>
     <ul class="sidebar-nav">
       {#each navItems as item}

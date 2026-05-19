@@ -91,6 +91,9 @@
 <style>
   .view {
     padding: var(--spacing-lg);
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
   }
 
   .view-header {
@@ -120,7 +123,7 @@
 
   .binary-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: 1fr;
     gap: var(--spacing-md);
   }
 

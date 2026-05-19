@@ -371,7 +371,7 @@
           jobId: job.id,
           url: job.url,
           workflow: job.config.workflow,
-          outputPath: $settings.downloadPath,
+          outputPath: job.config.downloadPath || $settings.downloadPath,
           targetFormat: job.config.videoTranscode?.targetFormat,
           videoQuality: job.config.videoTranscode?.quality,
           audioFormat: job.config.audioOnlyConfig?.format,
@@ -469,18 +469,23 @@
     {:else}
       <ul class="job-list">
         {#each filteredQueueJobs as job (job.id)}
-          <li class="job-list-item">
-            <MediaCard
-              {job}
-              selected={$selectedJobId === job.id}
-              onselect={() => selectJob(job.id)}
-            />
+          <li
+            class="job-list-item"
+            class:item-selected={$selectedJobId === job.id}
+            class:item-error={job.status === 'error'}
+          >
+            <div class="job-card-wrap">
+              <MediaCard
+                {job}
+                selected={$selectedJobId === job.id}
+                onselect={() => selectJob(job.id)}
+              />
+            </div>
             <div class="job-actions">
               {#if job.status === 'error'}
                 <button
                   class="btn-sm"
                   onclick={() => {
-                    // Re-run ingestion for errored jobs
                     updateJobStatus(job.id, 'inspecting');
                     invoke('fetch_metadata', { url: job.url })
                       .then((metadata) => {
@@ -515,13 +520,15 @@
   .queue-layout {
     display: flex;
     height: 100%;
-    gap: 0;
+    overflow: hidden;
   }
 
   .view {
     flex: 1;
     min-width: 0;
     max-width: 900px;
+    overflow-y: auto;
+    padding: var(--spacing-lg) var(--spacing-xl);
   }
 
   /* Input zone */
@@ -680,29 +687,73 @@
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
   }
 
+  /* Each item IS the card — buttons live inside it */
   .job-list-item {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--card-bg);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .job-list-item:hover {
+    border-color: var(--border-color);
+  }
+
+  .job-list-item.item-selected {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
+  }
+
+  .job-list-item.item-error {
+    border-color: var(--error-color);
+  }
+
+  .job-card-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Strip MediaCard's own card chrome — the parent li handles it */
+  .job-card-wrap :global(.media-card) {
+    border: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .job-card-wrap :global(.media-card:hover),
+  .job-card-wrap :global(.media-card.selected),
+  .job-card-wrap :global(.media-card.error) {
+    border-color: transparent !important;
+    box-shadow: none !important;
   }
 
   .job-actions {
-    position: absolute;
-    top: var(--spacing-md);
-    right: var(--spacing-md);
     display: flex;
-    gap: var(--spacing-xs);
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-md) var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
   }
 
   .btn-sm {
-    padding: 2px var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-md);
     font-size: 0.8rem;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     background-color: var(--bg-surface);
     color: var(--text-color);
     cursor: pointer;
+    transition: background-color 0.15s;
+    white-space: nowrap;
   }
 
   .btn-sm:hover {

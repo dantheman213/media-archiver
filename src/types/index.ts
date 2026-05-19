@@ -33,8 +33,8 @@ export interface MediaMetadata {
 }
 
 export interface JobConfig {
-  workflow: 'video_best' | 'audio_only' | 'custom';
-  format?: string; // specific format id if custom
+  workflow: 'video_best' | 'audio_only';
+  downloadPath?: string;
   videoTranscode?: {
     targetFormat: 'mp4' | 'mkv' | 'webm';
     quality: 'best' | 'balanced' | 'small_size'; // Maps to CRF 18, 23, 28
@@ -73,6 +73,7 @@ export interface GlobalSettings {
   globalPaused: boolean;
   downloadPath: string;
   theme: 'system' | 'light' | 'dark';
+  checkForYtDlpUpdates: boolean;
 }
 
 export interface HistoryRecord {
@@ -81,7 +82,7 @@ export interface HistoryRecord {
   title: string;
   uploader: string;
   thumbnailUrl: string;         // Original remote URL
-  cachedThumbnailPath?: string; // Local cached path (future)
+  cachedThumbnailPath?: string; // Local file path in app cache dir
   durationSeconds: number;
   extractor: string;
   filePath: string;             // Resolved output file path

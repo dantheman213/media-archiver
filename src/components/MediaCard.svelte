@@ -42,6 +42,32 @@
     if (sizes.length === 0) return null;
     return formatFilesize(Math.max(...sizes));
   }
+
+  let titleExpanded = $state(false);
+  let contextMenu = $state({ open: false, x: 0, y: 0 });
+
+  function openContextMenu(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    contextMenu = { open: true, x: e.clientX, y: e.clientY };
+  }
+
+  function closeContextMenu() {
+    contextMenu.open = false;
+  }
+
+  async function copyText(text: string) {
+    await navigator.clipboard.writeText(text);
+    closeContextMenu();
+  }
+
+  $effect(() => {
+    if (contextMenu.open) {
+      const close = () => closeContextMenu();
+      document.addEventListener('click', close, { once: true });
+      return () => document.removeEventListener('click', close);
+    }
+  });
 </script>
 
 <div
@@ -53,6 +79,7 @@
   tabindex="0"
   onclick={onselect}
   onkeydown={(e) => { if (e.key === 'Enter' && onselect) onselect(); }}
+  oncontextmenu={openContextMenu}
 >
   {#if job.status === 'inspecting'}
     <!-- Skeleton loading state -->
@@ -77,7 +104,15 @@
         </div>
       {/if}
       <div class="card-info">
-        <span class="card-title">{job.metadata.title}</span>
+        <div class="card-title-row">
+          <span class="card-title" class:expanded={titleExpanded}>{job.metadata.title}</span>
+          <button
+            class="expand-btn"
+            class:expanded={titleExpanded}
+            onclick={(e) => { e.stopPropagation(); titleExpanded = !titleExpanded; }}
+            title={titleExpanded ? 'Collapse title' : 'Expand title'}
+          >▾</button>
+        </div>
         <span class="card-uploader">{job.metadata.uploader}</span>
         <div class="card-meta-row">
           <span class="status-badge status-{job.status}">{statusLabels[job.status] ?? job.status}</span>
@@ -130,6 +165,20 @@
     </div>
   {/if}
 </div>
+
+{#if contextMenu.open}
+  <div
+    class="context-menu"
+    style="left: {contextMenu.x}px; top: {contextMenu.y}px;"
+    role="menu"
+    onclick={(e) => e.stopPropagation()}
+  >
+    <button role="menuitem" onclick={() => copyText(job.url)}>Copy source URL</button>
+    {#if job.errorMessage}
+      <button role="menuitem" onclick={() => copyText(job.errorMessage!)}>Copy error to clipboard</button>
+    {/if}
+  </div>
+{/if}
 
 <style>
   .media-card {
@@ -248,11 +297,47 @@
     min-width: 0;
   }
 
+  .card-title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 3px;
+    min-width: 0;
+  }
+
   .card-title {
     font-weight: 500;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-title.expanded {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .expand-btn {
+    all: unset;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    flex-shrink: 0;
+    line-height: 1.6;
+    padding: 0 1px;
+    transition: transform 0.15s ease, color 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .expand-btn.expanded {
+    transform: rotate(180deg);
+  }
+
+  .expand-btn:hover {
+    color: var(--text-primary);
   }
 
   .card-uploader {
@@ -364,5 +449,34 @@
     -webkit-line-clamp: 3;
     line-clamp: 3;
     -webkit-box-orient: vertical;
+  }
+
+  .context-menu {
+    position: fixed;
+    z-index: 1000;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+  }
+
+  .context-menu button {
+    all: unset;
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+
+  .context-menu button:hover {
+    background-color: var(--bg-surface-hover);
   }
 </style>

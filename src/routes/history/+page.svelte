@@ -2,7 +2,7 @@
   import { invoke } from '@tauri-apps/api/core';
   import { convertFileSrc } from '@tauri-apps/api/core';
   import { onMount } from 'svelte';
-  import { history, clearHistory, removeHistoryRecord } from '../../stores/history';
+  import { history, clearHistory, removeHistoryRecord, updateHistoryRecord } from '../../stores/history';
   import type { HistoryRecord } from '../../types';
 
   let records: HistoryRecord[] = $state([]);
@@ -25,6 +25,32 @@
       checkFilesExist();
     }
   });
+
+  const thumbLoading = new Set<string>();
+
+  function lazyThumb(node: HTMLElement, record: HistoryRecord) {
+    if (!record.thumbnailUrl || record.cachedThumbnailPath || thumbLoading.has(record.id)) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !thumbLoading.has(record.id)) {
+          thumbLoading.add(record.id);
+          observer.disconnect();
+          invoke('cache_thumbnail', { url: record.thumbnailUrl, jobId: record.id })
+            .then((localPath) => {
+              updateHistoryRecord(record.id, { cachedThumbnailPath: localPath as string });
+            })
+            .catch(() => thumbLoading.delete(record.id));
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    observer.observe(node);
+    return { destroy() { observer.disconnect(); } };
+  }
 
   async function checkFilesExist() {
     const map: Record<string, boolean> = {};
@@ -186,11 +212,15 @@
     <ul class="history-list">
       {#each filteredAndSorted as record (record.id)}
         {@const fileExists = record.filePath ? (fileExistsMap[record.id] ?? true) : false}
-        <li class="history-card">
+        <li class="history-card" use:lazyThumb={record}>
           <div class="card-content">
             {#if getThumbSrc(record)}
               <div class="card-thumb">
-                <img src={getThumbSrc(record)} alt={record.title} />
+                <img
+                  src={getThumbSrc(record)}
+                  alt={record.title}
+                  onerror={(e) => { (e.currentTarget as HTMLImageElement).src = record.thumbnailUrl || ''; }}
+                />
                 {#if record.durationSeconds > 0}
                   <span class="duration-badge">{formatDuration(record.durationSeconds)}</span>
                 {/if}
@@ -240,6 +270,9 @@
 <style>
   .view {
     padding: var(--spacing-lg);
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
   }
 
   .view-header {

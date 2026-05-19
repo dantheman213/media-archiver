@@ -10,6 +10,7 @@
     setDownloadPath,
     setTheme,
     resetSettings,
+    toggleCheckForYtDlpUpdates,
   } from '../../stores/settings';
   import { clearHistory } from '../../stores/history';
   import { clearMetadataCache } from '../../stores/metadataCache';
@@ -152,6 +153,22 @@
         {$settings.globalPaused ? 'Paused' : 'Running'}
       </button>
     </div>
+
+    <div class="setting">
+      <div>
+        <span class="setting-label">Check for yt-dlp Updates on Launch</span>
+        <span class="setting-desc">Automatically check for a newer version of yt-dlp at startup</span>
+      </div>
+      <button
+        class="toggle"
+        class:active={$settings.checkForYtDlpUpdates}
+        onclick={toggleCheckForYtDlpUpdates}
+        role="switch"
+        aria-checked={$settings.checkForYtDlpUpdates}
+      >
+        {$settings.checkForYtDlpUpdates ? 'On' : 'Off'}
+      </button>
+    </div>
   </section>
 
   <section class="settings-group">
@@ -222,6 +239,9 @@
   .view {
     padding: var(--spacing-lg);
     max-width: 640px;
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
   }
 
   .view-header {
