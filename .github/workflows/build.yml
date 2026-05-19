@@ -12,7 +12,34 @@ on:
   workflow_dispatch:
 
 jobs:
+  create-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create draft release
+        id: create-release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: context.ref_name,
+              name: `Media Archiver ${context.ref_name}`,
+              body: 'See the assets below to download the latest version of Media Archiver.',
+              draft: true,
+              prerelease: false
+            })
+            return data.id
+
   build:
+    needs: [create-release]
+    if: always() && (needs.create-release.result == 'success' || needs.create-release.result == 'skipped')
     permissions:
       contents: write
     strategy:
@@ -23,14 +50,20 @@ jobs:
             rust-target: x86_64-pc-windows-msvc
             artifact-name: Media-Archiver-Windows
             artifact-glob: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+            friendly-name: Windows
+            ext: exe
           - platform: macos-latest
             rust-target: aarch64-apple-darwin
             artifact-name: Media-Archiver-Apple-Silicon
             artifact-glob: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+            friendly-name: Apple-Silicon
+            ext: dmg
           - platform: macos-latest
             rust-target: x86_64-apple-darwin
             artifact-name: Media-Archiver-Apple-Intel
             artifact-glob: src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
+            friendly-name: Apple-Intel
+            ext: dmg
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -73,15 +106,64 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '' }}
-          releaseName: ${{ startsWith(github.ref, 'refs/tags/v') && format('Media Archiver {0}', github.ref_name) || '' }}
-          releaseBody: "See the assets below to download the latest version of Media Archiver."
-          releaseDraft: false
-          prerelease: false
           args: --target ${{ matrix.rust-target }}
 
-      - name: Upload Artifacts
+      - name: Upload DMG/EXE release asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          ARTIFACT=$(ls ${{ matrix.artifact-glob }} | head -1)
+          DEST="Media.Archiver_${VERSION}_${{ matrix.friendly-name }}.${{ matrix.ext }}"
+          cp "$ARTIFACT" "$DEST"
+          gh release upload "v${VERSION}" "$DEST" --repo ${{ github.repository }} --clobber
+
+      - name: Upload Windows MSI release asset
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.platform == 'windows-latest'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          MSI=$(ls src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi | head -1)
+          DEST="Media.Archiver_${VERSION}_Windows.msi"
+          cp "$MSI" "$DEST"
+          gh release upload "v${VERSION}" "$DEST" --repo ${{ github.repository }} --clobber
+
+      - name: Upload macOS app tarball release asset
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.platform == 'macos-latest'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          TARBALL=$(ls src-tauri/target/${{ matrix.rust-target }}/release/bundle/macos/*.app.tar.gz | head -1)
+          DEST="Media.Archiver_${{ matrix.friendly-name }}.app.tar.gz"
+          cp "$TARBALL" "$DEST"
+          gh release upload "v${VERSION}" "$DEST" --repo ${{ github.repository }} --clobber
+
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.artifact-glob }}
+
+  publish-release:
+    needs: [create-release, build]
+    if: startsWith(github.ref, 'refs/tags/v') && needs.create-release.result == 'success'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ needs.create-release.outputs.release_id }},
+              draft: false
+            })
