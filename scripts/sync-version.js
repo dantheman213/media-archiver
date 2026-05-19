@@ -17,5 +17,6 @@ console.log(`  Updated ${cargoPath}`);
 const tauriConfPath = 'src-tauri/tauri.conf.json';
 const tauriConf = JSON.parse(readFileSync(tauriConfPath, 'utf8'));
 tauriConf.version = version;
+tauriConf.app.windows[0].title = `Media Archiver v${version}`;
 writeFileSync(tauriConfPath, JSON.stringify(tauriConf, null, 2) + '\n');
 console.log(`  Updated ${tauriConfPath}`);

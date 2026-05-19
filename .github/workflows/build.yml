@@ -21,15 +21,15 @@ jobs:
         include:
           - platform: windows-latest
             rust-target: x86_64-pc-windows-msvc
-            artifact-name: Media-Archiver-Windows-x64
+            artifact-name: Media-Archiver-Windows
             artifact-glob: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
           - platform: macos-latest
             rust-target: aarch64-apple-darwin
-            artifact-name: Media-Archiver-macOS-arm64
+            artifact-name: Media-Archiver-Apple-Silicon
             artifact-glob: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
           - platform: macos-latest
             rust-target: x86_64-apple-darwin
-            artifact-name: Media-Archiver-macOS-x64
+            artifact-name: Media-Archiver-Apple-Intel
             artifact-glob: src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
 
     runs-on: ${{ matrix.platform }}
