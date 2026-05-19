@@ -1,6 +1,6 @@
 [package]
 name = "media_archiver"
-version = "0.9.5"
+version = "0.9.6"
 description = "Local media archiving application built with Tauri and SvelteKit."
 authors = ["you"]
 edition = "2021"
