@@ -44,30 +44,6 @@
   }
 
   let titleExpanded = $state(false);
-  let contextMenu = $state({ open: false, x: 0, y: 0 });
-
-  function openContextMenu(e: MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    contextMenu = { open: true, x: e.clientX, y: e.clientY };
-  }
-
-  function closeContextMenu() {
-    contextMenu.open = false;
-  }
-
-  async function copyText(text: string) {
-    await navigator.clipboard.writeText(text);
-    closeContextMenu();
-  }
-
-  $effect(() => {
-    if (contextMenu.open) {
-      const close = () => closeContextMenu();
-      document.addEventListener('click', close, { once: true });
-      return () => document.removeEventListener('click', close);
-    }
-  });
 </script>
 
 <div
@@ -79,7 +55,6 @@
   tabindex="0"
   onclick={onselect}
   onkeydown={(e) => { if (e.key === 'Enter' && onselect) onselect(); }}
-  oncontextmenu={openContextMenu}
 >
   {#if job.status === 'inspecting'}
     <!-- Skeleton loading state -->
@@ -166,19 +141,6 @@
   {/if}
 </div>
 
-{#if contextMenu.open}
-  <div
-    class="context-menu"
-    style="left: {contextMenu.x}px; top: {contextMenu.y}px;"
-    role="menu"
-    onclick={(e) => e.stopPropagation()}
-  >
-    <button role="menuitem" onclick={() => copyText(job.url)}>Copy source URL</button>
-    {#if job.errorMessage}
-      <button role="menuitem" onclick={() => copyText(job.errorMessage!)}>Copy error to clipboard</button>
-    {/if}
-  </div>
-{/if}
 
 <style>
   .media-card {

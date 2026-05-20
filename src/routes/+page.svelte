@@ -326,14 +326,14 @@
   let nonCompletedJobs = $derived($jobs.filter((j) => j.status !== 'completed'));
 
   // Context menu
-  let contextMenu = $state<{ x: number; y: number; cmd: string } | null>(null);
+  let contextMenu = $state<{ x: number; y: number; cmd: string; job: MediaJob } | null>(null);
   let copiedCmd = $state(false);
   let copyTimeout: ReturnType<typeof setTimeout> | null = null;
 
   function openContextMenu(e: MouseEvent, job: MediaJob) {
     e.preventDefault();
     const cmd = buildCommandFromJob(job, $settings.downloadPath, $settings.useImpersonateChrome, $settings.useNoCookies);
-    contextMenu = { x: e.clientX, y: e.clientY, cmd };
+    contextMenu = { x: e.clientX, y: e.clientY, cmd, job };
     copiedCmd = false;
   }
 
@@ -557,6 +557,14 @@
     <li class="context-menu-item" role="menuitem" onclick={copyYtDlpCommand}>
       Copy yt-dlp Command
     </li>
+    <li class="context-menu-item" role="menuitem" onclick={() => { navigator.clipboard.writeText(contextMenu!.job.url); closeContextMenu(); }}>
+      Copy source URL
+    </li>
+    {#if contextMenu.job.errorMessage}
+      <li class="context-menu-item" role="menuitem" onclick={() => { navigator.clipboard.writeText(contextMenu!.job.errorMessage!); closeContextMenu(); }}>
+        Copy error to clipboard
+      </li>
+    {/if}
   </ul>
 {/if}
 
