@@ -20,6 +20,8 @@ pub struct DownloadConfig {
     pub embed_thumbnail: Option<bool>,
     pub trim_start: Option<String>,
     pub trim_end: Option<String>,
+    pub use_impersonate_chrome: Option<bool>,
+    pub use_no_cookies: Option<bool>,
 }
 
 #[tauri::command]
@@ -133,6 +135,15 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
             args.push("--postprocessor-args".to_string());
             args.push(format!("-to {}", end));
         }
+    }
+
+    // Optional yt-dlp flags from settings
+    if config.use_impersonate_chrome.unwrap_or(true) {
+        args.push("--impersonate".to_string());
+        args.push("chrome".to_string());
+    }
+    if config.use_no_cookies.unwrap_or(true) {
+        args.push("--no-cookies".to_string());
     }
 
     // The URL must be last

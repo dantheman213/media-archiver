@@ -11,6 +11,8 @@
     setTheme,
     resetSettings,
     toggleCheckForYtDlpUpdates,
+    toggleUseImpersonateChrome,
+    toggleUseNoCookies,
   } from '../../stores/settings';
   import { clearHistory } from '../../stores/history';
   import { clearMetadataCache } from '../../stores/metadataCache';
@@ -60,6 +62,7 @@
   }
 </script>
 
+<div class="settings-layout">
 <div class="view">
   <header class="view-header">
     <h2>Settings</h2>
@@ -172,6 +175,42 @@
   </section>
 
   <section class="settings-group">
+    <h3>yt-dlp Flags</h3>
+
+    <div class="setting">
+      <div>
+        <span class="setting-label">Impersonate Chrome (<code class="flag-code">--impersonate chrome</code>)</span>
+        <span class="setting-desc">Spoof Chrome browser headers to bypass bot detection on some sites</span>
+      </div>
+      <button
+        class="toggle"
+        class:active={$settings.useImpersonateChrome}
+        onclick={toggleUseImpersonateChrome}
+        role="switch"
+        aria-checked={$settings.useImpersonateChrome}
+      >
+        {$settings.useImpersonateChrome ? 'On' : 'Off'}
+      </button>
+    </div>
+
+    <div class="setting">
+      <div>
+        <span class="setting-label">No Cookies (<code class="flag-code">--no-cookies</code>)</span>
+        <span class="setting-desc">Do not use stored cookies when making requests</span>
+      </div>
+      <button
+        class="toggle"
+        class:active={$settings.useNoCookies}
+        onclick={toggleUseNoCookies}
+        role="switch"
+        aria-checked={$settings.useNoCookies}
+      >
+        {$settings.useNoCookies ? 'On' : 'Off'}
+      </button>
+    </div>
+  </section>
+
+  <section class="settings-group">
     <h3>Data & Storage</h3>
 
     <div class="setting">
@@ -234,14 +273,29 @@
     </div>
   </section>
 </div>
+</div>
 
 <style>
+  .settings-layout {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+  }
+
   .view {
-    padding: var(--spacing-lg);
-    max-width: 640px;
+    flex: 1;
+    padding: var(--spacing-lg) var(--spacing-xl);
     height: 100%;
     overflow-y: auto;
     box-sizing: border-box;
+  }
+
+  .flag-code {
+    font-family: monospace;
+    font-size: 0.8rem;
+    background-color: var(--bg-surface-hover);
+    padding: 1px 4px;
+    border-radius: var(--radius-sm);
   }
 
   .view-header {

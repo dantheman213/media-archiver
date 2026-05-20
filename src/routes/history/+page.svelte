@@ -3,7 +3,9 @@
   import { convertFileSrc } from '@tauri-apps/api/core';
   import { onMount } from 'svelte';
   import { history, clearHistory, removeHistoryRecord, updateHistoryRecord } from '../../stores/history';
+  import { settings } from '../../stores/settings';
   import type { HistoryRecord } from '../../types';
+  import { buildCommandFromHistory } from '../../lib/ytdlpCommand';
 
   let records: HistoryRecord[] = $state([]);
 
@@ -165,6 +167,31 @@
     await removeHistoryRecord(id);
   }
 
+  // Context menu
+  let contextMenu = $state<{ x: number; y: number; cmd: string } | null>(null);
+  let copiedCmd = $state(false);
+  let copyTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  function openContextMenu(e: MouseEvent, record: HistoryRecord) {
+    e.preventDefault();
+    const cmd = buildCommandFromHistory(record, $settings.downloadPath);
+    contextMenu = { x: e.clientX, y: e.clientY, cmd };
+    copiedCmd = false;
+  }
+
+  function closeContextMenu() {
+    contextMenu = null;
+  }
+
+  async function copyYtDlpCommand() {
+    if (!contextMenu) return;
+    await navigator.clipboard.writeText(contextMenu.cmd);
+    contextMenu = null;
+    copiedCmd = true;
+    if (copyTimeout) clearTimeout(copyTimeout);
+    copyTimeout = setTimeout(() => { copiedCmd = false; }, 1500);
+  }
+
   function getThumbSrc(record: HistoryRecord): string {
     if (record.cachedThumbnailPath) {
       return convertFileSrc(record.cachedThumbnailPath);
@@ -172,6 +199,8 @@
     return record.thumbnailUrl || '';
   }
 </script>
+
+<svelte:window onclick={closeContextMenu} />
 
 <div class="view">
   <header class="view-header">
@@ -212,7 +241,7 @@
     <ul class="history-list">
       {#each filteredAndSorted as record (record.id)}
         {@const fileExists = record.filePath ? (fileExistsMap[record.id] ?? true) : false}
-        <li class="history-card" use:lazyThumb={record}>
+        <li class="history-card" use:lazyThumb={record} oncontextmenu={(e) => openContextMenu(e, record)}>
           <div class="card-content">
             {#if getThumbSrc(record)}
               <div class="card-thumb">
@@ -266,6 +295,25 @@
     </ul>
   {/if}
 </div>
+
+{#if contextMenu}
+  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+  <ul
+    class="context-menu"
+    style="left: {contextMenu.x}px; top: {contextMenu.y}px"
+    onclick={(e) => e.stopPropagation()}
+    onkeydown={(e) => e.key === 'Escape' && closeContextMenu()}
+    role="menu"
+  >
+    <li class="context-menu-item" role="menuitem" onclick={copyYtDlpCommand}>
+      Copy yt-dlp Command
+    </li>
+  </ul>
+{/if}
+
+{#if copiedCmd}
+  <div class="copy-toast">Command copied!</div>
+{/if}
 
 <style>
   .view {
@@ -506,5 +554,45 @@
 
   .btn-secondary:hover {
     opacity: 0.85;
+  }
+
+  .context-menu {
+    position: fixed;
+    z-index: 1000;
+    list-style: none;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    padding: var(--spacing-xs) 0;
+    min-width: 180px;
+  }
+
+  .context-menu-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+    color: var(--text-color);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .context-menu-item:hover {
+    background-color: var(--bg-surface-hover);
+  }
+
+  .copy-toast {
+    position: fixed;
+    bottom: var(--spacing-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 0.875rem;
+    color: var(--success-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    z-index: 1001;
   }
 </style>

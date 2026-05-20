@@ -74,6 +74,8 @@ export interface GlobalSettings {
   downloadPath: string;
   theme: 'system' | 'light' | 'dark';
   checkForYtDlpUpdates: boolean;
+  useImpersonateChrome: boolean;
+  useNoCookies: boolean;
 }
 
 export interface HistoryRecord {

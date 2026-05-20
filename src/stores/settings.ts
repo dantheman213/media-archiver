@@ -15,6 +15,8 @@ const defaultSettings: GlobalSettings = {
   downloadPath: '',
   theme: 'system',
   checkForYtDlpUpdates: true,
+  useImpersonateChrome: true,
+  useNoCookies: true,
 };
 
 export const settings = writable<GlobalSettings>({ ...defaultSettings });
@@ -111,6 +113,16 @@ export function toggleAutoRetry(): void {
 /** Toggle yt-dlp update check on launch */
 export function toggleCheckForYtDlpUpdates(): void {
   settings.update((s) => ({ ...s, checkForYtDlpUpdates: !s.checkForYtDlpUpdates }));
+}
+
+/** Toggle --impersonate chrome flag for yt-dlp */
+export function toggleUseImpersonateChrome(): void {
+  settings.update((s) => ({ ...s, useImpersonateChrome: !s.useImpersonateChrome }));
+}
+
+/** Toggle --no-cookies flag for yt-dlp */
+export function toggleUseNoCookies(): void {
+  settings.update((s) => ({ ...s, useNoCookies: !s.useNoCookies }));
 }
 
 /** Set the default download path */
