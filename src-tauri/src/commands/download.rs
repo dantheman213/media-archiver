@@ -3,6 +3,41 @@ use crate::process_manager::{ProcessEvent, ProcessManager};
 use serde::Deserialize;
 use tauri::{AppHandle, Emitter};
 
+/// Sanitize a user-supplied file name so it is safe on disk and inside a yt-dlp
+/// output template. Returns a base name without extension; empty string means the
+/// caller should fall back to the default `%(title)s`.
+/// Keep in sync with src/lib/sanitizeFilename.ts.
+fn sanitize_filename(name: &str) -> String {
+    // Replace illegal chars, control chars, and '%' (reserved by yt-dlp templates).
+    let mut safe: String = name
+        .chars()
+        .map(|c| match c {
+            '<' | '>' | ':' | '"' | '/' | '\\' | '|' | '?' | '*' | '%' => '_',
+            c if (c as u32) < 0x20 => '_',
+            c => c,
+        })
+        .collect();
+
+    // Trim surrounding whitespace, then trailing dots/spaces.
+    safe = safe.trim().trim_end_matches(['.', ' ']).to_string();
+
+    if safe.is_empty() {
+        return String::new();
+    }
+
+    // Guard Windows reserved device names (case-insensitive, ignoring extension).
+    const RESERVED: [&str; 22] = [
+        "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7",
+        "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+    ];
+    let base = safe.split('.').next().unwrap_or("").to_uppercase();
+    if RESERVED.contains(&base.as_str()) {
+        safe.push('_');
+    }
+
+    safe
+}
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DownloadConfig {
@@ -10,6 +45,7 @@ pub struct DownloadConfig {
     pub url: String,
     pub workflow: String,
     pub output_path: String,
+    pub output_filename: Option<String>,
     // Optional overrides
     pub target_format: Option<String>,
     pub video_quality: Option<String>,
@@ -44,10 +80,17 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
         config.output_path.clone()
     };
 
-    // Output template
+    // Output template. Use a sanitized custom file name when provided, else fall
+    // back to yt-dlp's title template (which yt-dlp also sanitizes).
     let output_base = output_path.trim_end_matches('/').trim_end_matches('\\');
+    let name_template = config
+        .output_filename
+        .as_deref()
+        .map(sanitize_filename)
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| "%(title)s".to_string());
     args.push("-o".to_string());
-    args.push(format!("{}/%(title)s.%(ext)s", output_base));
+    args.push(format!("{}/{}.%(ext)s", output_base, name_template));
 
     // Restrict filenames to characters valid on Windows
     #[cfg(target_os = "windows")]

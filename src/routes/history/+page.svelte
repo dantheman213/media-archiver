@@ -4,6 +4,7 @@
   import { onMount } from 'svelte';
   import { history, clearHistory, removeHistoryRecord, updateHistoryRecord } from '../../stores/history';
   import { settings } from '../../stores/settings';
+  import { binaryStatus } from '../../stores/binaries';
   import type { HistoryRecord } from '../../types';
   import { buildCommandFromHistory } from '../../lib/ytdlpCommand';
 
@@ -174,7 +175,12 @@
 
   function openContextMenu(e: MouseEvent, record: HistoryRecord) {
     e.preventDefault();
-    const cmd = buildCommandFromHistory(record, $settings.downloadPath);
+    const cmd = buildCommandFromHistory(
+      record,
+      $settings.downloadPath,
+      $binaryStatus?.yt_dlp_path,
+      $binaryStatus?.ffmpeg_path,
+    );
     contextMenu = { x: e.clientX, y: e.clientY, cmd };
     copiedCmd = false;
   }

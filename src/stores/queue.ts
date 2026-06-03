@@ -27,6 +27,21 @@ export const errorJobs = derived(jobs, ($jobs) =>
 export const selectedJobId = writable<string | null>(null);
 
 // ---------------------------------------------------------------------------
+// Bulk Add mode – session-only (not persisted)
+// ---------------------------------------------------------------------------
+
+/** When true, newly added URLs skip the inspect/configure flow and queue immediately. */
+export const bulkAddMode = writable<boolean>(false);
+
+/**
+ * The settings from the most recent "Configure Download" add this session.
+ * Reused by Bulk Add mode (the custom rename is intentionally excluded). Null
+ * until at least one configure-download add has happened, which keeps the Bulk
+ * Add toggle disabled.
+ */
+export const lastSessionConfig = writable<JobConfig | null>(null);
+
+// ---------------------------------------------------------------------------
 // Mutation helpers
 // ---------------------------------------------------------------------------
 

@@ -2324,7 +2324,7 @@ checksum = "2532096657941c2fea9c289d370a250971c689d4f143798ff67113ec042024a5"
 
 [[package]]
 name = "media_archiver"
-version = "0.9.10"
+version = "0.9.12"
 dependencies = [
  "dirs-next",
  "flate2",

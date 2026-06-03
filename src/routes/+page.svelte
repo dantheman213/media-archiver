@@ -10,9 +10,12 @@
     updateJobStatus,
     updateJobMetadata,
     updateJobProgress,
+    updateJobConfig,
+    bulkAddMode,
+    lastSessionConfig,
   } from '../stores/queue';
   import { settings } from '../stores/settings';
-  import { binaryCheckState } from '../stores/binaries';
+  import { binaryCheckState, binaryStatus } from '../stores/binaries';
   import { addHistoryRecord } from '../stores/history';
   import { getCachedMetadata, cacheMetadata } from '../stores/metadataCache';
   import type { MediaJob, MediaMetadata, HistoryRecord } from '../types';
@@ -200,6 +203,31 @@
     if (!url) return;
     urlInput = '';
 
+    // Bulk Add mode: skip the inspect/configure round-trip and queue immediately,
+    // reusing the last configure-download settings from this session.
+    if ($bulkAddMode && $lastSessionConfig) {
+      const id = addJob(url, true); // status 'queued'
+      updateJobConfig(id, $lastSessionConfig);
+      // Fetch metadata in the background so the card/history fill in, without
+      // touching status (the queued-download effect starts the download now).
+      const cached = getCachedMetadata(url);
+      if (cached) {
+        updateJobMetadata(id, cached);
+      } else {
+        invoke('fetch_metadata', { url }).then((metadata) => {
+          updateJobMetadata(id, metadata as MediaMetadata);
+          cacheMetadata(url, metadata as MediaMetadata);
+          const thumb = (metadata as MediaMetadata).thumbnailUrl;
+          if (thumb) {
+            invoke('cache_thumbnail', { url: thumb, jobId: id }).then((localPath) => {
+              cachedThumbnailPaths.set(id, localPath as string);
+            }).catch(() => { /* non-critical */ });
+          }
+        }).catch(() => { /* non-critical in bulk mode; download still proceeds */ });
+      }
+      return;
+    }
+
     const jobId = addJob(url);
     // Auto-select the new job
     selectedJobId.set(jobId);
@@ -332,7 +360,14 @@
 
   function openContextMenu(e: MouseEvent, job: MediaJob) {
     e.preventDefault();
-    const cmd = buildCommandFromJob(job, $settings.downloadPath, $settings.useImpersonateChrome, $settings.useNoCookies);
+    const cmd = buildCommandFromJob(
+      job,
+      $settings.downloadPath,
+      $settings.useImpersonateChrome,
+      $settings.useNoCookies,
+      $binaryStatus?.yt_dlp_path,
+      $binaryStatus?.ffmpeg_path,
+    );
     contextMenu = { x: e.clientX, y: e.clientY, cmd, job };
     copiedCmd = false;
   }
@@ -398,6 +433,7 @@
           url: job.url,
           workflow: job.config.workflow,
           outputPath: job.config.downloadPath || $settings.downloadPath,
+          outputFilename: job.config.outputFilename,
           targetFormat: job.config.videoTranscode?.targetFormat,
           videoQuality: job.config.videoTranscode?.quality,
           audioFormat: job.config.audioOnlyConfig?.format,
@@ -445,6 +481,20 @@
         />
         <button class="btn-primary" onclick={handleAddUrl} disabled={!urlInput.trim() || $binaryCheckState !== 'done'}>
           Add
+        </button>
+        <button
+          class="btn-bulk"
+          class:active={$bulkAddMode}
+          onclick={() => bulkAddMode.set(!$bulkAddMode)}
+          disabled={$lastSessionConfig === null}
+          aria-pressed={$bulkAddMode}
+          title={$lastSessionConfig === null
+            ? 'Bulk Add: configure one download first to set the reused settings'
+            : $bulkAddMode
+              ? 'Bulk Add ON — new URLs queue instantly with the last used settings'
+              : 'Bulk Add OFF — click to queue new URLs instantly with the last used settings'}
+        >
+          Bulk Add
         </button>
       </div>
 
@@ -670,6 +720,35 @@
   }
 
   .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-bulk {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--bg-surface);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .btn-bulk:hover:not(:disabled) {
+    background-color: var(--bg-surface-hover);
+    color: var(--text-color);
+  }
+
+  .btn-bulk.active {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+  }
+
+  .btn-bulk:disabled {
     opacity: 0.4;
     cursor: not-allowed;
   }

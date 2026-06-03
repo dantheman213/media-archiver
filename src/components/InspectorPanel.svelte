@@ -2,10 +2,11 @@
   import { invoke } from '@tauri-apps/api/core';
   import { get } from 'svelte/store';
   import type { MediaJob, JobConfig } from '../types';
-  import { updateJobConfig, updateJobStatus, removeJob } from '../stores/queue';
+  import { updateJobConfig, updateJobStatus, removeJob, lastSessionConfig } from '../stores/queue';
   import { binaryCheckState } from '../stores/binaries';
   import { settings } from '../stores/settings';
   import { isValidTimeString, parseTimeString, formatTime } from '../lib/timeUtils';
+  import { sanitizeFilename } from '../lib/sanitizeFilename';
   import ToggleSwitch from './ToggleSwitch.svelte';
 
   let { job, onclose }: {
@@ -25,6 +26,7 @@
   let trimStart = $state('');
   let trimEnd = $state('');
   let downloadPath = $state('');
+  let outputFilename = $state('');
 
   // Sync local state when job changes
   $effect(() => {
@@ -39,7 +41,11 @@
     trimStart = job.config.trim?.start ?? '';
     trimEnd = job.config.trim?.end ?? '';
     downloadPath = job.config.downloadPath ?? get(settings).downloadPath;
+    outputFilename = job.config.outputFilename ?? '';
   });
+
+  // Live preview of the sanitized custom file name
+  let sanitizedName = $derived(outputFilename.trim() ? sanitizeFilename(outputFilename) : '');
 
   // Human-friendly quality labels with descriptions
   const videoQualityOptions: { value: string; label: string; desc: string }[] = [
@@ -85,6 +91,7 @@
     const cfg: Partial<JobConfig> = {
       workflow,
       downloadPath: downloadPath || undefined,
+      outputFilename: outputFilename.trim() || undefined,
       embedSubtitles,
       embedMetadata,
       embedThumbnail,
@@ -116,8 +123,12 @@
 
   function handleAddToQueue() {
     if ($binaryCheckState !== 'done') return;
-    updateJobConfig(job.id, buildConfig());
+    const cfg = buildConfig();
+    updateJobConfig(job.id, cfg);
     updateJobStatus(job.id, 'queued');
+    // Remember these settings for Bulk Add mode, minus the per-file rename so
+    // reused downloads keep their own titles instead of colliding.
+    lastSessionConfig.set({ ...(cfg as JobConfig), outputFilename: undefined });
     onclose();
   }
 
@@ -283,13 +294,29 @@
       {/if}
     </fieldset>
 
-    <!-- Download folder -->
+    <!-- Output folder -->
     <fieldset class="config-section">
-      <legend>Download Folder</legend>
+      <legend>Output Folder</legend>
       <div class="folder-row">
         <span class="folder-path" title={downloadPath}>{downloadPath || 'Default folder'}</span>
         <button class="btn-browse" onclick={browseSaveFolder}>Browse</button>
       </div>
+    </fieldset>
+
+    <!-- File name (optional rename) -->
+    <fieldset class="config-section">
+      <legend>File Name (optional)</legend>
+      <input
+        id="output-filename"
+        type="text"
+        placeholder="Keep original title"
+        bind:value={outputFilename}
+      />
+      {#if sanitizedName && sanitizedName !== outputFilename.trim()}
+        <div class="format-hint">Saved as: {sanitizedName}.&lt;ext&gt;</div>
+      {:else}
+        <div class="format-hint">The file extension is added automatically.</div>
+      {/if}
     </fieldset>
   </div>
 
@@ -473,6 +500,23 @@
 
   .config-row select:focus,
   .config-row input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+
+  /* Full-width text input (e.g. File Name field) */
+  .config-section > input[type="text"] {
+    width: 100%;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-surface);
+    color: var(--text-color);
+    font-size: var(--font-size-sm);
+    box-sizing: border-box;
+  }
+
+  .config-section > input[type="text"]:focus {
     outline: none;
     border-color: var(--primary-color);
   }

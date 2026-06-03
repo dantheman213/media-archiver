@@ -1,4 +1,5 @@
 import type { MediaJob, HistoryRecord } from '../types';
+import { sanitizeFilename } from './sanitizeFilename';
 
 function quoteArg(s: string): string {
   return s.includes(' ') ? `"${s}"` : s;
@@ -9,14 +10,21 @@ export function buildCommandFromJob(
   defaultDownloadPath: string,
   useImpersonateChrome = true,
   useNoCookies = true,
+  ytDlpPath?: string,
+  ffmpegPath?: string,
 ): string {
   const outputPath = (job.config.downloadPath || defaultDownloadPath).replace(/[/\\]+$/, '');
-  const parts: string[] = ['yt-dlp'];
+  const parts: string[] = [quoteArg(ytDlpPath || 'yt-dlp')];
 
-  parts.push('-o', quoteArg(`${outputPath}/%(title)s.%(ext)s`));
+  const safeName = job.config.outputFilename ? sanitizeFilename(job.config.outputFilename) : '';
+  const nameTemplate = safeName || '%(title)s';
+  parts.push('-o', quoteArg(`${outputPath}/${nameTemplate}.%(ext)s`));
   parts.push('--windows-filenames');
   parts.push('--newline', '--progress');
   parts.push('--print', 'after_move:filepath');
+  if (ffmpegPath) {
+    parts.push('--ffmpeg-location', quoteArg(ffmpegPath));
+  }
 
   if (job.config.workflow === 'audio_only') {
     parts.push('-x');
@@ -62,14 +70,22 @@ export function buildCommandFromJob(
   return parts.join(' ');
 }
 
-export function buildCommandFromHistory(record: HistoryRecord, defaultDownloadPath: string): string {
+export function buildCommandFromHistory(
+  record: HistoryRecord,
+  defaultDownloadPath: string,
+  ytDlpPath?: string,
+  ffmpegPath?: string,
+): string {
   const outputPath = defaultDownloadPath.replace(/[/\\]+$/, '');
-  const parts: string[] = ['yt-dlp'];
+  const parts: string[] = [quoteArg(ytDlpPath || 'yt-dlp')];
 
   parts.push('-o', quoteArg(`${outputPath}/%(title)s.%(ext)s`));
   parts.push('--windows-filenames');
   parts.push('--newline', '--progress');
   parts.push('--print', 'after_move:filepath');
+  if (ffmpegPath) {
+    parts.push('--ffmpeg-location', quoteArg(ffmpegPath));
+  }
 
   const [fmtRaw = '', qLabelRaw = ''] = record.formatLabel.split(' - ');
   const fmt = fmtRaw.toLowerCase();

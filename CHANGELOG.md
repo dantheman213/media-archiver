@@ -1,3 +1,11 @@
+# v0.9.12
+
+* Sanitize custom file names, removing/replacing characters that are invalid in real filenames
+* Added an optional "File Name" field in Configure Download to rename the output file
+* Renamed "Download Folder" to "Output Folder" in Configure Download
+* Added a Bulk Add mode toggle that queues new URLs instantly using the last used download settings
+* "Copy yt-dlp Command" now uses the full binary paths (yt-dlp and ffmpeg)
+
 # v0.9.2
 
 TBA
