@@ -27,7 +27,7 @@ futures-util = "0.3.32"
 tokio = { version = "1", features = ["fs", "rt-multi-thread", "io-util", "macros", "process"] }
 zip = "8.5.1"
 flate2 = "1.1.9"
-tar = "0.4.45"
+tar = "0.4.46"
 tauri-plugin-dialog = "2.7.0"
 which = "8.0.2"
 fs4 = "0.13"
