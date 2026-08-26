@@ -2,12 +2,14 @@
   import { invoke } from '@tauri-apps/api/core';
   import { get } from 'svelte/store';
   import type { MediaJob, JobConfig } from '../types';
-  import { updateJobConfig, updateJobStatus, removeJob, lastSessionConfig } from '../stores/queue';
+  import { updateJobConfig, updateJobStatus, removeJob } from '../stores/queue';
+  import { rememberDownloadDefaults } from '../stores/downloadDefaults';
   import { binaryCheckState } from '../stores/binaries';
   import { settings } from '../stores/settings';
   import { isValidTimeString, parseTimeString, formatTime } from '../lib/timeUtils';
   import { sanitizeFilename } from '../lib/sanitizeFilename';
   import ToggleSwitch from './ToggleSwitch.svelte';
+  import RangeSlider from './RangeSlider.svelte';
 
   let { job, onclose }: {
     job: MediaJob;
@@ -25,8 +27,16 @@
   let embedThumbnail = $state(true);
   let trimStart = $state('');
   let trimEnd = $state('');
+  // Numeric trim bounds (seconds) that drive the dual-handle slider when the
+  // media duration is known.
+  let startSec = $state(0);
+  let endSec = $state(0);
   let downloadPath = $state('');
   let outputFilename = $state('');
+
+  // Whether we can show the slider (duration reported by yt-dlp).
+  let hasDuration = $derived(!!job.metadata && job.metadata.durationSeconds > 0);
+  let durationInt = $derived(Math.round(job.metadata?.durationSeconds ?? 0));
 
   // Sync local state when job changes
   $effect(() => {
@@ -40,6 +50,10 @@
     embedThumbnail = job.config.embedThumbnail;
     trimStart = job.config.trim?.start ?? '';
     trimEnd = job.config.trim?.end ?? '';
+    // Seed slider bounds from any existing trim, else full range.
+    const dur = Math.round(job.metadata?.durationSeconds ?? 0);
+    startSec = parseTimeString(job.config.trim?.start ?? '') ?? 0;
+    endSec = parseTimeString(job.config.trim?.end ?? '') ?? dur;
     downloadPath = job.config.downloadPath ?? get(settings).downloadPath;
     outputFilename = job.config.outputFilename ?? '';
   });
@@ -111,10 +125,22 @@
       };
     }
 
-    if (trimStart || trimEnd) {
+    // Trim: when the duration is known the slider is the source of truth
+    // (a full-range selection means "no trim"); otherwise fall back to the
+    // manually typed timestamps.
+    let start = '';
+    let end = '';
+    if (hasDuration) {
+      start = startSec > 0 ? formatTime(startSec) : '';
+      end = endSec < durationInt ? formatTime(endSec) : '';
+    } else {
+      start = trimStart;
+      end = trimEnd;
+    }
+    if (start || end) {
       cfg.trim = {
-        ...(trimStart ? { start: trimStart } : {}),
-        ...(trimEnd ? { end: trimEnd } : {}),
+        ...(start ? { start } : {}),
+        ...(end ? { end } : {}),
       };
     }
 
@@ -126,9 +152,10 @@
     const cfg = buildConfig();
     updateJobConfig(job.id, cfg);
     updateJobStatus(job.id, 'queued');
-    // Remember these settings for Bulk Add mode, minus the per-file rename so
-    // reused downloads keep their own titles instead of colliding.
-    lastSessionConfig.set({ ...(cfg as JobConfig), outputFilename: undefined });
+    // Persist these settings as the remembered defaults for the quick Add
+    // button and future app runs. Per-video trim and the per-file rename are
+    // dropped inside rememberDownloadDefaults().
+    rememberDownloadDefaults(cfg as JobConfig);
     onclose();
   }
 
@@ -255,42 +282,57 @@
     <!-- Trim -->
     <fieldset class="config-section">
       <legend>Trim (optional)</legend>
-      <div class="config-row">
-        <label for="trim-start">Start</label>
-        <input
-          id="trim-start"
-          type="text"
-          placeholder="0:00"
-          class:input-error={trimStart && !isValidTimeString(trimStart)}
-          bind:value={trimStart}
-        />
-      </div>
-      <div class="config-row">
-        <label for="trim-end">End</label>
-        <input
-          id="trim-end"
-          type="text"
-          placeholder="0:00"
-          class:input-error={trimEnd && !isValidTimeString(trimEnd)}
-          bind:value={trimEnd}
-        />
-      </div>
-      {#if trimStart && !isValidTimeString(trimStart)}
-        <div class="trim-error">Use format MM:SS or HH:MM:SS</div>
-      {:else if trimEnd && !isValidTimeString(trimEnd)}
-        <div class="trim-error">Use format MM:SS or HH:MM:SS</div>
-      {:else if trimStart && trimEnd && isValidTimeString(trimStart) && isValidTimeString(trimEnd)}
-        {@const startSec = parseTimeString(trimStart)}
-        {@const endSec = parseTimeString(trimEnd)}
-        {#if startSec !== null && endSec !== null}
-          {#if startSec >= endSec}
-            <div class="trim-error">Start must be before end</div>
-          {:else}
-            <div class="trim-summary">Trimming from {trimStart} to {trimEnd} ({formatTime(endSec - startSec)} selected)</div>
+      {#if hasDuration}
+        <RangeSlider max={durationInt} bind:start={startSec} bind:end={endSec} />
+        <div class="trim-slider-labels">
+          <span>{formatTime(startSec)}</span>
+          <span class="trim-total">Total {formatTime(durationInt)}</span>
+          <span>{formatTime(endSec)}</span>
+        </div>
+        {#if startSec > 0 || endSec < durationInt}
+          <div class="trim-summary">
+            Trimming {formatTime(startSec)} &rarr; {formatTime(endSec)} ({formatTime(Math.max(0, endSec - startSec))} selected)
+          </div>
+        {:else}
+          <div class="trim-hint">Full video &mdash; drag the handles to trim</div>
+        {/if}
+      {:else}
+        <!-- Duration unknown (e.g. live streams): fall back to manual entry -->
+        <div class="config-row">
+          <label for="trim-start">Start</label>
+          <input
+            id="trim-start"
+            type="text"
+            placeholder="0:00"
+            class:input-error={trimStart && !isValidTimeString(trimStart)}
+            bind:value={trimStart}
+          />
+        </div>
+        <div class="config-row">
+          <label for="trim-end">End</label>
+          <input
+            id="trim-end"
+            type="text"
+            placeholder="0:00"
+            class:input-error={trimEnd && !isValidTimeString(trimEnd)}
+            bind:value={trimEnd}
+          />
+        </div>
+        {#if trimStart && !isValidTimeString(trimStart)}
+          <div class="trim-error">Use format MM:SS or HH:MM:SS</div>
+        {:else if trimEnd && !isValidTimeString(trimEnd)}
+          <div class="trim-error">Use format MM:SS or HH:MM:SS</div>
+        {:else if trimStart && trimEnd && isValidTimeString(trimStart) && isValidTimeString(trimEnd)}
+          {@const s = parseTimeString(trimStart)}
+          {@const e = parseTimeString(trimEnd)}
+          {#if s !== null && e !== null}
+            {#if s >= e}
+              <div class="trim-error">Start must be before end</div>
+            {:else}
+              <div class="trim-summary">Trimming from {trimStart} to {trimEnd} ({formatTime(e - s)} selected)</div>
+            {/if}
           {/if}
         {/if}
-      {:else if (trimStart || trimEnd) && job.metadata && job.metadata.durationSeconds > 0}
-        <div class="trim-hint">Full duration: {formatTime(job.metadata.durationSeconds)}</div>
       {/if}
     </fieldset>
 
@@ -550,6 +592,19 @@
     font-size: 0.75rem;
     color: var(--text-muted);
     padding-left: var(--spacing-xs);
+  }
+
+  .trim-slider-labels {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-color);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .trim-slider-labels .trim-total {
+    color: var(--text-muted);
   }
 
   /* Download folder */

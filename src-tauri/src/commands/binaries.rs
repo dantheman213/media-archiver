@@ -13,6 +13,9 @@ pub struct BinaryStatus {
     pub ffmpeg_found: bool,
     pub ffmpeg_path: Option<String>,
     pub ffmpeg_version: Option<String>,
+    pub ffprobe_found: bool,
+    pub ffprobe_path: Option<String>,
+    pub ffprobe_version: Option<String>,
     pub atomic_parsley_found: bool,
     pub atomic_parsley_path: Option<String>,
     pub atomic_parsley_version: Option<String>,
@@ -22,6 +25,8 @@ pub struct BinaryStatus {
 pub struct BinaryPaths {
     pub yt_dlp_path: Option<String>,
     pub ffmpeg_path: Option<String>,
+    #[serde(default)]
+    pub ffprobe_path: Option<String>,
     #[serde(default)]
     pub atomic_parsley_path: Option<String>,
 }
@@ -62,7 +67,27 @@ fn load_custom_paths(app: &AppHandle) -> BinaryPaths {
     BinaryPaths {
         yt_dlp_path: None,
         ffmpeg_path: None,
+        ffprobe_path: None,
         atomic_parsley_path: None,
+    }
+}
+
+/// ffprobe almost always sits next to ffmpeg. When ffprobe isn't found through
+/// the normal resolution order, look in the same directory as the resolved
+/// ffmpeg binary (covers a custom ffmpeg path whose sibling holds ffprobe).
+fn ffprobe_beside_ffmpeg(ffmpeg_path: &Option<String>) -> Option<String> {
+    let ffmpeg = ffmpeg_path.as_ref()?;
+    let dir = Path::new(ffmpeg).parent()?;
+    let exe = if cfg!(target_os = "windows") {
+        "ffprobe.exe"
+    } else {
+        "ffprobe"
+    };
+    let candidate = dir.join(exe);
+    if candidate.exists() {
+        Some(candidate.to_string_lossy().to_string())
+    } else {
+        None
     }
 }
 
@@ -137,6 +162,15 @@ pub fn check_binaries(app: AppHandle) -> BinaryStatus {
 
     let (yt_dlp_found, yt_dlp_path) = check_executable("yt-dlp", &paths.yt_dlp_path, &bin_dir);
     let (ffmpeg_found, ffmpeg_path) = check_executable("ffmpeg", &paths.ffmpeg_path, &bin_dir);
+    let (mut ffprobe_found, mut ffprobe_path) =
+        check_executable("ffprobe", &paths.ffprobe_path, &bin_dir);
+    // Fallback: ffprobe living beside the resolved ffmpeg binary.
+    if !ffprobe_found {
+        if let Some(p) = ffprobe_beside_ffmpeg(&ffmpeg_path) {
+            ffprobe_found = true;
+            ffprobe_path = Some(p);
+        }
+    }
     let (atomic_parsley_found, atomic_parsley_path) =
         check_executable("AtomicParsley", &paths.atomic_parsley_path, &bin_dir);
 
@@ -145,6 +179,10 @@ pub fn check_binaries(app: AppHandle) -> BinaryStatus {
         .and_then(|p| get_version(p, &["--version"]));
 
     let ffmpeg_version = ffmpeg_path
+        .as_ref()
+        .and_then(|p| get_version(p, &["-version"]));
+
+    let ffprobe_version = ffprobe_path
         .as_ref()
         .and_then(|p| get_version(p, &["-version"]));
 
@@ -159,6 +197,9 @@ pub fn check_binaries(app: AppHandle) -> BinaryStatus {
         ffmpeg_found,
         ffmpeg_path,
         ffmpeg_version,
+        ffprobe_found,
+        ffprobe_path,
+        ffprobe_version,
         atomic_parsley_found,
         atomic_parsley_path,
         atomic_parsley_version,
@@ -170,11 +211,13 @@ pub fn set_binary_paths(
     app: AppHandle,
     yt_dlp_path: Option<String>,
     ffmpeg_path: Option<String>,
+    ffprobe_path: Option<String>,
     atomic_parsley_path: Option<String>,
 ) -> Result<(), String> {
     let paths = BinaryPaths {
         yt_dlp_path,
         ffmpeg_path,
+        ffprobe_path,
         atomic_parsley_path,
     };
     let config_path = get_config_path(&app);
@@ -240,6 +283,7 @@ pub async fn update_ytdlp(app: AppHandle) -> Result<String, String> {
     let yt_dlp_path = status
         .yt_dlp_path
         .ok_or_else(|| "yt-dlp not found. Please install it first.".to_string())?;
+    let version_before = status.yt_dlp_version.clone().unwrap_or_default();
 
     let mut cmd = tokio::process::Command::new(&yt_dlp_path);
     cmd.arg("-U");
@@ -256,24 +300,49 @@ pub async fn update_ytdlp(app: AppHandle) -> Result<String, String> {
 
     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
     let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+    let combined = format!("{}\n{}", stdout.trim(), stderr.trim());
+    let combined = combined.trim().to_string();
+    let combined_lower = combined.to_lowercase();
 
-    if output.status.success() {
-        // yt-dlp prints update info to stdout
-        let msg = if stdout.contains("up to date") || stdout.contains("Up-to-date") {
-            "yt-dlp is already up to date.".to_string()
-        } else {
-            format!("yt-dlp updated successfully.\n{}", stdout.trim())
-        };
-        Ok(msg)
+    // Re-read the version after the attempt so we can report the truth rather
+    // than trusting a fragile stdout string.
+    let version_after = get_version(&yt_dlp_path, &["--version"]).unwrap_or_default();
+
+    if !output.status.success() {
+        // Most common non-zero cause: yt-dlp was installed by a package manager
+        // and refuses to self-update.
+        if combined_lower.contains("package manager")
+            || combined_lower.contains("pip")
+            || combined_lower.contains("installed by")
+        {
+            return Err(format!(
+                "yt-dlp at {} can't self-update — it appears to be managed by a package manager. Update it with that tool.\n{}",
+                yt_dlp_path, combined
+            ));
+        }
+        return Err(format!(
+            "yt-dlp update failed at {}:\n{}",
+            yt_dlp_path, combined
+        ));
+    }
+
+    // Success exit — report based on the actual version change, not guesswork.
+    if !version_before.is_empty() && !version_after.is_empty() && version_before != version_after {
+        Ok(format!(
+            "Updated yt-dlp {} \u{2192} {}\n({})",
+            version_before, version_after, yt_dlp_path
+        ))
+    } else if combined_lower.contains("up to date") || combined_lower.contains("up-to-date") {
+        Ok(format!(
+            "yt-dlp is already up to date ({}).\n{}",
+            version_after, yt_dlp_path
+        ))
     } else {
-        Err(format!(
-            "yt-dlp update failed:\n{}{}",
-            stdout.trim(),
-            if stderr.is_empty() {
-                String::new()
-            } else {
-                format!("\n{}", stderr.trim())
-            }
+        // Exited zero but the version didn't change: don't claim success —
+        // show exactly what yt-dlp reported.
+        Ok(format!(
+            "yt-dlp reported no version change (still {}).\n{}\n{}",
+            version_after, yt_dlp_path, combined
         ))
     }
 }
@@ -313,6 +382,12 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
     } else {
         "ffmpeg"
     });
+    // ffprobe sits beside ffmpeg; yt-dlp needs it for several post-processors.
+    let ffprobe_dest = bin_dir.join(if cfg!(target_os = "windows") {
+        "ffprobe.exe"
+    } else {
+        "ffprobe"
+    });
     let ffmpeg_archive = bin_dir.join(if cfg!(target_os = "linux") {
         "ffmpeg.tar.xz"
     } else {
@@ -331,16 +406,23 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
 
     #[cfg(target_os = "windows")]
     {
-        // Extract Windows zip
+        // Extract Windows zip — pull BOTH ffmpeg.exe and ffprobe.exe (the BtbN
+        // build ships both under bin/). Don't stop after the first match.
         let file = fs::File::open(&ffmpeg_archive).map_err(|e| e.to_string())?;
         let mut archive = zip::ZipArchive::new(file).map_err(|e| e.to_string())?;
         for i in 0..archive.len() {
             let mut file = archive.by_index(i).map_err(|e| e.to_string())?;
             if let Some(path) = file.enclosed_name() {
-                if path.file_name().and_then(|n| n.to_str()) == Some("ffmpeg.exe") {
-                    let mut out = fs::File::create(&ffmpeg_dest).map_err(|e| e.to_string())?;
-                    std::io::copy(&mut file, &mut out).map_err(|e| e.to_string())?;
-                    break;
+                match path.file_name().and_then(|n| n.to_str()) {
+                    Some("ffmpeg.exe") => {
+                        let mut out = fs::File::create(&ffmpeg_dest).map_err(|e| e.to_string())?;
+                        std::io::copy(&mut file, &mut out).map_err(|e| e.to_string())?;
+                    }
+                    Some("ffprobe.exe") => {
+                        let mut out = fs::File::create(&ffprobe_dest).map_err(|e| e.to_string())?;
+                        std::io::copy(&mut file, &mut out).map_err(|e| e.to_string())?;
+                    }
+                    _ => {}
                 }
             }
         }
@@ -348,10 +430,11 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
 
     #[cfg(not(target_os = "windows"))]
     {
-        // Dummy block for linux/mac to avoid compilation errors for this prototype, or actually extract it.
-        // For macOS: zip contains `ffmpeg` directly.
+        // For macOS: each evermeet zip contains a single binary. ffmpeg and
+        // ffprobe are separate downloads, so fetch both.
         #[cfg(target_os = "macos")]
         {
+            // ffmpeg (already downloaded into ffmpeg_archive above)
             let file = fs::File::open(&ffmpeg_archive).map_err(|e| e.to_string())?;
             let mut archive = zip::ZipArchive::new(file).map_err(|e| e.to_string())?;
             for i in 0..archive.len() {
@@ -364,12 +447,36 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
                     }
                 }
             }
+
+            // ffprobe (separate download)
+            let ffprobe_url = "https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip";
+            let ffprobe_archive = bin_dir.join("ffprobe.zip");
+            download_file(&app, ffprobe_url, &ffprobe_archive, "ffmpeg").await?;
+            let file = fs::File::open(&ffprobe_archive).map_err(|e| e.to_string())?;
+            let mut archive = zip::ZipArchive::new(file).map_err(|e| e.to_string())?;
+            for i in 0..archive.len() {
+                let mut file = archive.by_index(i).map_err(|e| e.to_string())?;
+                if let Some(path) = file.enclosed_name() {
+                    if path.file_name().and_then(|n| n.to_str()) == Some("ffprobe") {
+                        let mut out = fs::File::create(&ffprobe_dest).map_err(|e| e.to_string())?;
+                        std::io::copy(&mut file, &mut out).map_err(|e| e.to_string())?;
+                        break;
+                    }
+                }
+            }
+            let _ = fs::remove_file(ffprobe_archive);
         }
         #[cfg(target_os = "linux")]
         {
-            // Just copy the archive to dest as a dummy for linux MVP since tar.xz is very hard
-            // or use simple copy
-            let _ = fs::copy(&ffmpeg_archive, &ffmpeg_dest);
+            // The Linux static build is distributed as .tar.xz, which we can't
+            // decompress without an xz decoder. Rather than leave a broken dummy
+            // binary (which fails cryptically later when yt-dlp calls ffmpeg),
+            // fail clearly so the user installs ffmpeg/ffprobe themselves.
+            let _ = fs::remove_file(&ffmpeg_archive);
+            return Err(
+                "Automatic ffmpeg install isn't supported on Linux yet. Please install ffmpeg and ffprobe (e.g. via your package manager) and set their paths on the Dependencies screen."
+                    .to_string(),
+            );
         }
     }
 
@@ -470,26 +577,37 @@ pub async fn check_ytdlp_update(app: AppHandle) -> Result<Option<YtDlpUpdateInfo
         .build()
         .map_err(|e| e.to_string())?;
 
-    let json: serde_json::Value = client
+    // Surface failures (network, rate limiting) instead of silently returning
+    // "no update" — a swallowed error is why the check appeared not to work.
+    let resp = client
         .get("https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest")
         .send()
         .await
-        .map_err(|e| e.to_string())?
+        .map_err(|e| format!("Failed to reach GitHub: {}", e))?
+        .error_for_status()
+        .map_err(|e| format!("GitHub update check failed: {}", e))?;
+
+    let json: serde_json::Value = resp
         .json()
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| format!("Failed to parse GitHub response: {}", e))?;
 
-    let latest_version = json["tag_name"]
-        .as_str()
-        .unwrap_or("")
-        .to_string();
+    let latest_version = json["tag_name"].as_str().unwrap_or("").trim().to_string();
 
     if latest_version.is_empty() {
-        return Ok(None);
+        return Err(
+            "Could not determine the latest yt-dlp version (GitHub API may be rate-limited)."
+                .to_string(),
+        );
     }
 
+    // Normalize before comparing so cosmetic differences don't cause false
+    // "update available" flags.
+    let norm = |s: &str| s.trim().trim_start_matches('v').to_lowercase();
+    let update_available = norm(&current_version) != norm(&latest_version);
+
     Ok(Some(YtDlpUpdateInfo {
-        update_available: current_version != latest_version,
+        update_available,
         current_version,
         latest_version,
     }))

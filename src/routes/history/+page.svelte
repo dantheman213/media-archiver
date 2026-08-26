@@ -7,6 +7,7 @@
   import { binaryStatus } from '../../stores/binaries';
   import type { HistoryRecord } from '../../types';
   import { buildCommandFromHistory } from '../../lib/ytdlpCommand';
+  import { describeHistoryRecord } from '../../lib/settingsSummary';
 
   let records: HistoryRecord[] = $state([]);
 
@@ -269,7 +270,6 @@
                 <span class="card-uploader">{record.uploader}</span>
               {/if}
               <div class="card-meta-row">
-                <span class="format-badge">{record.formatLabel}</span>
                 {#if record.extractor}
                   <span class="extractor-badge">{record.extractor}</span>
                 {/if}
@@ -280,6 +280,14 @@
                   {formatRelativeDate(record.completedAt)}
                 </span>
               </div>
+              <dl class="settings-list">
+                {#each describeHistoryRecord(record) as row}
+                  <div class="setting-row">
+                    <dt class="setting-label">{row.label}</dt>
+                    <dd class="setting-value">{row.value}</dd>
+                  </div>
+                {/each}
+              </dl>
               {#if record.filePath && !fileExists}
                 <span class="file-missing">File moved or deleted</span>
               {/if}
@@ -476,14 +484,37 @@
     flex-wrap: wrap;
   }
 
-  .format-badge {
-    display: inline-block;
+  /* Settings summary list */
+  .settings-list {
+    margin-top: var(--spacing-xs);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .setting-row {
+    display: flex;
+    gap: var(--spacing-xs);
     font-size: 0.75rem;
-    padding: 1px 6px;
-    border-radius: var(--radius-sm);
-    font-weight: 500;
-    background-color: rgba(40, 167, 69, 0.15);
-    color: var(--success-color);
+    line-height: 1.4;
+  }
+
+  .setting-label {
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .setting-label::after {
+    content: ':';
+  }
+
+  .setting-value {
+    color: var(--text-color);
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .extractor-badge {

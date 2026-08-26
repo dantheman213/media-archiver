@@ -11,9 +11,10 @@
     updateJobMetadata,
     updateJobProgress,
     updateJobConfig,
-    bulkAddMode,
-    lastSessionConfig,
+    defaultConfig,
   } from '../stores/queue';
+  import { downloadDefaults } from '../stores/downloadDefaults';
+  import { get } from 'svelte/store';
   import { settings } from '../stores/settings';
   import { binaryCheckState, binaryStatus } from '../stores/binaries';
   import { addHistoryRecord } from '../stores/history';
@@ -197,36 +198,52 @@
   // Ingestion flow
   // -------------------------------------------------------------------------
 
-  async function handleAddUrl() {
-    if ($binaryCheckState !== 'done') return;
+  /** Read + clear the URL input, returning the trimmed value (or '' if empty). */
+  function takeUrlInput(): string {
+    if ($binaryCheckState !== 'done') return '';
     const url = urlInput.trim();
-    if (!url) return;
+    if (!url) return '';
     urlInput = '';
+    return url;
+  }
 
-    // Bulk Add mode: skip the inspect/configure round-trip and queue immediately,
-    // reusing the last configure-download settings from this session.
-    if ($bulkAddMode && $lastSessionConfig) {
-      const id = addJob(url, true); // status 'queued'
-      updateJobConfig(id, $lastSessionConfig);
-      // Fetch metadata in the background so the card/history fill in, without
-      // touching status (the queued-download effect starts the download now).
-      const cached = getCachedMetadata(url);
-      if (cached) {
-        updateJobMetadata(id, cached);
-      } else {
-        invoke('fetch_metadata', { url }).then((metadata) => {
-          updateJobMetadata(id, metadata as MediaMetadata);
-          cacheMetadata(url, metadata as MediaMetadata);
-          const thumb = (metadata as MediaMetadata).thumbnailUrl;
-          if (thumb) {
-            invoke('cache_thumbnail', { url: thumb, jobId: id }).then((localPath) => {
-              cachedThumbnailPaths.set(id, localPath as string);
-            }).catch(() => { /* non-critical */ });
-          }
-        }).catch(() => { /* non-critical in bulk mode; download still proceeds */ });
-      }
-      return;
+  /**
+   * Default Add: queue immediately using the remembered download defaults
+   * (or a fresh default config on first run), fetching metadata in the
+   * background so the card/history fill in without blocking the download.
+   */
+  function handleQuickAdd() {
+    const url = takeUrlInput();
+    if (!url) return;
+
+    const cfg = get(downloadDefaults) ?? defaultConfig();
+    const id = addJob(url, true); // status 'queued'
+    updateJobConfig(id, cfg);
+
+    const cached = getCachedMetadata(url);
+    if (cached) {
+      updateJobMetadata(id, cached);
+    } else {
+      invoke('fetch_metadata', { url }).then((metadata) => {
+        updateJobMetadata(id, metadata as MediaMetadata);
+        cacheMetadata(url, metadata as MediaMetadata);
+        const thumb = (metadata as MediaMetadata).thumbnailUrl;
+        if (thumb) {
+          invoke('cache_thumbnail', { url: thumb, jobId: id }).then((localPath) => {
+            cachedThumbnailPaths.set(id, localPath as string);
+          }).catch(() => { /* non-critical */ });
+        }
+      }).catch(() => { /* non-critical; download still proceeds */ });
     }
+  }
+
+  /**
+   * Add w/ Options: inspect the URL, then open the configure pane so the user
+   * can adjust settings before queueing.
+   */
+  async function handleAddWithOptions() {
+    const url = takeUrlInput();
+    if (!url) return;
 
     const jobId = addJob(url);
     // Auto-select the new job
@@ -259,7 +276,12 @@
 
   function handleInputKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter') {
-      handleAddUrl();
+      // Shift+Enter opens the options pane; Enter uses the remembered defaults.
+      if (e.shiftKey) {
+        handleAddWithOptions();
+      } else {
+        handleQuickAdd();
+      }
     }
   }
 
@@ -283,7 +305,7 @@
     const text = e.dataTransfer?.getData('text/plain') ?? '';
     if (text && isValidUrl(text)) {
       urlInput = text;
-      handleAddUrl();
+      handleQuickAdd();
     }
 
     // Also check for text/uri-list
@@ -292,7 +314,7 @@
       const firstUrl = uriList.split('\n').find((line) => line.trim() && !line.startsWith('#'));
       if (firstUrl) {
         urlInput = firstUrl.trim();
-        handleAddUrl();
+        handleQuickAdd();
       }
     }
   }
@@ -323,7 +345,7 @@
         const trimmed = text.trim();
         if (trimmed && isValidUrl(trimmed)) {
           urlInput = trimmed;
-          handleAddUrl();
+          handleQuickAdd();
         } else if (trimmed) {
           urlInput = trimmed;
         }
@@ -479,22 +501,21 @@
           onkeydown={handleInputKeydown}
           disabled={$binaryCheckState !== 'done'}
         />
-        <button class="btn-primary" onclick={handleAddUrl} disabled={!urlInput.trim() || $binaryCheckState !== 'done'}>
+        <button
+          class="btn-primary"
+          onclick={handleQuickAdd}
+          disabled={!urlInput.trim() || $binaryCheckState !== 'done'}
+          title="Download now with your last-used settings (Enter)"
+        >
           Add
         </button>
         <button
-          class="btn-bulk"
-          class:active={$bulkAddMode}
-          onclick={() => bulkAddMode.set(!$bulkAddMode)}
-          disabled={$lastSessionConfig === null}
-          aria-pressed={$bulkAddMode}
-          title={$lastSessionConfig === null
-            ? 'Bulk Add: configure one download first to set the reused settings'
-            : $bulkAddMode
-              ? 'Bulk Add ON — new URLs queue instantly with the last used settings'
-              : 'Bulk Add OFF — click to queue new URLs instantly with the last used settings'}
+          class="btn-options"
+          onclick={handleAddWithOptions}
+          disabled={!urlInput.trim() || $binaryCheckState !== 'done'}
+          title="Choose settings before downloading (Shift+Enter)"
         >
-          Bulk Add
+          Add w/ Options
         </button>
       </div>
 
@@ -724,7 +745,7 @@
     cursor: not-allowed;
   }
 
-  .btn-bulk {
+  .btn-options {
     padding: var(--spacing-sm) var(--spacing-md);
     background-color: var(--bg-surface);
     color: var(--text-muted);
@@ -737,18 +758,12 @@
     transition: background-color 0.15s, color 0.15s, border-color 0.15s;
   }
 
-  .btn-bulk:hover:not(:disabled) {
+  .btn-options:hover:not(:disabled) {
     background-color: var(--bg-surface-hover);
     color: var(--text-color);
   }
 
-  .btn-bulk.active {
-    background-color: var(--primary-color);
-    color: #fff;
-    border-color: var(--primary-color);
-  }
-
-  .btn-bulk:disabled {
+  .btn-options:disabled {
     opacity: 0.4;
     cursor: not-allowed;
   }

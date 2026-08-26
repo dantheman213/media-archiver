@@ -1,11 +1,18 @@
 <script lang="ts">
   import type { MediaJob } from '../types';
+  import { describeJobConfig } from '../lib/settingsSummary';
 
   let { job, selected = false, onselect }: {
     job: MediaJob;
     selected?: boolean;
     onselect?: () => void;
   } = $props();
+
+  // Settings are only meaningful once the job is committed (not while still
+  // inspecting or being configured in the inspector panel).
+  let settingsRows = $derived(
+    ['inspecting', 'configuring'].includes(job.status) ? [] : describeJobConfig(job.config)
+  );
 
   const statusLabels: Record<string, string> = {
     inspecting: 'Inspecting...',
@@ -98,6 +105,16 @@
             <span class="extractor-badge">{job.metadata.extractor}</span>
           {/if}
         </div>
+        {#if settingsRows.length > 0}
+          <dl class="settings-list">
+            {#each settingsRows as row}
+              <div class="setting-row">
+                <dt class="setting-label">{row.label}</dt>
+                <dd class="setting-value">{row.value}</dd>
+              </div>
+            {/each}
+          </dl>
+        {/if}
       </div>
     </div>
   {:else}
@@ -108,6 +125,16 @@
         <div class="card-meta-row">
           <span class="status-badge status-{job.status}">{statusLabels[job.status] ?? job.status}</span>
         </div>
+        {#if settingsRows.length > 0}
+          <dl class="settings-list">
+            {#each settingsRows as row}
+              <div class="setting-row">
+                <dt class="setting-label">{row.label}</dt>
+                <dd class="setting-value">{row.value}</dd>
+              </div>
+            {/each}
+          </dl>
+        {/if}
       </div>
     </div>
   {/if}
@@ -344,6 +371,39 @@
 
   .card-minimal {
     padding: var(--spacing-xs) 0;
+  }
+
+  /* Settings summary list */
+  .settings-list {
+    margin-top: var(--spacing-xs);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .setting-row {
+    display: flex;
+    gap: var(--spacing-xs);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .setting-label {
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .setting-label::after {
+    content: ':';
+  }
+
+  .setting-value {
+    color: var(--text-color);
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* Progress */

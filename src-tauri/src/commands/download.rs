@@ -71,6 +71,10 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
     let ffmpeg_path = status.ffmpeg_path;
 
     let mut args: Vec<String> = Vec::new();
+    // Extra ffmpeg args collected for a SINGLE `--postprocessor-args`. yt-dlp
+    // keeps only the last unkeyed `--postprocessor-args`, so passing the option
+    // more than once silently drops earlier values — always combine here.
+    let mut pp_args: Vec<String> = Vec::new();
 
     let output_path = if config.output_path.is_empty() {
         dirs_next::download_dir()
@@ -104,10 +108,18 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
     args.push("--print".to_string());
     args.push("after_move:filepath".to_string());
 
-    // Set ffmpeg location if available
+    // Set ffmpeg location if available. Pass the *directory* containing the
+    // binary (not the exe path) so yt-dlp also discovers ffprobe sitting next
+    // to it — several post-processors (thumbnail embed, format probing) need
+    // ffprobe, and a missing ffprobe is a common cause of hand-off errors.
     if let Some(ref ffmpeg) = ffmpeg_path {
+        let ffmpeg_location = std::path::Path::new(ffmpeg)
+            .parent()
+            .map(|p| p.to_string_lossy().to_string())
+            .filter(|s| !s.is_empty())
+            .unwrap_or_else(|| ffmpeg.clone());
         args.push("--ffmpeg-location".to_string());
-        args.push(ffmpeg.clone());
+        args.push(ffmpeg_location);
     }
 
     // Workflow-specific args
@@ -140,15 +152,15 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
             }
 
             if let Some(ref quality) = config.video_quality {
-                // Map quality preset to postprocessor CRF
+                // Map quality preset to postprocessor CRF (applied when a
+                // re-encode occurs; combined into one --postprocessor-args below).
                 let crf = match quality.as_str() {
                     "best" => "18",
                     "balanced" => "23",
                     "small_size" => "28",
                     _ => "23",
                 };
-                args.push("--postprocessor-args".to_string());
-                args.push(format!("-crf {}", crf));
+                pp_args.push(format!("-crf {}", crf));
             }
         }
     }
@@ -166,18 +178,32 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
         args.push("--embed-thumbnail".to_string());
     }
 
-    // Trim
-    if let Some(ref start) = config.trim_start {
-        if !start.is_empty() {
-            args.push("--postprocessor-args".to_string());
-            args.push(format!("-ss {}", start));
-        }
+    // Trim — use yt-dlp's native section download rather than ffmpeg copy-trim.
+    // This is accurate (with --force-keyframes-at-cuts) and only downloads the
+    // selected range. Format: --download-sections "*START-END" where either
+    // bound may be omitted (start defaults to 0, end to the end of media).
+    let trim_start = config
+        .trim_start
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+    let trim_end = config
+        .trim_end
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+    if trim_start.is_some() || trim_end.is_some() {
+        let start = trim_start.unwrap_or("0");
+        let end = trim_end.unwrap_or("inf");
+        args.push("--download-sections".to_string());
+        args.push(format!("*{}-{}", start, end));
+        args.push("--force-keyframes-at-cuts".to_string());
     }
-    if let Some(ref end) = config.trim_end {
-        if !end.is_empty() {
-            args.push("--postprocessor-args".to_string());
-            args.push(format!("-to {}", end));
-        }
+
+    // Emit any collected ffmpeg post-processor args as a single option.
+    if !pp_args.is_empty() {
+        args.push("--postprocessor-args".to_string());
+        args.push(pp_args.join(" "));
     }
 
     // Optional yt-dlp flags from settings
@@ -203,7 +229,7 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
         cmd.creation_flags(0x08000000);
     }
 
-    let mut child = manager
+    let (mut child, stderr_tail) = manager
         .spawn(job_id.clone(), cmd)
         .await
         .map_err(|e| format!("Failed to start download: {}", e))?;
@@ -222,10 +248,27 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
                 let payload = if exit_status.success() {
                     "0".to_string()
                 } else {
-                    format!(
-                        "Download failed with exit code {}",
-                        exit_status.code().unwrap_or(-1)
-                    )
+                    let code = exit_status.code().unwrap_or(-1);
+                    // Include the tail of stderr so the real yt-dlp/ffmpeg error
+                    // reaches the UI instead of a bare exit code.
+                    let tail = stderr_tail
+                        .lock()
+                        .ok()
+                        .map(|b| {
+                            b.iter()
+                                .rev()
+                                .take(8)
+                                .rev()
+                                .cloned()
+                                .collect::<Vec<_>>()
+                                .join("\n")
+                        })
+                        .unwrap_or_default();
+                    if tail.trim().is_empty() {
+                        format!("Download failed with exit code {}", code)
+                    } else {
+                        format!("Download failed (exit code {}):\n{}", code, tail)
+                    }
                 };
                 let _ = app_clone.emit(
                     &format!("process-event-{}", job_id_clone),

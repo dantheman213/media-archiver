@@ -5,6 +5,12 @@ function quoteArg(s: string): string {
   return s.includes(' ') ? `"${s}"` : s;
 }
 
+/** Directory containing the ffmpeg binary (so yt-dlp also finds ffprobe). */
+function ffmpegLocation(ffmpegPath: string): string {
+  const dir = ffmpegPath.replace(/[/\\][^/\\]*$/, '');
+  return dir || ffmpegPath;
+}
+
 export function buildCommandFromJob(
   job: MediaJob,
   defaultDownloadPath: string,
@@ -23,8 +29,11 @@ export function buildCommandFromJob(
   parts.push('--newline', '--progress');
   parts.push('--print', 'after_move:filepath');
   if (ffmpegPath) {
-    parts.push('--ffmpeg-location', quoteArg(ffmpegPath));
+    parts.push('--ffmpeg-location', quoteArg(ffmpegLocation(ffmpegPath)));
   }
+
+  // Collected into a single --postprocessor-args (repeated ones override).
+  const ppArgs: string[] = [];
 
   if (job.config.workflow === 'audio_only') {
     parts.push('-x');
@@ -39,7 +48,7 @@ export function buildCommandFromJob(
     parts.push('--merge-output-format', fmt);
     const q = job.config.videoTranscode?.quality ?? 'balanced';
     const crf = q === 'best' ? '18' : q === 'balanced' ? '23' : '28';
-    parts.push('--postprocessor-args', quoteArg(`-crf ${crf}`));
+    ppArgs.push(`-crf ${crf}`);
   }
 
   if (job.config.embedSubtitles) {
@@ -52,11 +61,16 @@ export function buildCommandFromJob(
     parts.push('--embed-thumbnail');
   }
 
-  if (job.config.trim?.start) {
-    parts.push('--postprocessor-args', quoteArg(`-ss ${job.config.trim.start}`));
+  // Trim via native section download (accurate, only fetches the range).
+  const trimStart = job.config.trim?.start?.trim();
+  const trimEnd = job.config.trim?.end?.trim();
+  if (trimStart || trimEnd) {
+    parts.push('--download-sections', quoteArg(`*${trimStart || '0'}-${trimEnd || 'inf'}`));
+    parts.push('--force-keyframes-at-cuts');
   }
-  if (job.config.trim?.end) {
-    parts.push('--postprocessor-args', quoteArg(`-to ${job.config.trim.end}`));
+
+  if (ppArgs.length > 0) {
+    parts.push('--postprocessor-args', quoteArg(ppArgs.join(' ')));
   }
 
   if (useImpersonateChrome) {
@@ -84,7 +98,7 @@ export function buildCommandFromHistory(
   parts.push('--newline', '--progress');
   parts.push('--print', 'after_move:filepath');
   if (ffmpegPath) {
-    parts.push('--ffmpeg-location', quoteArg(ffmpegPath));
+    parts.push('--ffmpeg-location', quoteArg(ffmpegLocation(ffmpegPath)));
   }
 
   const [fmtRaw = '', qLabelRaw = ''] = record.formatLabel.split(' - ');

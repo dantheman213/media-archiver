@@ -4,7 +4,11 @@
     binaryStatus,
     binaryCheckState,
     binaryErrorMsg,
-    checkBinaries
+    checkBinaries,
+    checkYtDlpUpdate,
+    ytdlpUpdateInfo,
+    ytdlpChecking,
+    ytdlpUpdateError
   } from '../../stores/binaries';
 
   let updating = $state(false);
@@ -20,8 +24,9 @@
       updateMessage = `Update failed: ${String(e)}`;
     } finally {
       updating = false;
-      // Re-check binaries to refresh version info
-      checkBinaries();
+      // Re-check binaries to refresh version info, then re-check for updates.
+      await checkBinaries();
+      checkYtDlpUpdate();
     }
   }
 </script>
@@ -46,9 +51,14 @@
         <div class="binary-card-header">
           <h3>yt-dlp</h3>
           {#if $binaryStatus.yt_dlp_found}
-            <button class="btn-sm" onclick={updateYtDlp} disabled={updating}>
-              {updating ? 'Updating...' : 'Update yt-dlp'}
-            </button>
+            <div class="card-actions">
+              <button class="btn-sm" onclick={checkYtDlpUpdate} disabled={$ytdlpChecking || updating}>
+                {$ytdlpChecking ? 'Checking...' : 'Check for updates'}
+              </button>
+              <button class="btn-sm" onclick={updateYtDlp} disabled={updating}>
+                {updating ? 'Updating...' : 'Update yt-dlp'}
+              </button>
+            </div>
           {/if}
         </div>
         <span class="status-badge">{$binaryStatus.yt_dlp_found ? 'Found' : 'Not Found'}</span>
@@ -57,6 +67,15 @@
         {/if}
         {#if $binaryStatus.yt_dlp_path}
           <p class="path">{$binaryStatus.yt_dlp_path}</p>
+        {/if}
+        {#if $ytdlpUpdateError}
+          <p class="update-message update-error">Update check failed: {$ytdlpUpdateError}</p>
+        {:else if $ytdlpUpdateInfo}
+          {#if $ytdlpUpdateInfo.updateAvailable}
+            <p class="update-message">Update available: {$ytdlpUpdateInfo.currentVersion} &rarr; {$ytdlpUpdateInfo.latestVersion}</p>
+          {:else}
+            <p class="update-message">Up to date ({$ytdlpUpdateInfo.latestVersion}).</p>
+          {/if}
         {/if}
         {#if updateMessage}
           <p class="update-message" class:update-error={updateMessage.startsWith('Update failed')}>{updateMessage}</p>
@@ -71,6 +90,20 @@
         {/if}
         {#if $binaryStatus.ffmpeg_path}
           <p class="path">{$binaryStatus.ffmpeg_path}</p>
+        {/if}
+      </div>
+
+      <div class="binary-card" class:found={$binaryStatus.ffprobe_found} class:missing={!$binaryStatus.ffprobe_found}>
+        <h3>ffprobe</h3>
+        <span class="status-badge">{$binaryStatus.ffprobe_found ? 'Found' : 'Not Found'}</span>
+        {#if $binaryStatus.ffprobe_version}
+          <p class="version">{$binaryStatus.ffprobe_version}</p>
+        {/if}
+        {#if $binaryStatus.ffprobe_path}
+          <p class="path">{$binaryStatus.ffprobe_path}</p>
+        {/if}
+        {#if !$binaryStatus.ffprobe_found}
+          <p class="update-message update-error">Required for merging and embedding. Use Automatic Setup to install it.</p>
         {/if}
       </div>
 
@@ -207,6 +240,11 @@
 
   .binary-card-header h3 {
     margin-bottom: 0;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: var(--spacing-sm);
   }
 
   .btn-sm {

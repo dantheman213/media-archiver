@@ -5,6 +5,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { toggleGlobalPause, settings, initializeSettings } from '../stores/settings';
+  import { initializeDownloadDefaults } from '../stores/downloadDefaults';
   import { selectedJobId, removeJob, jobs } from '../stores/queue';
   import { checkBinaries, binaryCheckState, checkYtDlpUpdate, performYtDlpUpdate, ytdlpUpdateInfo, ytdlpUpdating } from '../stores/binaries';
   import { loadHistory, preloadRecentThumbnails } from '../stores/history';
@@ -59,6 +60,7 @@
   onMount(async () => {
     checkBinaries();
     initializeSettings();
+    initializeDownloadDefaults();
     await loadHistory();
     preloadRecentThumbnails(10); // fire-and-forget; makes History tab feel instant
     loadMetadataCache();
