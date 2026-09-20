@@ -1,10 +1,13 @@
 use crate::emit_error;
+use chrono::Local;
 use serde::Serialize;
 use std::process::Stdio;
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter};
-use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::fs::OpenOptions;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, Command};
+use tokio::sync::Mutex as AsyncMutex;
 
 /// How many trailing stderr lines to retain for error reporting.
 const STDERR_TAIL_LINES: usize = 30;
@@ -17,6 +20,74 @@ pub struct ProcessEvent {
     pub job_id: String,
     pub event_type: String, // "stdout", "stderr", "exit", "error"
     pub payload: String,
+}
+
+/// Writes the raw stdout/stderr of a single ingestion to a per-job log file so
+/// failures can be diagnosed even when the UI only shows a generic error.
+#[derive(Clone)]
+pub struct JobLogger {
+    file: Arc<AsyncMutex<tokio::fs::File>>,
+}
+
+impl JobLogger {
+    async fn create(
+        app: &AppHandle,
+        job_id: &str,
+        label: Option<&str>,
+        command: &Command,
+    ) -> Option<Self> {
+        let dir = crate::commands::logs::logs_dir(app);
+        tokio::fs::create_dir_all(&dir).await.ok()?;
+
+        let path = dir.join(format!("{}.log", job_id));
+        let mut file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&path)
+            .await
+            .ok()?;
+
+        let program = command.as_std().get_program().to_string_lossy().to_string();
+        let args = command
+            .as_std()
+            .get_args()
+            .map(|a| a.to_string_lossy().to_string())
+            .collect::<Vec<_>>()
+            .join(" ");
+
+        let mut header = String::new();
+        header.push_str("==================================================\n");
+        header.push_str("Media Archiver ingestion log\n");
+        header.push_str(&format!("job_id : {}\n", job_id));
+        header.push_str(&format!(
+            "started: {}\n",
+            Local::now().format("%Y-%m-%d %H:%M:%S")
+        ));
+        if let Some(label) = label {
+            header.push_str(&format!("source : {}\n", label));
+        }
+        header.push_str(&format!("command: {} {}\n", program, args));
+        header.push_str("==================================================\n");
+
+        file.write_all(header.as_bytes()).await.ok()?;
+
+        Some(Self {
+            file: Arc::new(AsyncMutex::new(file)),
+        })
+    }
+
+    async fn write(&self, stream: &str, line: &str) {
+        let mut file = self.file.lock().await;
+        let _ = file
+            .write_all(format!("[{}] {}\n", stream, line).as_bytes())
+            .await;
+    }
+
+    /// Write a plain line without a stream prefix (used for headers/footers).
+    pub async fn note(&self, text: &str) {
+        let mut file = self.file.lock().await;
+        let _ = file.write_all(format!("{}\n", text).as_bytes()).await;
+    }
 }
 
 pub struct ProcessManager {
@@ -32,9 +103,17 @@ impl ProcessManager {
         &self,
         job_id: String,
         mut command: Command,
-    ) -> Result<(Child, StderrTail), String> {
+        log_label: Option<String>,
+        collect_logs: bool,
+    ) -> Result<(Child, StderrTail, Option<JobLogger>), String> {
         command.stdout(Stdio::piped());
         command.stderr(Stdio::piped());
+
+        let logger = if collect_logs {
+            JobLogger::create(&self.app_handle, &job_id, log_label.as_deref(), &command).await
+        } else {
+            None
+        };
 
         let mut child = command.spawn().map_err(|e| {
             let msg = format!("Failed to spawn process for job {}: {}", job_id, e);
@@ -51,9 +130,13 @@ impl ProcessManager {
 
         let app_handle_clone = self.app_handle.clone();
         let job_id_clone = job_id.clone();
+        let stdout_logger = logger.clone();
         tokio::spawn(async move {
             let mut reader = BufReader::new(stdout).lines();
             while let Ok(Some(line)) = reader.next_line().await {
+                if let Some(ref logger) = stdout_logger {
+                    logger.write("stdout", &line).await;
+                }
                 let _ = app_handle_clone.emit(
                     &format!("process-event-{}", job_id_clone),
                     ProcessEvent {
@@ -68,9 +151,13 @@ impl ProcessManager {
         let app_handle_clone2 = self.app_handle.clone();
         let job_id_clone2 = job_id.clone();
         let stderr_tail_clone = stderr_tail.clone();
+        let stderr_logger = logger.clone();
         tokio::spawn(async move {
             let mut reader = BufReader::new(stderr).lines();
             while let Ok(Some(line)) = reader.next_line().await {
+                if let Some(ref logger) = stderr_logger {
+                    logger.write("stderr", &line).await;
+                }
                 // Keep a bounded tail of stderr for error reporting.
                 if let Ok(mut buf) = stderr_tail_clone.lock() {
                     buf.push(line.clone());
@@ -90,6 +177,6 @@ impl ProcessManager {
             }
         });
 
-        Ok((child, stderr_tail))
+        Ok((child, stderr_tail, logger))
     }
 }

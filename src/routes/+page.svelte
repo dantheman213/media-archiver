@@ -17,12 +17,14 @@
   import { get } from 'svelte/store';
   import { settings } from '../stores/settings';
   import { binaryCheckState, binaryStatus } from '../stores/binaries';
-  import { addHistoryRecord } from '../stores/history';
+  import { addHistoryRecord, updateHistoryRecord, history } from '../stores/history';
   import { getCachedMetadata, cacheMetadata } from '../stores/metadataCache';
-  import type { MediaJob, MediaMetadata, HistoryRecord } from '../types';
+  import type { MediaJob, MediaMetadata, HistoryRecord, JobStatus } from '../types';
   import MediaCard from '../components/MediaCard.svelte';
   import InspectorPanel from '../components/InspectorPanel.svelte';
   import { buildCommandFromJob } from '../lib/ytdlpCommand';
+  import { describeJobConfig } from '../lib/settingsSummary';
+  import { isThumbnailEmbeddable } from '../lib/thumbnail';
 
   interface ProcessEvent {
     job_id: string;
@@ -35,6 +37,9 @@
 
   // Track locally cached thumbnail paths
   const cachedThumbnailPaths = new Map<string, string>();
+
+  // Job ids whose final file size has already been looked up.
+  const sizeFetched = new Set<string>();
 
   /** Build a human-readable format label from job config */
   function buildFormatLabel(job: MediaJob): string {
@@ -50,23 +55,67 @@
     return `${fmt} - ${qLabel}`;
   }
 
-  /** Create a HistoryRecord from a completed job */
-  function buildHistoryRecord(job: MediaJob): HistoryRecord {
-    return {
+  /**
+   * Create or update the history record for a job at its current lifecycle
+   * state. Invoked as soon as a job is added (queued/inspecting) and on every
+   * status or metadata change, so in-progress and failed downloads are tracked
+   * too — not just completed ones.
+   */
+  function syncHistoryRecord(job: MediaJob, statusOverride?: JobStatus): void {
+    const existing = get(history).find((r) => r.id === job.id);
+    const now = new Date().toISOString();
+    const status = statusOverride ?? job.status;
+    const terminal = status === 'completed' || status === 'error';
+    const wasTerminal = existing ? existing.status === 'completed' || existing.status === 'error' : false;
+
+    const record: HistoryRecord = {
       id: job.id,
       url: job.url,
-      title: job.metadata?.title ?? job.url,
-      uploader: job.metadata?.uploader ?? '',
-      thumbnailUrl: job.metadata?.thumbnailUrl ?? '',
-      cachedThumbnailPath: cachedThumbnailPaths.get(job.id),
-      durationSeconds: job.metadata?.durationSeconds ?? 0,
-      extractor: job.metadata?.extractor ?? '',
-      filePath: resolvedFilePaths.get(job.id) ?? '',
-      completedAt: new Date().toISOString(),
+      title: job.metadata?.title || existing?.title || job.url,
+      uploader: job.metadata?.uploader ?? existing?.uploader ?? '',
+      thumbnailUrl: job.metadata?.thumbnailUrl ?? existing?.thumbnailUrl ?? '',
+      cachedThumbnailPath: cachedThumbnailPaths.get(job.id) ?? existing?.cachedThumbnailPath,
+      durationSeconds: job.metadata?.durationSeconds ?? existing?.durationSeconds ?? 0,
+      extractor: job.metadata?.extractor ?? existing?.extractor ?? '',
+      filePath: resolvedFilePaths.get(job.id) ?? existing?.filePath ?? '',
+      fileSize: existing?.fileSize,
+      status,
+      addedAt: existing?.addedAt ?? now,
+      completedAt: terminal
+        ? (wasTerminal && existing ? existing.completedAt : now)
+        : (existing?.completedAt ?? now),
+      errorMessage: status === 'error' ? job.errorMessage : undefined,
       workflow: job.config.workflow,
       formatLabel: buildFormatLabel(job),
     };
+
+    if (existing) {
+      void updateHistoryRecord(job.id, record);
+    } else {
+      void addHistoryRecord(record);
+    }
+
+    // Fill in the file size once the download has finished.
+    if (status === 'completed' && record.filePath && record.fileSize == null && !sizeFetched.has(job.id)) {
+      sizeFetched.add(job.id);
+      invoke<number>('get_file_size', { path: record.filePath })
+        .then((size) => updateHistoryRecord(job.id, { fileSize: size }))
+        .catch(() => { /* non-critical */ });
+    }
   }
+
+  // Keep history in sync with the queue: whenever a tracked field changes
+  // (status, metadata, error), upsert the corresponding history record. The
+  // signature guard avoids rewriting history on every progress tick.
+  let historySyncKey = '';
+  $effect(() => {
+    const key = $jobs
+      .map((j) => `${j.id}|${j.status}|${j.metadata?.title ?? ''}|${j.metadata?.thumbnailUrl ?? ''}|${j.errorMessage ?? ''}`)
+      .join(';');
+    if (key === historySyncKey) return;
+    historySyncKey = key;
+    for (const job of $jobs) syncHistoryRecord(job);
+  });
 
   // Comprehensive error message humanization
   const errorMappings: { match: string; message: string }[] = [
@@ -86,7 +135,10 @@
     for (const { match, message } of errorMappings) {
       if (raw.includes(match)) return message;
     }
-    return raw.length > 200 ? raw.substring(0, 200) + '...' : raw;
+    if (raw.length <= 400) return raw;
+    // Keep the head for context and the tail, where yt-dlp/ffmpeg place the
+    // actual failure (e.g. the offending output file path).
+    return raw.substring(0, 120) + '\n…\n' + raw.substring(raw.length - 300);
   }
 
   // Map of active process event listeners (jobId -> unlisten fn)
@@ -130,23 +182,32 @@
       } else if (event_type === 'exit') {
         updateJobProgress(jobId, { percentage: 100, currentStep: '' });
         updateJobStatus(jobId, 'completed');
-        // Save to persistent history
+        // Sync history synchronously, while the resolved output path is still
+        // cached (it is cleared immediately below).
         const completedJob = $jobs.find(j => j.id === jobId);
         if (completedJob) {
-          addHistoryRecord(buildHistoryRecord(completedJob));
+          syncHistoryRecord({ ...completedJob, status: 'completed' });
         }
         resolvedFilePaths.delete(jobId);
         cachedThumbnailPaths.delete(jobId);
         cleanupListener(jobId);
       } else if (event_type === 'error') {
-        updateJobStatus(jobId, 'error', humanizeError(payload));
+        const message = humanizeError(payload);
+        updateJobStatus(jobId, 'error', message);
+        // Record the failure in history so failed downloads are still tracked.
+        const failedJob = $jobs.find(j => j.id === jobId);
+        if (failedJob) {
+          syncHistoryRecord({ ...failedJob, status: 'error', errorMessage: message });
+        }
         cleanupListener(jobId);
       } else if (event_type === 'stderr') {
-        // yt-dlp often writes progress to stderr; also capture errors
+        // yt-dlp often writes progress to stderr; also capture errors.
+        // Surface the error immediately but keep listening: the terminal
+        // `error` event carries a richer stderr tail (verbose ffmpeg output),
+        // and tearing the listener down here would drop it.
         if (payload.includes('ERROR')) {
           const raw = payload.replace(/^.*ERROR:\s*/, '');
           updateJobStatus(jobId, 'error', humanizeError(raw));
-          cleanupListener(jobId);
         }
       }
     });
@@ -161,6 +222,8 @@
 
   let urlInput = $state('');
   let urlInputEl: HTMLInputElement | undefined = $state(undefined);
+  // URLs from a multi-URL paste awaiting confirmation before queuing.
+  let pendingUrls: string[] | null = $state(null);
   let diskAvailable = $state<number | null>(null);
   let diskTotal = $state<number | null>(null);
   let dragOver = $state(false);
@@ -208,23 +271,27 @@
   }
 
   /**
-   * Default Add: queue immediately using the remembered download defaults
+   * Queue a single URL immediately using the remembered download defaults
    * (or a fresh default config on first run), fetching metadata in the
    * background so the card/history fill in without blocking the download.
    */
-  function handleQuickAdd() {
-    const url = takeUrlInput();
-    if (!url) return;
-
+  function queueUrlWithDefaults(url: string) {
     const cfg = get(downloadDefaults) ?? defaultConfig();
-    const id = addJob(url, true); // status 'queued'
+    // Add as 'inspecting' so the download waits for metadata: the selected
+    // thumbnail's format decides whether yt-dlp can safely embed it (see
+    // isThumbnailEmbeddable).
+    const id = addJob(url);
     updateJobConfig(id, cfg);
 
     const cached = getCachedMetadata(url);
     if (cached) {
       updateJobMetadata(id, cached);
-    } else {
-      invoke('fetch_metadata', { url }).then((metadata) => {
+      updateJobStatus(id, 'queued');
+      return;
+    }
+
+    invoke('fetch_metadata', { url })
+      .then((metadata) => {
         updateJobMetadata(id, metadata as MediaMetadata);
         cacheMetadata(url, metadata as MediaMetadata);
         const thumb = (metadata as MediaMetadata).thumbnailUrl;
@@ -233,7 +300,40 @@
             cachedThumbnailPaths.set(id, localPath as string);
           }).catch(() => { /* non-critical */ });
         }
-      }).catch(() => { /* non-critical; download still proceeds */ });
+      })
+      .catch(() => { /* non-critical; download still proceeds */ })
+      .finally(() => updateJobStatus(id, 'queued'));
+  }
+
+  /** Default Add: queue the current input with the remembered defaults. */
+  function handleQuickAdd() {
+    const url = takeUrlInput();
+    if (!url) return;
+    queueUrlWithDefaults(url);
+  }
+
+  /**
+   * Detect a pasted list of URLs. The text is stripped of surrounding
+   * whitespace and split on any run of whitespace (spaces, tabs, newlines);
+   * if every resulting token is a valid http(s) URL and there is more than
+   * one, the individual URLs are returned. Otherwise null, so ordinary text
+   * pastes fall through untouched.
+   */
+  function parseUrlList(text: string): string[] | null {
+    const tokens = text.trim().split(/\s+/).filter(Boolean);
+    if (tokens.length < 2) return null;
+    if (!tokens.every((token) => isValidUrl(token))) return null;
+    return tokens;
+  }
+
+  function handleInputPaste(e: ClipboardEvent) {
+    const text = e.clipboardData?.getData('text') ?? '';
+    if (!text) return;
+    const urls = parseUrlList(text);
+    if (urls) {
+      // Take over the paste: confirm before queuing the whole list.
+      e.preventDefault();
+      pendingUrls = urls;
     }
   }
 
@@ -285,6 +385,19 @@
     }
   }
 
+  /** Confirm a multi-URL paste: queue every URL with the default Add options. */
+  function confirmBulkAdd() {
+    if (!pendingUrls || $binaryCheckState !== 'done') return;
+    const urls = pendingUrls;
+    pendingUrls = null;
+    urlInput = '';
+    for (const url of urls) queueUrlWithDefaults(url);
+  }
+
+  function cancelBulkAdd() {
+    pendingUrls = null;
+  }
+
   // -------------------------------------------------------------------------
   // Drag and drop
   // -------------------------------------------------------------------------
@@ -333,6 +446,12 @@
   // -------------------------------------------------------------------------
 
   function handleGlobalKeydown(e: KeyboardEvent) {
+    if (pendingUrls && e.key === 'Escape') {
+      e.preventDefault();
+      cancelBulkAdd();
+      return;
+    }
+
     // Don't handle if already in an input
     const tag = (e.target as HTMLElement)?.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
@@ -342,6 +461,11 @@
       urlInputEl?.focus();
       // Read clipboard and populate
       navigator.clipboard.readText().then((text) => {
+        const urls = parseUrlList(text);
+        if (urls) {
+          pendingUrls = urls;
+          return;
+        }
         const trimmed = text.trim();
         if (trimmed && isValidUrl(trimmed)) {
           urlInput = trimmed;
@@ -374,6 +498,14 @@
   );
 
   let nonCompletedJobs = $derived($jobs.filter((j) => j.status !== 'completed'));
+
+  // Settings the default "Add" button will use (the remembered defaults, or a
+  // fresh default config on first run). Shown beneath the URL input.
+  let quickAddSummary = $derived(
+    describeJobConfig($downloadDefaults ?? defaultConfig())
+      .map((row) => `${row.label}: ${row.value}`)
+      .join(' | ')
+  );
 
   // Context menu
   let contextMenu = $state<{ x: number; y: number; cmd: string; job: MediaJob } | null>(null);
@@ -462,11 +594,14 @@
           audioQuality: job.config.audioOnlyConfig?.quality,
           embedSubtitles: job.config.embedSubtitles,
           embedMetadata: job.config.embedMetadata,
-          embedThumbnail: job.config.embedThumbnail,
+          // yt-dlp can't embed thumbnails it has to convert with ffmpeg's
+          // image2 demuxer (e.g. AVIF) — skip embedding rather than fail.
+          embedThumbnail: job.config.embedThumbnail && isThumbnailEmbeddable(job.metadata?.thumbnailUrl),
           trimStart: job.config.trim?.start,
           trimEnd: job.config.trim?.end,
           useImpersonateChrome: $settings.useImpersonateChrome,
           useNoCookies: $settings.useNoCookies,
+          collectLogs: $settings.collectLogs,
         },
       });
     } catch (err) {
@@ -499,6 +634,7 @@
           placeholder="Paste a URL to download... (Ctrl+V)"
           bind:value={urlInput}
           onkeydown={handleInputKeydown}
+          onpaste={handleInputPaste}
           disabled={$binaryCheckState !== 'done'}
         />
         <button
@@ -523,19 +659,22 @@
         <div class="drop-overlay">Drop URL here</div>
       {/if}
 
-      <!-- Disk space indicator -->
+      <!-- Default settings + disk space -->
       <div class="input-meta">
-        {#if diskAvailable !== null}
-          <span class="disk-info" class:disk-warning={hasLargeSizeWarning()}>
-            {formatBytes(diskAvailable)} free
-            {#if diskTotal !== null}
-              of {formatBytes(diskTotal)}
-            {/if}
-          </span>
-        {/if}
-        {#if hasLargeSizeWarning()}
-          <span class="disk-warning-text">Low disk space!</span>
-        {/if}
+        <span class="defaults-summary">{quickAddSummary}</span>
+        <div class="input-meta-right">
+          {#if diskAvailable !== null}
+            <span class="disk-info" class:disk-warning={hasLargeSizeWarning()}>
+              {formatBytes(diskAvailable)} free
+              {#if diskTotal !== null}
+                of {formatBytes(diskTotal)}
+              {/if}
+            </span>
+          {/if}
+          {#if hasLargeSizeWarning()}
+            <span class="disk-warning-text">Low disk space!</span>
+          {/if}
+        </div>
       </div>
     </div>
 
@@ -626,7 +765,7 @@
     role="menu"
   >
     <li class="context-menu-item" role="menuitem" onclick={copyYtDlpCommand}>
-      Copy yt-dlp Command
+      Copy yt-dlp command
     </li>
     <li class="context-menu-item" role="menuitem" onclick={() => { navigator.clipboard.writeText(contextMenu!.job.url); closeContextMenu(); }}>
       Copy source URL
@@ -637,6 +776,34 @@
       </li>
     {/if}
   </ul>
+{/if}
+
+{#if pendingUrls}
+  <div class="bulk-overlay" role="presentation" onclick={cancelBulkAdd}>
+    <div
+      class="bulk-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="bulk-dialog-title"
+      tabindex="-1"
+      onclick={(e) => e.stopPropagation()}
+      onkeydown={(e) => e.key === 'Escape' && cancelBulkAdd()}
+    >
+      <h3 id="bulk-dialog-title">Add {pendingUrls.length} URLs?</h3>
+      <p class="bulk-desc">
+        These links will be queued with your default settings: {quickAddSummary}
+      </p>
+      <ul class="bulk-list">
+        {#each pendingUrls as url}
+          <li title={url}>{url}</li>
+        {/each}
+      </ul>
+      <div class="bulk-actions">
+        <button class="btn-secondary" onclick={cancelBulkAdd}>Cancel</button>
+        <button class="btn-primary" onclick={confirmBulkAdd}>Add All ({pendingUrls.length})</button>
+      </div>
+    </div>
+  </div>
 {/if}
 
 {#if copiedCmd}
@@ -771,9 +938,26 @@
   .input-meta {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--spacing-sm);
     margin-top: var(--spacing-xs);
     padding: 0 var(--spacing-xs);
+  }
+
+  .defaults-summary {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .input-meta-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
   }
 
   .disk-info {
@@ -957,5 +1141,87 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     pointer-events: none;
     z-index: 1001;
+  }
+
+  /* Multi-URL paste confirmation dialog */
+  .bulk-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: var(--spacing-lg);
+  }
+
+  .bulk-dialog {
+    background-color: var(--bg-surface);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    padding: var(--spacing-lg);
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .bulk-dialog h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .bulk-desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .bulk-list {
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-color);
+    padding: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .bulk-list li {
+    font-size: 0.8rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bulk-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+  }
+
+  .bulk-actions .btn-secondary {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 0.15s, color 0.15s;
+  }
+
+  .bulk-actions .btn-secondary:hover {
+    background-color: var(--bg-surface-hover);
+    color: var(--text-color);
   }
 </style>

@@ -1,9 +1,20 @@
+# v0.9.13
+
+* Track downloads in History as soon as they are added, including in-progress and failed ones
+* Fixed a postprocessing error caused by ffmpeg quality arguments being applied to every postprocessor
+* Fixed copied yt-dlp commands failing in PowerShell due to unquoted output templates and URLs
+* Skip thumbnail embedding for formats yt-dlp cannot convert (e.g. AVIF) instead of failing the download
+* Added optional per-download technical logs with open/delete and retention controls in Settings
+* Show the default "Add" settings beneath the URL input
+* Renamed "Copy yt-dlp Command" to "Copy yt-dlp command"
+
 # v0.9.12
 
 * Sanitize custom file names, removing/replacing characters that are invalid in real filenames
 * Added an optional "File Name" field in Configure Download to rename the output file
 * Renamed "Download Folder" to "Output Folder" in Configure Download
 * Added a Bulk Add mode toggle that queues new URLs instantly using the last used download settings
+* Pasting a list of URLs now prompts to add them all at once using the default Add settings
 * "Copy yt-dlp Command" now uses the full binary paths (yt-dlp and ffmpeg)
 
 # v0.9.2

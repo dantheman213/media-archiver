@@ -32,7 +32,15 @@ export async function loadHistory(): Promise<void> {
   try {
     const raw: string | null = await invoke('load_json', { key: STORAGE_KEY });
     if (raw) {
-      const records: HistoryRecord[] = JSON.parse(raw);
+      const parsed: Partial<HistoryRecord>[] = JSON.parse(raw);
+      // Backfill fields added after records were first persisted: older
+      // entries were only written on completion, so they default to
+      // 'completed' with their completion time as the added time.
+      const records: HistoryRecord[] = parsed.map((r) => ({
+        ...(r as HistoryRecord),
+        status: r.status ?? 'completed',
+        addedAt: r.addedAt ?? r.completedAt ?? new Date().toISOString(),
+      }));
       history.set(records);
     }
   } catch (e) {

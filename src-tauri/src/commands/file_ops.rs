@@ -1,16 +1,11 @@
 use std::path::Path;
 
-#[tauri::command]
-pub async fn open_file(path: String) -> Result<(), String> {
-    let p = Path::new(&path);
-    if !p.exists() {
-        return Err("File not found".to_string());
-    }
-
+/// Open a file or folder with the operating system's default handler.
+pub fn open_path_in_os(path: &str) -> Result<(), String> {
     #[cfg(target_os = "windows")]
     {
         std::process::Command::new("cmd")
-            .args(["/C", "start", "", &path])
+            .args(["/C", "start", "", path])
             .spawn()
             .map_err(|e| format!("Failed to open file: {}", e))?;
     }
@@ -18,7 +13,7 @@ pub async fn open_file(path: String) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     {
         std::process::Command::new("open")
-            .arg(&path)
+            .arg(path)
             .spawn()
             .map_err(|e| format!("Failed to open file: {}", e))?;
     }
@@ -26,12 +21,22 @@ pub async fn open_file(path: String) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         std::process::Command::new("xdg-open")
-            .arg(&path)
+            .arg(path)
             .spawn()
             .map_err(|e| format!("Failed to open file: {}", e))?;
     }
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn open_file(path: String) -> Result<(), String> {
+    let p = Path::new(&path);
+    if !p.exists() {
+        return Err("File not found".to_string());
+    }
+
+    open_path_in_os(&path)
 }
 
 #[tauri::command]

@@ -1,8 +1,19 @@
 import type { MediaJob, HistoryRecord } from '../types';
 import { sanitizeFilename } from './sanitizeFilename';
+import { isThumbnailEmbeddable } from './thumbnail';
+
+/**
+ * Characters that a shell (cmd.exe / PowerShell) would otherwise interpret —
+ * whitespace, quotes, yt-dlp output-template `%(...)s`, redirection, pipes,
+ * `&` (URL query separators), etc. Arguments containing any of these must be
+ * quoted so the copied command runs correctly when pasted into a terminal.
+ */
+const SHELL_SPECIAL = /[\s"'`()%&|<>^*!;,#]/;
 
 function quoteArg(s: string): string {
-  return s.includes(' ') ? `"${s}"` : s;
+  if (!SHELL_SPECIAL.test(s)) return s;
+  // Escape embedded double quotes so the argument survives a copy/paste.
+  return `"${s.replace(/"/g, '\\"')}"`;
 }
 
 /** Directory containing the ffmpeg binary (so yt-dlp also finds ffprobe). */
@@ -32,7 +43,9 @@ export function buildCommandFromJob(
     parts.push('--ffmpeg-location', quoteArg(ffmpegLocation(ffmpegPath)));
   }
 
-  // Collected into a single --postprocessor-args (repeated ones override).
+  // Extra ffmpeg args, keyed to the postprocessor they belong to. An unkeyed
+  // value is handed to *every* postprocessor, which can break thumbnail or
+  // metadata embedding; always name the target postprocessor.
   const ppArgs: string[] = [];
 
   if (job.config.workflow === 'audio_only') {
@@ -48,7 +61,7 @@ export function buildCommandFromJob(
     parts.push('--merge-output-format', fmt);
     const q = job.config.videoTranscode?.quality ?? 'balanced';
     const crf = q === 'best' ? '18' : q === 'balanced' ? '23' : '28';
-    ppArgs.push(`-crf ${crf}`);
+    ppArgs.push(`VideoConvertor:-crf ${crf}`);
   }
 
   if (job.config.embedSubtitles) {
@@ -57,7 +70,7 @@ export function buildCommandFromJob(
   if (job.config.embedMetadata) {
     parts.push('--embed-metadata');
   }
-  if (job.config.embedThumbnail) {
+  if (job.config.embedThumbnail && isThumbnailEmbeddable(job.metadata?.thumbnailUrl)) {
     parts.push('--embed-thumbnail');
   }
 
@@ -69,8 +82,8 @@ export function buildCommandFromJob(
     parts.push('--force-keyframes-at-cuts');
   }
 
-  if (ppArgs.length > 0) {
-    parts.push('--postprocessor-args', quoteArg(ppArgs.join(' ')));
+  for (const pp of ppArgs) {
+    parts.push('--postprocessor-args', quoteArg(pp));
   }
 
   if (useImpersonateChrome) {
@@ -114,12 +127,14 @@ export function buildCommandFromHistory(
     parts.push('-f', quoteArg('bestvideo+bestaudio/best'));
     parts.push('--merge-output-format', fmt || 'mp4');
     const crf = q === 'best' ? '18' : q === 'balanced' ? '23' : '28';
-    parts.push('--postprocessor-args', quoteArg(`-crf ${crf}`));
+    parts.push('--postprocessor-args', quoteArg(`VideoConvertor:-crf ${crf}`));
   }
 
   // History doesn't store embed options; use the same defaults as download.rs
   parts.push('--embed-metadata');
-  parts.push('--embed-thumbnail');
+  if (isThumbnailEmbeddable(record.thumbnailUrl)) {
+    parts.push('--embed-thumbnail');
+  }
 
   parts.push(quoteArg(record.url));
   return parts.join(' ');

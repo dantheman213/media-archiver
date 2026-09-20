@@ -5,7 +5,7 @@
   import { history, clearHistory, removeHistoryRecord, updateHistoryRecord } from '../../stores/history';
   import { settings } from '../../stores/settings';
   import { binaryStatus } from '../../stores/binaries';
-  import type { HistoryRecord } from '../../types';
+  import type { HistoryRecord, HistoryStatus } from '../../types';
   import { buildCommandFromHistory } from '../../lib/ytdlpCommand';
   import { describeHistoryRecord } from '../../lib/settingsSummary';
 
@@ -59,7 +59,7 @@
   async function checkFilesExist() {
     const map: Record<string, boolean> = {};
     const checks = records
-      .filter(r => r.filePath)
+      .filter(r => isCompleted(r) && r.filePath)
       .map(async (r) => {
         try {
           const exists: boolean = await invoke('check_file_exists', { path: r.filePath });
@@ -70,6 +70,27 @@
       });
     await Promise.all(checks);
     fileExistsMap = map;
+  }
+
+  // Status presentation for tracked downloads (including in-progress/failed).
+  const statusMeta: Record<HistoryStatus, { label: string; className: string }> = {
+    inspecting: { label: 'Checking', className: 'status-pending' },
+    configuring: { label: 'Setup', className: 'status-pending' },
+    queued: { label: 'Queued', className: 'status-pending' },
+    paused: { label: 'Paused', className: 'status-warning' },
+    downloading: { label: 'Downloading', className: 'status-active' },
+    processing: { label: 'Processing', className: 'status-active' },
+    completed: { label: 'Completed', className: 'status-success' },
+    error: { label: 'Failed', className: 'status-error' },
+  };
+
+  /** Records persisted before status tracking default to 'completed'. */
+  function recordStatus(record: HistoryRecord): HistoryStatus {
+    return record.status ?? 'completed';
+  }
+
+  function isCompleted(record: HistoryRecord): boolean {
+    return recordStatus(record) === 'completed';
   }
 
   function formatDuration(seconds: number): string {
@@ -237,8 +258,8 @@
 
   {#if records.length === 0}
     <div class="empty-state">
-      <p>No completed downloads yet.</p>
-      <p class="hint">Completed downloads will appear here and persist across sessions.</p>
+      <p>Nothing here yet.</p>
+      <p class="hint">Downloads appear here as soon as you add them and persist across sessions.</p>
     </div>
   {:else if filteredAndSorted.length === 0}
     <div class="empty-state">
@@ -270,6 +291,9 @@
                 <span class="card-uploader">{record.uploader}</span>
               {/if}
               <div class="card-meta-row">
+                <span class="status-badge {statusMeta[recordStatus(record)].className}">
+                  {statusMeta[recordStatus(record)].label}
+                </span>
                 {#if record.extractor}
                   <span class="extractor-badge">{record.extractor}</span>
                 {/if}
@@ -288,13 +312,16 @@
                   </div>
                 {/each}
               </dl>
-              {#if record.filePath && !fileExists}
+              {#if isCompleted(record) && record.filePath && !fileExists}
                 <span class="file-missing">File moved or deleted</span>
+              {/if}
+              {#if recordStatus(record) === 'error' && record.errorMessage}
+                <span class="error-text" title={record.errorMessage}>{record.errorMessage}</span>
               {/if}
             </div>
           </div>
           <div class="card-actions">
-            {#if record.filePath && fileExists}
+            {#if isCompleted(record) && record.filePath && fileExists}
               <button class="btn-sm btn-action" onclick={() => handleOpen(record.filePath)} title="Open file">
                 Open
               </button>
@@ -320,7 +347,7 @@
     role="menu"
   >
     <li class="context-menu-item" role="menuitem" onclick={copyYtDlpCommand}>
-      Copy yt-dlp Command
+      Copy yt-dlp command
     </li>
   </ul>
 {/if}
@@ -521,6 +548,50 @@
     font-size: 0.7rem;
     color: var(--text-muted);
     text-transform: capitalize;
+  }
+
+  .status-badge {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .status-pending {
+    background-color: color-mix(in srgb, var(--text-muted) 15%, transparent);
+    color: var(--text-muted);
+  }
+
+  .status-active {
+    background-color: color-mix(in srgb, var(--primary-color) 15%, transparent);
+    color: var(--primary-color);
+  }
+
+  .status-success {
+    background-color: color-mix(in srgb, var(--success-color) 15%, transparent);
+    color: var(--success-color);
+  }
+
+  .status-warning {
+    background-color: color-mix(in srgb, var(--warning-color) 15%, transparent);
+    color: var(--warning-color);
+  }
+
+  .status-error {
+    background-color: color-mix(in srgb, var(--error-color) 15%, transparent);
+    color: var(--error-color);
+  }
+
+  .error-text {
+    font-size: 0.75rem;
+    color: var(--error-color);
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .size-label {

@@ -104,6 +104,16 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   line-height: 1.6;
+  /* Treat the UI like a native app: text is not selectable/copyable. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Inputs still need normal text selection for editing. */
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 a {

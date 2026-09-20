@@ -3,7 +3,7 @@ pub mod models;
 pub mod process_manager;
 
 use serde::Serialize;
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, Manager};
 
 #[derive(Clone, Serialize)]
 pub struct AppError {
@@ -33,6 +33,14 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        .setup(|app| {
+            // Evaluate the log rotation period once, when the app opens.
+            let handle = app.app_handle().clone();
+            tauri::async_runtime::spawn(async move {
+                commands::logs::run_startup_log_rotation(&handle).await;
+            });
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             greet,
             commands::binaries::check_binaries,
@@ -54,7 +62,9 @@ pub fn run() {
             commands::file_ops::open_file,
             commands::file_ops::show_in_folder,
             commands::file_ops::check_file_exists,
-            commands::file_ops::get_file_size
+            commands::file_ops::get_file_size,
+            commands::logs::open_logs_folder,
+            commands::logs::clear_logs
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

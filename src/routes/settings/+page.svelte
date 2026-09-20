@@ -13,6 +13,8 @@
     toggleCheckForYtDlpUpdates,
     toggleUseImpersonateChrome,
     toggleUseNoCookies,
+    toggleCollectLogs,
+    setLogRetentionHours,
   } from '../../stores/settings';
   import { clearHistory } from '../../stores/history';
   import { clearMetadataCache } from '../../stores/metadataCache';
@@ -21,6 +23,7 @@
   let confirmingClearHistory = $state(false);
   let confirmingClearCache = $state(false);
   let confirmingResetSettings = $state(false);
+  let confirmingClearLogs = $state(false);
 
   onMount(async () => {
     try {
@@ -59,6 +62,23 @@
   async function handleResetSettings() {
     await resetSettings();
     confirmingResetSettings = false;
+  }
+
+  async function handleOpenLogs() {
+    try {
+      await invoke('open_logs_folder');
+    } catch (e) {
+      console.error('Failed to open logs folder:', e);
+    }
+  }
+
+  async function handleClearLogs() {
+    try {
+      await invoke('clear_logs');
+    } catch (e) {
+      console.error('Failed to clear logs:', e);
+    }
+    confirmingClearLogs = false;
   }
 </script>
 
@@ -258,6 +278,73 @@
         </div>
       {:else}
         <button class="btn-destructive" onclick={() => confirmingResetSettings = true}>Reset All</button>
+      {/if}
+    </div>
+  </section>
+
+  <section class="settings-group">
+    <h3>Technical Logs</h3>
+
+    <div class="setting">
+      <div>
+        <span class="setting-label">Collect Technical Logs</span>
+        <span class="setting-desc">Save the stdout and stderr of each download for troubleshooting</span>
+      </div>
+      <button
+        class="toggle"
+        class:active={$settings.collectLogs}
+        onclick={toggleCollectLogs}
+        role="switch"
+        aria-checked={$settings.collectLogs}
+      >
+        {$settings.collectLogs ? 'On' : 'Off'}
+      </button>
+    </div>
+
+    <div class="setting">
+      <div>
+        <span class="setting-label">Log Folder</span>
+        <span class="setting-desc">Open the folder containing per-download technical logs for troubleshooting</span>
+      </div>
+      <button class="btn-link" onclick={handleOpenLogs}>Open Folder</button>
+    </div>
+
+    <label class="setting">
+      <div>
+        <span class="setting-label">Log Retention</span>
+        <span class="setting-desc">Delete logs older than this period when the app opens</span>
+      </div>
+      <div class="setting-control">
+        <select
+          class="select-input"
+          value={$settings.logRetentionHours}
+          onchange={(e) => setLogRetentionHours(parseInt(e.currentTarget.value))}
+        >
+          <option value={0}>Never delete</option>
+          <option value={1}>1 hour</option>
+          <option value={2}>2 hours</option>
+          <option value={6}>6 hours</option>
+          <option value={24}>1 day</option>
+          <option value={168}>7 days</option>
+          <option value={720}>30 days</option>
+          <option value={2160}>90 days</option>
+        </select>
+      </div>
+    </label>
+
+    <div class="setting">
+      <div>
+        <span class="setting-label">Delete Logs</span>
+        <span class="setting-desc">Remove all technical logs</span>
+      </div>
+      {#if confirmingClearLogs}
+        <div class="confirm-group">
+          <span class="confirm-label">Are you sure?</span>
+          <button class="btn-danger-sm" onclick={handleClearLogs}>Yes, Delete</button>
+          <button class="btn-cancel-sm" onclick={() => confirmingClearLogs = false}>Cancel</button>
+        </div>
+      {:else}
+        <button class="btn-destructive" onclick={() => confirmingClearLogs = true}>Delete Logs</button>
       {/if}
     </div>
   </section>

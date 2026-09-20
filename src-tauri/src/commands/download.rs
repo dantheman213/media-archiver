@@ -1,5 +1,6 @@
 use crate::commands::binaries::check_binaries;
 use crate::process_manager::{ProcessEvent, ProcessManager};
+use chrono::Local;
 use serde::Deserialize;
 use tauri::{AppHandle, Emitter};
 
@@ -58,6 +59,7 @@ pub struct DownloadConfig {
     pub trim_end: Option<String>,
     pub use_impersonate_chrome: Option<bool>,
     pub use_no_cookies: Option<bool>,
+    pub collect_logs: Option<bool>,
 }
 
 #[tauri::command]
@@ -69,11 +71,13 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
         .ok_or_else(|| "yt-dlp not found. Please install or configure it first.".to_string())?;
 
     let ffmpeg_path = status.ffmpeg_path;
+    let collect_logs = config.collect_logs.unwrap_or(true);
 
     let mut args: Vec<String> = Vec::new();
-    // Extra ffmpeg args collected for a SINGLE `--postprocessor-args`. yt-dlp
-    // keeps only the last unkeyed `--postprocessor-args`, so passing the option
-    // more than once silently drops earlier values — always combine here.
+    // Extra ffmpeg args, keyed to the postprocessor they belong to. An unkeyed
+    // `--postprocessor-args` value is handed to *every* postprocessor, which
+    // can break thumbnail/metadata embedding; always name the target PP (e.g.
+    // "VideoConvertor:-crf 18"). Keyed options may safely be repeated.
     let mut pp_args: Vec<String> = Vec::new();
 
     let output_path = if config.output_path.is_empty() {
@@ -107,6 +111,14 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
     // Print the final file path after all post-processing/moves
     args.push("--print".to_string());
     args.push("after_move:filepath".to_string());
+
+    // When technical logging is enabled, run yt-dlp verbosely. This is the only
+    // way to see the exact postprocessor/ffmpeg command line and ffmpeg's own
+    // stderr — the raw cause behind generic failures such as
+    // "Postprocessing: Error opening output files: Invalid argument".
+    if collect_logs {
+        args.push("--verbose".to_string());
+    }
 
     // Set ffmpeg location if available. Pass the *directory* containing the
     // binary (not the exe path) so yt-dlp also discovers ffprobe sitting next
@@ -153,14 +165,14 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
 
             if let Some(ref quality) = config.video_quality {
                 // Map quality preset to postprocessor CRF (applied when a
-                // re-encode occurs; combined into one --postprocessor-args below).
+                // re-encode occurs; scoped to VideoConvertor below).
                 let crf = match quality.as_str() {
                     "best" => "18",
                     "balanced" => "23",
                     "small_size" => "28",
                     _ => "23",
                 };
-                pp_args.push(format!("-crf {}", crf));
+                pp_args.push(format!("VideoConvertor:-crf {}", crf));
             }
         }
     }
@@ -200,10 +212,10 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
         args.push("--force-keyframes-at-cuts".to_string());
     }
 
-    // Emit any collected ffmpeg post-processor args as a single option.
-    if !pp_args.is_empty() {
+    // Emit each collected ffmpeg post-processor arg as its own keyed option.
+    for pp in &pp_args {
         args.push("--postprocessor-args".to_string());
-        args.push(pp_args.join(" "));
+        args.push(pp.clone());
     }
 
     // Optional yt-dlp flags from settings
@@ -219,6 +231,7 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
     args.push(config.url.clone());
 
     let job_id = config.job_id.clone();
+    let source_label = config.url.clone();
     let manager = ProcessManager::new(app.clone());
 
     let mut cmd = tokio::process::Command::new(&yt_dlp_path);
@@ -229,8 +242,8 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
         cmd.creation_flags(0x08000000);
     }
 
-    let (mut child, stderr_tail) = manager
-        .spawn(job_id.clone(), cmd)
+    let (mut child, stderr_tail, logger) = manager
+        .spawn(job_id.clone(), cmd, Some(source_label), collect_logs)
         .await
         .map_err(|e| format!("Failed to start download: {}", e))?;
 
@@ -249,15 +262,17 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
                     "0".to_string()
                 } else {
                     let code = exit_status.code().unwrap_or(-1);
-                    // Include the tail of stderr so the real yt-dlp/ffmpeg error
-                    // reaches the UI instead of a bare exit code.
+                    // Include a generous tail of stderr so the real
+                    // yt-dlp/ffmpeg error reaches the UI instead of a bare
+                    // exit code. Verbose mode adds the failing command plus the
+                    // ffmpeg stderr block, so allow enough lines to keep them.
                     let tail = stderr_tail
                         .lock()
                         .ok()
                         .map(|b| {
                             b.iter()
                                 .rev()
-                                .take(8)
+                                .take(20)
                                 .rev()
                                 .cloned()
                                 .collect::<Vec<_>>()
@@ -270,6 +285,27 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
                         format!("Download failed (exit code {}):\n{}", code, tail)
                     }
                 };
+
+                if let Some(ref logger) = logger {
+                    logger
+                        .note(&format!(
+                            "----- finished: {} -----",
+                            Local::now().format("%Y-%m-%d %H:%M:%S")
+                        ))
+                        .await;
+                    logger
+                        .note(&format!(
+                            "result: {} (exit code {})",
+                            if exit_status.success() {
+                                "success"
+                            } else {
+                                "failure"
+                            },
+                            exit_status.code().unwrap_or(-1)
+                        ))
+                        .await;
+                }
+
                 let _ = app_clone.emit(
                     &format!("process-event-{}", job_id_clone),
                     ProcessEvent {
@@ -280,6 +316,11 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
                 );
             }
             Err(e) => {
+                if let Some(ref logger) = logger {
+                    logger
+                        .note(&format!("result: failure (process error: {})", e))
+                        .await;
+                }
                 let _ = app_clone.emit(
                     &format!("process-event-{}", job_id_clone),
                     ProcessEvent {

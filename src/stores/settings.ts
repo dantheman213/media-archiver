@@ -17,6 +17,8 @@ const defaultSettings: GlobalSettings = {
   checkForYtDlpUpdates: true,
   useImpersonateChrome: true,
   useNoCookies: true,
+  collectLogs: true,
+  logRetentionHours: 720,
 };
 
 export const settings = writable<GlobalSettings>({ ...defaultSettings });
@@ -125,9 +127,19 @@ export function toggleUseNoCookies(): void {
   settings.update((s) => ({ ...s, useNoCookies: !s.useNoCookies }));
 }
 
+/** Toggle collection of per-download technical logs */
+export function toggleCollectLogs(): void {
+  settings.update((s) => ({ ...s, collectLogs: !s.collectLogs }));
+}
+
 /** Set the default download path */
 export function setDownloadPath(path: string): void {
   settings.update((s) => ({ ...s, downloadPath: path }));
+}
+
+/** Set the technical log retention period in hours (0 = never delete) */
+export function setLogRetentionHours(hours: number): void {
+  settings.update((s) => ({ ...s, logRetentionHours: hours }));
 }
 
 /** Reset all settings to defaults and clear persisted data */

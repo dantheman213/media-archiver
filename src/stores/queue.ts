@@ -1,5 +1,6 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import type { MediaJob, JobStatus, JobProgress, JobConfig, MediaMetadata } from '../types';
+import { removeHistoryRecord } from './history';
 
 // ---------------------------------------------------------------------------
 // Queue store – holds every MediaJob in the application
@@ -102,7 +103,14 @@ export function updateJobConfig(id: string, config: Partial<JobConfig>): void {
 
 /** Remove a job from the queue by id */
 export function removeJob(id: string): void {
+  const job = get(jobs).find((j) => j.id === id);
   jobs.update((current) => current.filter((job) => job.id !== id));
+  // Drop the in-progress history entry too, so removing a pending/failed job
+  // from the queue doesn't leave an orphaned "downloading" record behind.
+  // Completed/errored records are kept for the archive.
+  if (job && job.status !== 'completed' && job.status !== 'error') {
+    void removeHistoryRecord(id);
+  }
   // Clear selection if the removed job was selected
   selectedJobId.update((sel) => (sel === id ? null : sel));
 }

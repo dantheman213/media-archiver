@@ -29,4 +29,5 @@ pnpm-debug.log*
 /src-tauri/gen/schemas
 
 .claude/
+.devbot/
 CLAUDE.md

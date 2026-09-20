@@ -77,6 +77,8 @@ export interface GlobalSettings {
   checkForYtDlpUpdates: boolean;
   useImpersonateChrome: boolean;
   useNoCookies: boolean;
+  collectLogs: boolean;
+  logRetentionHours: number;
 }
 
 export interface HistoryRecord {
@@ -90,9 +92,23 @@ export interface HistoryRecord {
   extractor: string;
   filePath: string;             // Resolved output file path
   fileSize?: number;            // Actual bytes
-  completedAt: string;          // ISO 8601 timestamp
+  status: HistoryStatus;        // Lifecycle state of the download
+  addedAt: string;              // ISO 8601 timestamp when the download was added
+  completedAt: string;          // ISO 8601 timestamp of completion (or added time while pending)
+  errorMessage?: string;        // Failure reason when status is 'error'
   workflow: string;             // Workflow used: 'video_best', 'audio_only', 'custom'
   formatLabel: string;          // Human-readable: "MP4 - Best Quality"
 }
+
+/** Lifecycle state of a tracked download. */
+export type HistoryStatus =
+  | 'inspecting'   // Fetching metadata
+  | 'configuring'  // Waiting for the user to confirm settings
+  | 'queued'       // Waiting in the queue
+  | 'paused'       // Queue paused
+  | 'downloading'  // yt-dlp is downloading
+  | 'processing'   // ffmpeg is merging/converting
+  | 'completed'    // Finished successfully
+  | 'error';       // Failed
 
 export type NavRoute = 'queue' | 'history' | 'settings' | 'binaries';
