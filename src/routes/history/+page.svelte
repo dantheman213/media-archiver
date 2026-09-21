@@ -191,8 +191,8 @@
   }
 
   // Context menu
-  let contextMenu = $state<{ x: number; y: number; cmd: string } | null>(null);
-  let copiedCmd = $state(false);
+  let contextMenu = $state<{ x: number; y: number; cmd: string; url: string } | null>(null);
+  let copyToast = $state<string | null>(null);
   let copyTimeout: ReturnType<typeof setTimeout> | null = null;
 
   function openContextMenu(e: MouseEvent, record: HistoryRecord) {
@@ -203,21 +203,32 @@
       $binaryStatus?.yt_dlp_path,
       $binaryStatus?.ffmpeg_path,
     );
-    contextMenu = { x: e.clientX, y: e.clientY, cmd };
-    copiedCmd = false;
+    contextMenu = { x: e.clientX, y: e.clientY, cmd, url: record.url };
+    copyToast = null;
   }
 
   function closeContextMenu() {
     contextMenu = null;
   }
 
+  function showCopyToast(message: string) {
+    copyToast = message;
+    if (copyTimeout) clearTimeout(copyTimeout);
+    copyTimeout = setTimeout(() => { copyToast = null; }, 1500);
+  }
+
   async function copyYtDlpCommand() {
     if (!contextMenu) return;
     await navigator.clipboard.writeText(contextMenu.cmd);
     contextMenu = null;
-    copiedCmd = true;
-    if (copyTimeout) clearTimeout(copyTimeout);
-    copyTimeout = setTimeout(() => { copiedCmd = false; }, 1500);
+    showCopyToast('Command copied!');
+  }
+
+  async function copyUrl() {
+    if (!contextMenu) return;
+    await navigator.clipboard.writeText(contextMenu.url);
+    contextMenu = null;
+    showCopyToast('URL copied!');
   }
 
   function getThumbSrc(record: HistoryRecord): string {
@@ -346,14 +357,17 @@
     onkeydown={(e) => e.key === 'Escape' && closeContextMenu()}
     role="menu"
   >
+    <li class="context-menu-item" role="menuitem" onclick={copyUrl}>
+      Copy URL
+    </li>
     <li class="context-menu-item" role="menuitem" onclick={copyYtDlpCommand}>
       Copy yt-dlp command
     </li>
   </ul>
 {/if}
 
-{#if copiedCmd}
-  <div class="copy-toast">Command copied!</div>
+{#if copyToast}
+  <div class="copy-toast">{copyToast}</div>
 {/if}
 
 <style>
