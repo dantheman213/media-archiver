@@ -1,3 +1,10 @@
+# v0.9.14
+
+* Fixed "ffmpeg not found" downloads on Apple Silicon by installing native arm64 ffmpeg/ffprobe instead of Intel builds
+* Windows downloads now match the host CPU (native arm64 on Windows on ARM)
+* Linux now installs ffmpeg/ffprobe from the distro's package manager (with a graphical password prompt) instead of failing
+* Treat binaries that exist but cannot run (e.g. wrong CPU architecture, missing exec bit) as not found
+
 # v0.9.13
 
 * Track downloads in History as soon as they are added, including in-progress and failed ones

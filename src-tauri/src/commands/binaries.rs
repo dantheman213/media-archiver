@@ -190,6 +190,28 @@ pub fn check_binaries(app: AppHandle) -> BinaryStatus {
         .as_ref()
         .and_then(|p| get_version(p, &["--version"]));
 
+    // An executable can exist yet fail to run — most commonly an x86_64 build
+    // on Apple Silicon with no Rosetta ("bad CPU type in executable"), or a
+    // binary whose executable bit was lost. Reporting it as "Found" hides the
+    // problem until yt-dlp aborts mid-download with a confusing "ffmpeg not
+    // found" error. If the version probe cannot run it, treat it as missing so
+    // the UI prompts a reinstall/repair instead.
+    let (yt_dlp_found, yt_dlp_path) = if yt_dlp_version.is_none() {
+        (false, None)
+    } else {
+        (yt_dlp_found, yt_dlp_path)
+    };
+    let (ffmpeg_found, ffmpeg_path) = if ffmpeg_version.is_none() {
+        (false, None)
+    } else {
+        (ffmpeg_found, ffmpeg_path)
+    };
+    let (ffprobe_found, ffprobe_path) = if ffprobe_version.is_none() {
+        (false, None)
+    } else {
+        (ffprobe_found, ffprobe_path)
+    };
+
     BinaryStatus {
         yt_dlp_found,
         yt_dlp_path,
@@ -347,6 +369,138 @@ pub async fn update_ytdlp(app: AppHandle) -> Result<String, String> {
     }
 }
 
+/// Package managers we know how to drive, in probe order. Every common distro
+/// ships ffprobe inside the `ffmpeg` package, so one install covers both.
+#[cfg(target_os = "linux")]
+fn linux_ffmpeg_install() -> Option<(&'static str, Vec<&'static str>)> {
+    if which::which("apt-get").is_ok() {
+        Some(("apt-get", vec!["install", "-y", "ffmpeg"]))
+    } else if which::which("dnf").is_ok() {
+        Some(("dnf", vec!["install", "-y", "ffmpeg"]))
+    } else if which::which("yum").is_ok() {
+        Some(("yum", vec!["install", "-y", "ffmpeg"]))
+    } else if which::which("pacman").is_ok() {
+        Some(("pacman", vec!["-S", "--noconfirm", "ffmpeg"]))
+    } else if which::which("zypper").is_ok() {
+        Some(("zypper", vec!["--non-interactive", "install", "ffmpeg"]))
+    } else if which::which("apk").is_ok() {
+        Some(("apk", vec!["add", "--no-cache", "ffmpeg"]))
+    } else if which::which("xbps-install").is_ok() {
+        Some(("xbps-install", vec!["-y", "ffmpeg"]))
+    } else {
+        None
+    }
+}
+
+/// Install ffmpeg/ffprobe from the distro's own repositories. Native packages
+/// are built against the running system's C library, so this sidesteps the
+/// glibc-mismatch problem of handing out a prebuilt static binary.
+#[cfg(target_os = "linux")]
+async fn install_ffmpeg_linux(app: &AppHandle) -> Result<(), String> {
+    let (pm, args) = linux_ffmpeg_install().ok_or_else(|| {
+        "Couldn't detect a supported package manager. Install ffmpeg with your distro's \
+         package manager, then choose \"I Already Have These Tools\" to point Media Archiver at it."
+            .to_string()
+    })?;
+
+    let manual = format!("sudo {} {}", pm, args.join(" "));
+
+    // pkexec sanitises PATH and may not find the manager by bare name; resolve
+    // its absolute path once and use that everywhere we exec it.
+    let pm_path = which::which(pm)
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_else(|_| pm.to_string());
+
+    // A GUI app has no TTY, so `sudo` cannot prompt for a password. pkexec
+    // instead raises the desktop's graphical authentication dialog, which is
+    // the right tool here. Fall back to non-interactive sudo (passwordless
+    // sudo, or already root) and finally to running the manager directly.
+    let mut cmd = if which::which("pkexec").is_ok() {
+        let mut c = tokio::process::Command::new("pkexec");
+        c.arg(&pm_path);
+        c
+    } else if which::which("sudo").is_ok() {
+        let mut c = tokio::process::Command::new("sudo");
+        c.arg("-n").arg(&pm_path);
+        c
+    } else {
+        tokio::process::Command::new(&pm_path)
+    };
+    cmd.args(&args);
+
+    let _ = app.emit(
+        "download-progress",
+        ProgressPayload {
+            component: "ffmpeg-extract".to_string(),
+            progress: 0.0,
+        },
+    );
+
+    let output = cmd.output().await.map_err(|e| {
+        format!("Failed to run {pm}: {e}\n\nInstall ffmpeg manually:\n\n    {manual}")
+    })?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let detail = if stderr.trim().is_empty() {
+            stdout.trim()
+        } else {
+            stderr.trim()
+        };
+        let lower = detail.to_lowercase();
+
+        // Turn the most common failures into actionable guidance rather than a
+        // raw blob of package-manager output.
+        let hint = if lower.contains("password is required")
+            || lower.contains("no tty")
+            || lower.contains("authentication agent")
+            || lower.contains("not authorized")
+        {
+            format!(
+                "Media Archiver can't prompt for a password on this system. Run this in a \
+                 terminal, then try again:\n\n    {manual}"
+            )
+        } else if lower.contains("unable to locate package")
+            || lower.contains("no match for argument")
+        {
+            "Your package lists may be stale or the ffmpeg package may live in a third-party \
+             repository (e.g. RPM Fusion on Fedora, Packman on openSUSE). Refresh your lists or \
+             enable that repository, then try again."
+                .to_string()
+        } else if detail.is_empty() {
+            format!("No output from {pm}. Install ffmpeg manually:\n\n    {manual}")
+        } else {
+            format!("Install ffmpeg manually:\n\n    {manual}")
+        };
+
+        let mut msg = format!("Installing ffmpeg with {pm} failed");
+        if !detail.is_empty() {
+            msg.push_str(&format!(":\n{detail}"));
+        }
+        msg.push_str(&format!("\n\n{hint}"));
+        return Err(msg);
+    }
+
+    let _ = app.emit(
+        "download-progress",
+        ProgressPayload {
+            component: "ffmpeg-extract".to_string(),
+            progress: 1.0,
+        },
+    );
+
+    // Confirm the install actually produced a runnable ffmpeg/ffprobe.
+    if which::which("ffmpeg").is_err() || which::which("ffprobe").is_err() {
+        return Err(format!(
+            "{pm} reported success but ffmpeg/ffprobe still aren't on PATH. Install them \
+             manually:\n\n    {manual}"
+        ));
+    }
+
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
     let bin_dir = get_bin_dir(&app);
@@ -369,13 +523,39 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
     // Download yt-dlp
     download_file(&app, ytdlp_url, &yt_dlp_dest, "yt-dlp").await?;
 
-    // FFmpeg is harder, we'll download a simpler build
+    // FFmpeg is harder, we'll download a simpler build.
+    //
+    // macOS: evermeet.cx only publishes x86_64 builds and explicitly does not
+    // ship Apple Silicon binaries. Handing that Intel build to an M-series Mac
+    // produces an x86_64 executable that only runs through Rosetta; when Rosetta
+    // isn't installed, every invocation dies with "bad CPU type in executable".
+    // yt-dlp then can't find a *working* ffmpeg and aborts postprocessing with
+    // "ffmpeg not found. Please install or provide the path using
+    // --ffmpeg-location" — even though the file exists. ffmpeg-static publishes
+    // native, unarchived binaries for both architectures, so use it on macOS.
+    //
+    // Windows: BtbN publishes per-architecture zips. Match the host CPU so
+    // Windows on ARM gets a native winarm64 build instead of an emulated x64
+    // one. (BtbN no longer ships a 32-bit win32 build, and Tauri does not
+    // target 32-bit Windows, so x86_64 is the fallback.)
     #[cfg(target_os = "windows")]
-    let ffmpeg_url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip";
+    let ffmpeg_url = if cfg!(target_arch = "aarch64") {
+        "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-winarm64-gpl.zip"
+    } else {
+        "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip"
+    };
     #[cfg(target_os = "macos")]
-    let ffmpeg_url = "https://evermeet.cx/ffmpeg/getrelease/zip";
-    #[cfg(target_os = "linux")]
-    let ffmpeg_url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz";
+    let ffmpeg_url = if cfg!(target_arch = "aarch64") {
+        "https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-darwin-arm64"
+    } else {
+        "https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-darwin-x64"
+    };
+    #[cfg(target_os = "macos")]
+    let ffprobe_url = if cfg!(target_arch = "aarch64") {
+        "https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffprobe-darwin-arm64"
+    } else {
+        "https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffprobe-darwin-x64"
+    };
 
     let ffmpeg_dest = bin_dir.join(if cfg!(target_os = "windows") {
         "ffmpeg.exe"
@@ -388,13 +568,6 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
     } else {
         "ffprobe"
     });
-    let ffmpeg_archive = bin_dir.join(if cfg!(target_os = "linux") {
-        "ffmpeg.tar.xz"
-    } else {
-        "ffmpeg.zip"
-    });
-
-    download_file(&app, ffmpeg_url, &ffmpeg_archive, "ffmpeg").await?;
 
     let _ = app.emit(
         "download-progress",
@@ -404,8 +577,18 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
         },
     );
 
+    #[cfg(target_os = "macos")]
+    {
+        // Raw (non-archived) binaries: download straight to their final paths.
+        // download_file() marks each unix download executable.
+        download_file(&app, ffmpeg_url, &ffmpeg_dest, "ffmpeg").await?;
+        download_file(&app, ffprobe_url, &ffprobe_dest, "ffmpeg").await?;
+    }
+
     #[cfg(target_os = "windows")]
     {
+        let ffmpeg_archive = bin_dir.join("ffmpeg.zip");
+        download_file(&app, ffmpeg_url, &ffmpeg_archive, "ffmpeg").await?;
         // Extract Windows zip — pull BOTH ffmpeg.exe and ffprobe.exe (the BtbN
         // build ships both under bin/). Don't stop after the first match.
         let file = fs::File::open(&ffmpeg_archive).map_err(|e| e.to_string())?;
@@ -426,70 +609,29 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
                 }
             }
         }
+        let _ = fs::remove_file(ffmpeg_archive);
     }
 
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "linux")]
     {
-        // For macOS: each evermeet zip contains a single binary. ffmpeg and
-        // ffprobe are separate downloads, so fetch both.
-        #[cfg(target_os = "macos")]
-        {
-            // ffmpeg (already downloaded into ffmpeg_archive above)
-            let file = fs::File::open(&ffmpeg_archive).map_err(|e| e.to_string())?;
-            let mut archive = zip::ZipArchive::new(file).map_err(|e| e.to_string())?;
-            for i in 0..archive.len() {
-                let mut file = archive.by_index(i).map_err(|e| e.to_string())?;
-                if let Some(path) = file.enclosed_name() {
-                    if path.file_name().and_then(|n| n.to_str()) == Some("ffmpeg") {
-                        let mut out = fs::File::create(&ffmpeg_dest).map_err(|e| e.to_string())?;
-                        std::io::copy(&mut file, &mut out).map_err(|e| e.to_string())?;
-                        break;
-                    }
-                }
-            }
-
-            // ffprobe (separate download)
-            let ffprobe_url = "https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip";
-            let ffprobe_archive = bin_dir.join("ffprobe.zip");
-            download_file(&app, ffprobe_url, &ffprobe_archive, "ffmpeg").await?;
-            let file = fs::File::open(&ffprobe_archive).map_err(|e| e.to_string())?;
-            let mut archive = zip::ZipArchive::new(file).map_err(|e| e.to_string())?;
-            for i in 0..archive.len() {
-                let mut file = archive.by_index(i).map_err(|e| e.to_string())?;
-                if let Some(path) = file.enclosed_name() {
-                    if path.file_name().and_then(|n| n.to_str()) == Some("ffprobe") {
-                        let mut out = fs::File::create(&ffprobe_dest).map_err(|e| e.to_string())?;
-                        std::io::copy(&mut file, &mut out).map_err(|e| e.to_string())?;
-                        break;
-                    }
-                }
-            }
-            let _ = fs::remove_file(ffprobe_archive);
-        }
-        #[cfg(target_os = "linux")]
-        {
-            // The Linux static build is distributed as .tar.xz, which we can't
-            // decompress without an xz decoder. Rather than leave a broken dummy
-            // binary (which fails cryptically later when yt-dlp calls ffmpeg),
-            // fail clearly so the user installs ffmpeg/ffprobe themselves.
-            let _ = fs::remove_file(&ffmpeg_archive);
-            return Err(
-                "Automatic ffmpeg install isn't supported on Linux yet. Please install ffmpeg and ffprobe (e.g. via your package manager) and set their paths on the Dependencies screen."
-                    .to_string(),
-            );
-        }
+        // No prebuilt binary is downloaded on Linux. Instead install ffmpeg
+        // (which provides ffprobe) from the distro's own repositories, built
+        // against the running system's C library.
+        install_ffmpeg_linux(&app).await?;
     }
-
-    // Cleanup archive
-    let _ = fs::remove_file(ffmpeg_archive);
 
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        if let Ok(metadata) = fs::metadata(&ffmpeg_dest) {
-            let mut perms = metadata.permissions();
-            perms.set_mode(0o755);
-            let _ = fs::set_permissions(&ffmpeg_dest, perms);
+        // Mark both binaries executable. ffprobe in particular loses its
+        // executable bit when it is extracted from a zip via fs::File::create,
+        // and yt-dlp refuses to use a non-executable helper.
+        for dest in [&ffmpeg_dest, &ffprobe_dest] {
+            if let Ok(metadata) = fs::metadata(dest) {
+                let mut perms = metadata.permissions();
+                perms.set_mode(0o755);
+                let _ = fs::set_permissions(dest, perms);
+            }
         }
     }
 
@@ -502,9 +644,17 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
     );
 
     // Download AtomicParsley
+    //
+    // wez/atomicparsley publishes a 64-bit Windows build and a 32-bit
+    // (WindowsX86) build, but no ARM64 build. On Windows-on-ARM the 64-bit
+    // build runs under x64 emulation, which is acceptable for this optional
+    // helper. Pick the 32-bit build only when the host itself is 32-bit.
     #[cfg(target_os = "windows")]
-    let atomicparsley_url =
-        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyWindows.zip";
+    let atomicparsley_url = if cfg!(target_arch = "x86") {
+        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyWindowsX86.zip"
+    } else {
+        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyWindows.zip"
+    };
     #[cfg(target_os = "macos")]
     let atomicparsley_url =
         "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyMacOS.zip";

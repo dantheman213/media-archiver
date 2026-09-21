@@ -39,7 +39,7 @@
       <div class="options">
         <div class="option-card">
           <h2>Automatic Setup (Recommended)</h2>
-          <p>We'll download everything you need. This takes about a minute.</p>
+          <p>Media Archiver will download or install everything you need. This takes about a minute.</p>
           <button onclick={autoInstallBinaries} class="btn-primary">Set Up Automatically</button>
         </div>
         <div class="option-card">
