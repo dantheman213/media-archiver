@@ -83,6 +83,50 @@ This will:
 
 Approve the draft release on GitHub to make it public.
 
+## Running Unsigned Builds
+
+Release binaries are not code-signed, so macOS and Windows may warn you or block the app the first time you open it. The steps below let you bypass those warnings.
+
+### macOS
+
+After copying `Media Archiver.app` to your `Applications` folder, remove the quarantine attribute:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/Media Archiver.app"
+```
+
+Then open the app normally. Alternatively, right-click (or Control-click) the app and choose **Open** to allow it via Gatekeeper's per-app exception.
+
+### Windows
+
+Windows applies several layers of protection to unsigned apps:
+
+**1. SmartScreen ("Windows protected your PC")**
+
+- Click **More info**, then **Run anyway**.
+- Or, before running, right-click the installer/executable → **Properties** → check **Unblock** → **OK**.
+
+**2. Smart App Control (Windows 11)**
+
+If Smart App Control is enabled, it may block the app without an override prompt. You can turn it off:
+
+1. Open **Settings** → **Privacy & security** → **Windows Security** → **App & browser control**.
+2. Under **Smart App Control**, set it to **Off**.
+
+Note: Smart App Control can only be re-enabled by reinstalling Windows, so disable it only if you trust the app.
+
+**3. Mark of the Web / Attachment Manager**
+
+If the download came from the internet, unblock the file from PowerShell:
+
+```powershell
+Unblock-File -Path ".\Media Archiver_<version>_x64-setup.exe"
+```
+
+**4. Microsoft Defender antivirus false positives**
+
+Unsigned builds are sometimes flagged by heuristic scanners. If Defender quarantines the file, restore it and add an exclusion for the install directory under **Windows Security** → **Virus & threat protection** → **Manage settings** → **Exclusions**.
+
 ## License
 
 MIT
