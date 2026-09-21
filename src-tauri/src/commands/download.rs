@@ -236,6 +236,7 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
 
     let mut cmd = tokio::process::Command::new(&yt_dlp_path);
     cmd.args(&args);
+    crate::process_env::apply_child_env_async(&mut cmd);
 
     #[cfg(target_os = "windows")]
     {

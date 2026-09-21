@@ -10,7 +10,20 @@ pub async fn fetch_metadata(app: AppHandle, url: String) -> Result<MediaMetadata
         .ok_or_else(|| "yt-dlp not found".to_string())?;
 
     let mut cmd = tokio::process::Command::new(yt_dlp_path);
-    cmd.arg("--dump-json").arg(&url);
+    cmd.arg("--dump-json");
+
+    // Point yt-dlp at our ffmpeg explicitly so it never has to search PATH for
+    // it — that search is what trips over unrelated, untrusted PATH entries.
+    if let Some(ref ffmpeg) = status.ffmpeg_path {
+        let location = std::path::Path::new(ffmpeg)
+            .parent()
+            .map(|p| p.to_path_buf())
+            .unwrap_or_else(|| std::path::PathBuf::from(ffmpeg));
+        cmd.arg("--ffmpeg-location").arg(location);
+    }
+
+    cmd.arg(&url);
+    crate::process_env::apply_child_env_async(&mut cmd);
 
     #[cfg(target_os = "windows")]
     {

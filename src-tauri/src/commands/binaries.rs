@@ -1,8 +1,9 @@
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{AppHandle, Emitter, Manager};
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -94,6 +95,7 @@ fn ffprobe_beside_ffmpeg(ffmpeg_path: &Option<String>) -> Option<String> {
 fn get_version(exe_path: &str, args: &[&str]) -> Option<String> {
     let mut cmd = std::process::Command::new(exe_path);
     cmd.args(args);
+    crate::process_env::apply_child_env(&mut cmd);
 
     #[cfg(target_os = "windows")]
     {
@@ -253,6 +255,13 @@ pub fn set_binary_paths(
     Ok(())
 }
 
+/// Sibling path used while a download is still in flight, e.g. `ffmpeg.zip.part`.
+fn part_path(dest: &Path) -> PathBuf {
+    let mut os = dest.as_os_str().to_os_string();
+    os.push(".part");
+    PathBuf::from(os)
+}
+
 async fn download_file(
     app: &AppHandle,
     url: &str,
@@ -263,16 +272,43 @@ async fn download_file(
         .user_agent("media-archiver")
         .build()
         .map_err(|e| e.to_string())?;
-    let res = client.get(url).send().await.map_err(|e| e.to_string())?;
+    let res = client
+        .get(url)
+        .send()
+        .await
+        .map_err(|e| format!("Couldn't download {component} from {url}: {e}"))?
+        // Without this a 4xx/5xx (rate limiting, a proxy error page, a moved
+        // asset) is written to disk and only surfaces much later as a bogus
+        // archive-format error.
+        .error_for_status()
+        .map_err(|e| format!("Downloading {component} from {url} failed: {e}"))?;
     let total_size = res.content_length().unwrap_or(0);
 
-    let mut file = fs::File::create(dest).map_err(|e| e.to_string())?;
+    // Stream into a `.part` file and move it into place only once the whole body
+    // has arrived. Writing straight to `dest` means a connection that dies
+    // mid-transfer leaves a half-written file at the path callers later treat
+    // as complete — which is how a ZIP download ends up reported as
+    // "invalid Zip archive: Could not find EOCD".
+    let part = part_path(dest);
+    let mut file = fs::File::create(&part)
+        .map_err(|e| format!("Failed to create {}: {e}", part.display()))?;
     let mut downloaded: u64 = 0;
     let mut stream = res.bytes_stream();
 
     while let Some(item) = stream.next().await {
-        let chunk = item.map_err(|e| e.to_string())?;
-        file.write_all(&chunk).map_err(|e| e.to_string())?;
+        let chunk = match item {
+            Ok(chunk) => chunk,
+            Err(e) => {
+                let _ = fs::remove_file(&part);
+                return Err(format!(
+                    "Downloading {component} from {url} was interrupted after {downloaded} bytes: {e}"
+                ));
+            }
+        };
+        if let Err(e) = file.write_all(&chunk) {
+            let _ = fs::remove_file(&part);
+            return Err(format!("Failed to write {}: {e}", part.display()));
+        }
         downloaded += chunk.len() as u64;
 
         if total_size > 0 {
@@ -286,6 +322,25 @@ async fn download_file(
             );
         }
     }
+    drop(file);
+
+    // A short body that still ended the stream cleanly (no transport error) is
+    // the other way a truncated archive reaches the extractor.
+    if total_size > 0 && downloaded != total_size {
+        let _ = fs::remove_file(&part);
+        return Err(format!(
+            "Downloading {component} from {url} was incomplete: received {downloaded} of {total_size} bytes. \
+             Check your connection and try again."
+        ));
+    }
+
+    // Replace the destination with the finished download. Remove first so this
+    // works even where rename refuses to clobber an existing file.
+    let _ = fs::remove_file(dest);
+    fs::rename(&part, dest).map_err(|e| {
+        let _ = fs::remove_file(&part);
+        format!("Failed to move the downloaded {component} into place: {e}")
+    })?;
 
     // Make executable on unix
     #[cfg(unix)]
@@ -299,6 +354,51 @@ async fn download_file(
     Ok(())
 }
 
+/// Open a freshly downloaded archive as a ZIP, turning the zip crate's terse
+/// "Could not find EOCD" into an error that names the component and URL.
+///
+/// A blocked, rate-limited, truncated, or proxy-served response all reach this
+/// point as a file that simply isn't a ZIP; the raw crate message gives the user
+/// no way to tell what went wrong or how to recover.
+fn open_zip(
+    path: &Path,
+    url: &str,
+    component: &str,
+) -> Result<zip::ZipArchive<std::io::BufReader<fs::File>>, String> {
+    let file = fs::File::open(path).map_err(|e| {
+        format!(
+            "Couldn't open the downloaded {component} archive at {}: {e}",
+            path.display()
+        )
+    })?;
+    let size = file.metadata().map(|m| m.len()).unwrap_or(0);
+    let mut reader = std::io::BufReader::new(file);
+
+    let mut magic = [0u8; 4];
+    if reader.read_exact(&mut magic).is_err() {
+        return Err(format!(
+            "The {component} download from {url} isn't a valid ZIP archive ({size} bytes — too \
+             short to read). It may have been blocked or truncated; check your connection and try again."
+        ));
+    }
+
+    // Local file header, empty-archive EOCD, or spanned-archive marker.
+    let is_zip = matches!(
+        magic,
+        [0x50, 0x4b, 0x03, 0x04] | [0x50, 0x4b, 0x05, 0x06] | [0x50, 0x4b, 0x07, 0x08]
+    );
+    if !is_zip {
+        return Err(format!(
+            "The {component} download from {url} isn't a valid ZIP archive ({size} bytes). It may \
+             have been blocked, rate-limited, or replaced with an error page by your network or \
+             proxy. Check your connection and try again."
+        ));
+    }
+
+    zip::ZipArchive::new(reader)
+        .map_err(|e| format!("The {component} archive from {url} couldn't be read: {e}"))
+}
+
 #[tauri::command]
 pub async fn update_ytdlp(app: AppHandle) -> Result<String, String> {
     let status = check_binaries(app.clone());
@@ -309,6 +409,7 @@ pub async fn update_ytdlp(app: AppHandle) -> Result<String, String> {
 
     let mut cmd = tokio::process::Command::new(&yt_dlp_path);
     cmd.arg("-U");
+    crate::process_env::apply_child_env_async(&mut cmd);
 
     #[cfg(target_os = "windows")]
     {
@@ -501,8 +602,25 @@ async fn install_ffmpeg_linux(app: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+/// Guards against two setup runs writing the same archive/binary paths at once,
+/// which interleaves their bytes and corrupts the result.
+static INSTALL_IN_PROGRESS: AtomicBool = AtomicBool::new(false);
+
+struct InstallGuard;
+
+impl Drop for InstallGuard {
+    fn drop(&mut self) {
+        INSTALL_IN_PROGRESS.store(false, Ordering::SeqCst);
+    }
+}
+
 #[tauri::command]
 pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
+    if INSTALL_IN_PROGRESS.swap(true, Ordering::SeqCst) {
+        return Err("A setup is already in progress. Please wait for it to finish.".to_string());
+    }
+    let _install_guard = InstallGuard;
+
     let bin_dir = get_bin_dir(&app);
     fs::create_dir_all(&bin_dir).map_err(|e| e.to_string())?;
 
@@ -583,6 +701,12 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
         // download_file() marks each unix download executable.
         download_file(&app, ffmpeg_url, &ffmpeg_dest, "ffmpeg").await?;
         download_file(&app, ffprobe_url, &ffprobe_dest, "ffmpeg").await?;
+        if !ffmpeg_dest.exists() || !ffprobe_dest.exists() {
+            return Err(format!(
+                "The ffmpeg/ffprobe download ({ffmpeg_url}) didn't produce usable binaries. \
+                 Install them manually and use \"I Already Have These Tools\"."
+            ));
+        }
     }
 
     #[cfg(target_os = "windows")]
@@ -591,8 +715,7 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
         download_file(&app, ffmpeg_url, &ffmpeg_archive, "ffmpeg").await?;
         // Extract Windows zip — pull BOTH ffmpeg.exe and ffprobe.exe (the BtbN
         // build ships both under bin/). Don't stop after the first match.
-        let file = fs::File::open(&ffmpeg_archive).map_err(|e| e.to_string())?;
-        let mut archive = zip::ZipArchive::new(file).map_err(|e| e.to_string())?;
+        let mut archive = open_zip(&ffmpeg_archive, ffmpeg_url, "ffmpeg")?;
         for i in 0..archive.len() {
             let mut file = archive.by_index(i).map_err(|e| e.to_string())?;
             if let Some(path) = file.enclosed_name() {
@@ -610,6 +733,13 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
             }
         }
         let _ = fs::remove_file(ffmpeg_archive);
+        if !ffmpeg_dest.exists() || !ffprobe_dest.exists() {
+            return Err(format!(
+                "The ffmpeg archive from {ffmpeg_url} downloaded, but didn't contain both \
+                 ffmpeg.exe and ffprobe.exe. Install ffmpeg manually and use \"I Already Have \
+                 These Tools\"."
+            ));
+        }
     }
 
     #[cfg(target_os = "linux")]
@@ -677,8 +807,7 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
         } else {
             "AtomicParsley"
         };
-        let file = fs::File::open(&atomicparsley_archive).map_err(|e| e.to_string())?;
-        let mut archive = zip::ZipArchive::new(file).map_err(|e| e.to_string())?;
+        let mut archive = open_zip(&atomicparsley_archive, atomicparsley_url, "AtomicParsley")?;
         for i in 0..archive.len() {
             let mut entry = archive.by_index(i).map_err(|e| e.to_string())?;
             if let Some(path) = entry.enclosed_name() {
@@ -693,6 +822,13 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
     }
 
     let _ = fs::remove_file(atomicparsley_archive);
+
+    if !atomicparsley_dest.exists() {
+        return Err(format!(
+            "The AtomicParsley archive from {atomicparsley_url} downloaded, but didn't contain \
+             AtomicParsley. Install it manually and use \"I Already Have These Tools\"."
+        ));
+    }
 
     #[cfg(unix)]
     {

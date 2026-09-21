@@ -26,6 +26,10 @@ export const binaryInstallProgress = writable<Record<string, number>>({ "yt-dlp"
 
 let unlistenProgress: (() => void) | null = null;
 
+// Re-entry guard: a second invoke while the first is still running would race
+// the same download/extract paths and corrupt the resulting archives.
+let installInFlight = false;
+
 export async function checkBinaries() {
   binaryCheckState.set('checking');
   binaryErrorMsg.set('');
@@ -44,6 +48,9 @@ export async function checkBinaries() {
 }
 
 export async function autoInstallBinaries() {
+  if (installInFlight) return;
+  installInFlight = true;
+
   binaryCheckState.set('installing');
   binaryErrorMsg.set('');
   
@@ -61,6 +68,7 @@ export async function autoInstallBinaries() {
     binaryErrorMsg.set(String(e));
     binaryCheckState.set('prompt');
   } finally {
+    installInFlight = false;
     if (unlistenProgress) {
       unlistenProgress();
       unlistenProgress = null;

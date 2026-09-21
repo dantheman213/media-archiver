@@ -1,3 +1,18 @@
+# v0.9.17
+
+* yt-dlp is now run with a minimal, controlled PATH (Windows system directories only) instead of inheriting the user's full PATH, so unrelated entries — such as junctions into other volumes — are never traversed
+* ffmpeg/ffprobe are passed explicitly via --ffmpeg-location for both metadata and downloads
+
+# v0.9.16
+
+* Fixed downloads failing with "WinError 448: The path cannot be traversed because it contains an untrusted mount point" when an unrelated junction/symlink sits on the system PATH
+
+# v0.9.15
+
+* Harden automatic setup downloads: verify HTTP status, detect interrupted/truncated downloads, and validate archives before extracting
+* Surface a clear, actionable error (naming the component and URL) instead of a cryptic "invalid Zip archive: Could not find EOCD"
+* Prevent concurrent setup runs from corrupting the same downloaded files
+
 # v0.9.14
 
 * Fixed "ffmpeg not found" downloads on Apple Silicon by installing native arm64 ffmpeg/ffprobe instead of Intel builds

@@ -1,5 +1,6 @@
 mod commands;
 pub mod models;
+pub mod process_env;
 pub mod process_manager;
 
 use serde::Serialize;
