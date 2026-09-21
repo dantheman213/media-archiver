@@ -47,6 +47,8 @@ pub fn run() {
             commands::binaries::check_binaries,
             commands::binaries::install_binaries,
             commands::binaries::set_binary_paths,
+            commands::binaries::get_binary_paths,
+            commands::binaries::get_binary_sources,
             commands::binaries::update_ytdlp,
             commands::binaries::check_ytdlp_update,
             commands::metadata::fetch_metadata,

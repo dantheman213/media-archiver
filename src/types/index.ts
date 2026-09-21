@@ -111,4 +111,4 @@ export type HistoryStatus =
   | 'completed'    // Finished successfully
   | 'error';       // Failed
 
-export type NavRoute = 'queue' | 'history' | 'settings' | 'binaries';
+export type NavRoute = 'queue' | 'history' | 'settings';

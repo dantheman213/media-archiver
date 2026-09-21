@@ -1,3 +1,10 @@
+# v0.9.18
+
+* Getting Started now names the real dependencies (yt-dlp, ffmpeg/ffprobe, AtomicParsley) and lists the exact source each is installed from instead of the vague "engine" and "media processor" wording
+* Moved dependency status, updates, and configuration from its own page into Settings → Dependencies
+* "Update yt-dlp" now only appears after a check finds a newer release, shown as a green version label beside the current one
+* Added per-dependency path overrides so you can point Media Archiver at your own yt-dlp, ffmpeg, ffprobe, and AtomicParsley executables
+
 # v0.9.17
 
 * yt-dlp is now run with a minimal, controlled PATH (Windows system directories only) instead of inheriting the user's full PATH, so unrelated entries — such as junctions into other volumes — are never traversed

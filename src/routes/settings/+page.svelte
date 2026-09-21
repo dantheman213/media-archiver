@@ -1,7 +1,7 @@
 <script lang="ts">
   import { invoke } from '@tauri-apps/api/core';
-  import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
+  import DependenciesSection from '../../components/DependenciesSection.svelte';
   import {
     settings,
     toggleGlobalPause,
@@ -349,16 +349,7 @@
     </div>
   </section>
 
-  <section class="settings-group">
-    <h3>Advanced</h3>
-    <div class="setting">
-      <div>
-        <span class="setting-label">Dependencies</span>
-        <span class="setting-desc">Check status or update the tools that power downloads</span>
-      </div>
-      <button class="btn-link" onclick={() => goto('/binaries')}>Manage</button>
-    </div>
-  </section>
+  <DependenciesSection />
 </div>
 </div>
 

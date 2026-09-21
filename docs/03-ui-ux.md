@@ -4,7 +4,7 @@
 The application uses a modern, clean, two-pane layout.
 
 1. **Sidebar / Navigation:** 
-   - Quick links to: **Queue** (active/pending), **History** (completed jobs), **Settings**, and **Binaries Status**.
+   - Quick links to: **Queue** (active/pending), **History** (completed jobs), and **Settings**. Dependency status and updates live under Settings → Dependencies.
 2. **Main Content Area:**
    - **Input Zone:** A prominent, welcoming area at the top to paste URLs or drop links.
    - **Active Queue:** A list or grid of media items. Items start in a "Configuring" state before moving to the active batch.

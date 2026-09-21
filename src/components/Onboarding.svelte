@@ -1,9 +1,22 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
-  import { binaryCheckState, binaryErrorMsg, binaryInstallProgress, autoInstallBinaries, saveManualBinaries } from '../stores/binaries';
+  import { onMount } from "svelte";
+  import {
+    binaryCheckState,
+    binaryErrorMsg,
+    binaryInstallProgress,
+    binarySources,
+    autoInstallBinaries,
+    loadBinarySources,
+    saveManualBinaries,
+  } from '../stores/binaries';
 
   let customYtDlp = $state("");
   let customFfmpeg = $state("");
+
+  onMount(() => {
+    loadBinarySources();
+  });
 
   async function selectPath(type: "yt-dlp" | "ffmpeg") {
     try {
@@ -29,7 +42,7 @@
 <div class="onboarding-overlay">
   <div class="onboarding-modal">
     <h1>Getting Started</h1>
-    <p>Media Archiver needs a couple of small helper tools to download and process media. We can set them up for you automatically.</p>
+    <p>Media Archiver uses yt-dlp, ffmpeg/ffprobe, and AtomicParsley to download and process media. We can set them up for you automatically.</p>
 
     {#if $binaryErrorMsg}
       <div class="error">{$binaryErrorMsg}</div>
@@ -39,12 +52,29 @@
       <div class="options">
         <div class="option-card">
           <h2>Automatic Setup (Recommended)</h2>
-          <p>Media Archiver will download or install everything you need. This takes about a minute.</p>
+          <p>Media Archiver will download and install:</p>
+          {#if $binarySources.length}
+            <ul class="source-list">
+              {#each $binarySources as source}
+                <li>
+                  <span class="source-name">{source.name}</span>
+                  {#if source.url}
+                    <span class="source-detail">from <code>{source.url}</code></span>
+                  {:else if source.note}
+                    <span class="source-detail">{source.note}</span>
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+          {:else}
+            <p>Everything it needs, from their official sources.</p>
+          {/if}
+          <p class="option-note">This takes about a minute.</p>
           <button onclick={autoInstallBinaries} class="btn-primary">Set Up Automatically</button>
         </div>
         <div class="option-card">
           <h2>I Already Have These Tools</h2>
-          <p>If you already have the required tools installed, you can point us to them.</p>
+          <p>If you already have yt-dlp and ffmpeg installed, you can point us to them.</p>
           <button onclick={() => $binaryCheckState = "manual"} class="btn-secondary">Set Up Manually</button>
         </div>
       </div>
@@ -53,30 +83,36 @@
         <h2>Setting things up...</h2>
 
         <div class="progress-item">
-          <span>Download engine</span>
+          <span>yt-dlp</span>
           <progress value={$binaryInstallProgress["yt-dlp"]} max="1"></progress>
           <span>{Math.round($binaryInstallProgress["yt-dlp"] * 100)}%</span>
         </div>
 
         <div class="progress-item">
-          <span>Media processor</span>
+          <span>ffmpeg</span>
           <progress value={$binaryInstallProgress["ffmpeg"]} max="1"></progress>
           <span>{Math.round($binaryInstallProgress["ffmpeg"] * 100)}%</span>
         </div>
 
         {#if $binaryInstallProgress["ffmpeg"] >= 1 && $binaryInstallProgress["ffmpeg-extract"] < 1}
           <div class="progress-item">
-            <span>Unpacking media processor...</span>
+            <span>Extracting ffmpeg...</span>
             <progress value={$binaryInstallProgress["ffmpeg-extract"]} max="1"></progress>
           </div>
         {/if}
+
+        <div class="progress-item">
+          <span>AtomicParsley</span>
+          <progress value={$binaryInstallProgress["atomicparsley"]} max="1"></progress>
+          <span>{Math.round($binaryInstallProgress["atomicparsley"] * 100)}%</span>
+        </div>
       </div>
     {:else if $binaryCheckState === "manual"}
       <div class="manual-section">
         <h2>Manual Setup</h2>
 
         <div class="input-group">
-          <label for="ytdlp-path">Download Engine (yt-dlp):</label>
+          <label for="ytdlp-path">yt-dlp:</label>
           <div class="path-input">
             <input id="ytdlp-path" type="text" bind:value={customYtDlp} placeholder="Select the yt-dlp executable..." />
             <button onclick={() => selectPath("yt-dlp")}>Browse</button>
@@ -84,16 +120,17 @@
         </div>
 
         <div class="input-group">
-          <label for="ffmpeg-path">Media Processor (ffmpeg):</label>
+          <label for="ffmpeg-path">ffmpeg:</label>
           <div class="path-input">
             <input id="ffmpeg-path" type="text" bind:value={customFfmpeg} placeholder="Select the ffmpeg executable..." />
             <button onclick={() => selectPath("ffmpeg")}>Browse</button>
           </div>
+          <p class="input-hint">ffprobe is detected alongside ffmpeg.</p>
         </div>
 
         <div class="actions">
           <button onclick={() => $binaryCheckState = "prompt"} class="btn-secondary">Back</button>
-          <button onclick={handleSaveManual} class="btn-primary">Save & Continue</button>
+          <button onclick={handleSaveManual} class="btn-primary">Save &amp; Continue</button>
         </div>
       </div>
     {/if}
@@ -120,8 +157,10 @@
     color: var(--text-color);
     padding: 2rem;
     border-radius: 8px;
-    max-width: 600px;
+    max-width: 640px;
     width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     border: 1px solid var(--border-color);
   }
@@ -155,6 +194,43 @@
   .option-card h2 {
     font-size: 1.2rem;
     margin-top: 0;
+  }
+
+  .option-card p {
+    margin: 0.5rem 0 0;
+  }
+
+  .option-note {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .source-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .source-list li {
+    font-size: 0.85rem;
+  }
+
+  .source-name {
+    font-weight: 600;
+  }
+
+  .source-detail {
+    color: var(--text-muted);
+  }
+
+  .source-detail code {
+    font-family: monospace;
+    font-size: 0.75rem;
+    word-break: break-all;
+    color: var(--text-color);
   }
 
   button {
@@ -229,6 +305,12 @@
 
   .path-input button {
     margin-top: 0;
+  }
+
+  .input-hint {
+    margin: 0.35rem 0 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
   }
 
   .actions {

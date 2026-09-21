@@ -255,6 +255,125 @@ pub fn set_binary_paths(
     Ok(())
 }
 
+/// The official source Media Archiver uses to obtain each helper tool on this
+/// platform. Surfaced in the Getting Started screen so "Set Up Automatically"
+/// can state exactly what it will download, instead of the vague "engine" and
+/// "media processor" wording.
+#[derive(Serialize, Clone)]
+pub struct BinarySource {
+    pub name: String,
+    pub url: Option<String>,
+    /// Extra explanation when there is no direct URL (e.g. ffmpeg installed
+    /// from the distro's package manager, or ffprobe bundled inside another
+    /// download).
+    pub note: Option<String>,
+}
+
+/// yt-dlp release URL for the host platform.
+fn ytdlp_download_url() -> &'static str {
+    #[cfg(target_os = "windows")]
+    return "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
+    #[cfg(target_os = "macos")]
+    return "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos";
+    #[cfg(target_os = "linux")]
+    return "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp";
+}
+
+/// ffmpeg build URL for the host platform, or `None` on Linux where ffmpeg
+/// comes from the distribution's package manager instead of a prebuilt archive.
+fn ffmpeg_download_url() -> Option<&'static str> {
+    #[cfg(target_os = "windows")]
+    return if cfg!(target_arch = "aarch64") {
+        Some("https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-winarm64-gpl.zip")
+    } else {
+        Some("https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip")
+    };
+    #[cfg(target_os = "macos")]
+    return if cfg!(target_arch = "aarch64") {
+        Some("https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-darwin-arm64")
+    } else {
+        Some("https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-darwin-x64")
+    };
+    #[cfg(target_os = "linux")]
+    return None;
+}
+
+/// ffprobe is published separately only on macOS; on Windows it ships inside the
+/// ffmpeg archive and on Linux it ships in the ffmpeg package.
+fn ffprobe_download_url() -> Option<&'static str> {
+    #[cfg(target_os = "macos")]
+    return if cfg!(target_arch = "aarch64") {
+        Some("https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffprobe-darwin-arm64")
+    } else {
+        Some("https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffprobe-darwin-x64")
+    };
+    #[cfg(not(target_os = "macos"))]
+    return None;
+}
+
+/// AtomicParsley release URL for the host platform.
+fn atomicparsley_download_url() -> &'static str {
+    #[cfg(target_os = "windows")]
+    return if cfg!(target_arch = "x86") {
+        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyWindowsX86.zip"
+    } else {
+        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyWindows.zip"
+    };
+    #[cfg(target_os = "macos")]
+    return "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyMacOS.zip";
+    #[cfg(target_os = "linux")]
+    return "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyLinux.zip";
+}
+
+/// Describe what Automatic Setup will download/install on this platform.
+#[tauri::command]
+pub fn get_binary_sources() -> Vec<BinarySource> {
+    let ffmpeg_url = ffmpeg_download_url();
+    let ffprobe_url = ffprobe_download_url();
+
+    let ffprobe_note = if ffprobe_url.is_some() {
+        None
+    } else if cfg!(target_os = "windows") {
+        Some("included with the ffmpeg download".to_string())
+    } else {
+        Some("installed together with ffmpeg".to_string())
+    };
+
+    vec![
+        BinarySource {
+            name: "yt-dlp".to_string(),
+            url: Some(ytdlp_download_url().to_string()),
+            note: None,
+        },
+        BinarySource {
+            name: "ffmpeg".to_string(),
+            url: ffmpeg_url.map(str::to_string),
+            note: if ffmpeg_url.is_none() {
+                Some("installed from your system package manager".to_string())
+            } else {
+                None
+            },
+        },
+        BinarySource {
+            name: "ffprobe".to_string(),
+            url: ffprobe_url.map(str::to_string),
+            note: ffprobe_note,
+        },
+        BinarySource {
+            name: "AtomicParsley".to_string(),
+            url: Some(atomicparsley_download_url().to_string()),
+            note: None,
+        },
+    ]
+}
+
+/// Return the user's configured binary path overrides (empty options mean
+/// "auto-detect").
+#[tauri::command]
+pub fn get_binary_paths(app: AppHandle) -> BinaryPaths {
+    load_custom_paths(&app)
+}
+
 /// Sibling path used while a download is still in flight, e.g. `ffmpeg.zip.part`.
 fn part_path(dest: &Path) -> PathBuf {
     let mut os = dest.as_os_str().to_os_string();
@@ -624,13 +743,9 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
     let bin_dir = get_bin_dir(&app);
     fs::create_dir_all(&bin_dir).map_err(|e| e.to_string())?;
 
-    // Define URLs based on OS
-    #[cfg(target_os = "windows")]
-    let ytdlp_url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
-    #[cfg(target_os = "macos")]
-    let ytdlp_url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos";
-    #[cfg(target_os = "linux")]
-    let ytdlp_url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp";
+    // Download source URLs are shared with get_binary_sources() so the
+    // Getting Started screen always states the same thing the installer does.
+    let ytdlp_url = ytdlp_download_url();
 
     let yt_dlp_dest = bin_dir.join(if cfg!(target_os = "windows") {
         "yt-dlp.exe"
@@ -657,23 +772,11 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
     // one. (BtbN no longer ships a 32-bit win32 build, and Tauri does not
     // target 32-bit Windows, so x86_64 is the fallback.)
     #[cfg(target_os = "windows")]
-    let ffmpeg_url = if cfg!(target_arch = "aarch64") {
-        "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-winarm64-gpl.zip"
-    } else {
-        "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip"
-    };
+    let ffmpeg_url = ffmpeg_download_url().expect("ffmpeg download URL for Windows");
     #[cfg(target_os = "macos")]
-    let ffmpeg_url = if cfg!(target_arch = "aarch64") {
-        "https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-darwin-arm64"
-    } else {
-        "https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-darwin-x64"
-    };
+    let ffmpeg_url = ffmpeg_download_url().expect("ffmpeg download URL for macOS");
     #[cfg(target_os = "macos")]
-    let ffprobe_url = if cfg!(target_arch = "aarch64") {
-        "https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffprobe-darwin-arm64"
-    } else {
-        "https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffprobe-darwin-x64"
-    };
+    let ffprobe_url = ffprobe_download_url().expect("ffprobe download URL for macOS");
 
     let ffmpeg_dest = bin_dir.join(if cfg!(target_os = "windows") {
         "ffmpeg.exe"
@@ -779,18 +882,7 @@ pub async fn install_binaries(app: AppHandle) -> Result<(), String> {
     // (WindowsX86) build, but no ARM64 build. On Windows-on-ARM the 64-bit
     // build runs under x64 emulation, which is acceptable for this optional
     // helper. Pick the 32-bit build only when the host itself is 32-bit.
-    #[cfg(target_os = "windows")]
-    let atomicparsley_url = if cfg!(target_arch = "x86") {
-        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyWindowsX86.zip"
-    } else {
-        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyWindows.zip"
-    };
-    #[cfg(target_os = "macos")]
-    let atomicparsley_url =
-        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyMacOS.zip";
-    #[cfg(target_os = "linux")]
-    let atomicparsley_url =
-        "https://github.com/wez/atomicparsley/releases/latest/download/AtomicParsleyLinux.zip";
+    let atomicparsley_url = atomicparsley_download_url();
 
     let atomicparsley_dest = bin_dir.join(if cfg!(target_os = "windows") {
         "AtomicParsley.exe"
