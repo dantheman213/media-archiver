@@ -1,6 +1,7 @@
 <script lang="ts">
   import { invoke } from '@tauri-apps/api/core';
   import { convertFileSrc } from '@tauri-apps/api/core';
+  import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { history, clearHistory, removeHistoryRecord, updateHistoryRecord } from '../../stores/history';
   import { settings } from '../../stores/settings';
@@ -8,6 +9,8 @@
   import type { HistoryRecord, HistoryStatus } from '../../types';
   import { buildCommandFromHistory } from '../../lib/ytdlpCommand';
   import { describeHistoryRecord } from '../../lib/settingsSummary';
+  import { queueUrlWithDefaults, configFromHistoryRecord } from '../../lib/ingest';
+  import { updateJobConfig } from '../../stores/queue';
 
   let records: HistoryRecord[] = $state([]);
 
@@ -191,7 +194,7 @@
   }
 
   // Context menu
-  let contextMenu = $state<{ x: number; y: number; cmd: string; url: string } | null>(null);
+  let contextMenu = $state<{ x: number; y: number; cmd: string; url: string; record: HistoryRecord } | null>(null);
   let copyToast = $state<string | null>(null);
   let copyTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -203,7 +206,7 @@
       $binaryStatus?.yt_dlp_path,
       $binaryStatus?.ffmpeg_path,
     );
-    contextMenu = { x: e.clientX, y: e.clientY, cmd, url: record.url };
+    contextMenu = { x: e.clientX, y: e.clientY, cmd, url: record.url, record };
     copyToast = null;
   }
 
@@ -229,6 +232,23 @@
     await navigator.clipboard.writeText(contextMenu.url);
     contextMenu = null;
     showCopyToast('URL copied!');
+  }
+
+  /**
+   * Re-queue a history entry as a fresh download, overwriting any existing
+   * file, then jump to the Queue so its progress is visible.
+   */
+  function redownload(record: HistoryRecord) {
+    const id = queueUrlWithDefaults(record.url, { force: true });
+    updateJobConfig(id, configFromHistoryRecord(record));
+    closeContextMenu();
+    showCopyToast('Added to queue');
+    goto('/');
+  }
+
+  function redownloadFromContextMenu() {
+    if (!contextMenu) return;
+    redownload(contextMenu.record);
   }
 
   function getThumbSrc(record: HistoryRecord): string {
@@ -357,6 +377,9 @@
     onkeydown={(e) => e.key === 'Escape' && closeContextMenu()}
     role="menu"
   >
+    <li class="context-menu-item" role="menuitem" onclick={redownloadFromContextMenu}>
+      Redownload
+    </li>
     <li class="context-menu-item" role="menuitem" onclick={copyUrl}>
       Copy URL
     </li>

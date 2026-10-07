@@ -2,6 +2,7 @@ use crate::commands::binaries::check_binaries;
 use crate::process_manager::{ProcessEvent, ProcessManager};
 use chrono::Local;
 use serde::Deserialize;
+use std::path::{Path, PathBuf};
 use tauri::{AppHandle, Emitter};
 
 /// Sanitize a user-supplied file name so it is safe on disk and inside a yt-dlp
@@ -28,8 +29,8 @@ fn sanitize_filename(name: &str) -> String {
 
     // Guard Windows reserved device names (case-insensitive, ignoring extension).
     const RESERVED: [&str; 22] = [
-        "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7",
-        "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+        "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8",
+        "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
     ];
     let base = safe.split('.').next().unwrap_or("").to_uppercase();
     if RESERVED.contains(&base.as_str()) {
@@ -60,49 +61,58 @@ pub struct DownloadConfig {
     pub use_impersonate_chrome: Option<bool>,
     pub use_no_cookies: Option<bool>,
     pub collect_logs: Option<bool>,
+    /// Force a fresh download even if the destination file already exists.
+    /// Set by the Retry / Redownload actions.
+    pub force: Option<bool>,
 }
 
-#[tauri::command]
-pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<(), String> {
-    let status = check_binaries(app.clone());
+/// Per-job staging directory for yt-dlp's intermediate and partial files.
+///
+/// Everything yt-dlp downloads (including `.part` files and the streams that
+/// get merged) is written here first and only moved into the user's target
+/// folder once the download and any post-processing succeed. A failed job can
+/// therefore be cleaned up without leaving stray assets behind.
+fn staging_dir_for(job_id: &str) -> PathBuf {
+    std::env::temp_dir()
+        .join("media-archiver-staging")
+        .join(job_id)
+}
 
-    let yt_dlp_path = status
-        .yt_dlp_path
-        .ok_or_else(|| "yt-dlp not found. Please install or configure it first.".to_string())?;
+/// Best-effort removal of a job's staging directory (and the now-empty parent).
+async fn cleanup_staging(dir: &Path) {
+    let _ = tokio::fs::remove_dir_all(dir).await;
+    if let Some(parent) = dir.parent() {
+        // Fails harmlessly when other jobs are still staging.
+        let _ = tokio::fs::remove_dir(parent).await;
+    }
+}
 
-    let ffmpeg_path = status.ffmpeg_path;
-    let collect_logs = config.collect_logs.unwrap_or(true);
+/// Flags shared by the primary and fallback yt-dlp invocations.
+fn push_common_args(
+    args: &mut Vec<String>,
+    output_base: &str,
+    staging: &Path,
+    name_template: &str,
+    config: &DownloadConfig,
+    ffmpeg_path: &Option<String>,
+    collect_logs: bool,
+) {
+    // Intermediate files are staged here and moved to `home` on success.
+    // NOTE: `--paths` is ignored when `--output` is absolute, so the output
+    // template below is deliberately relative.
+    args.push("-P".to_string());
+    args.push(format!("home:{}", output_base));
+    args.push("-P".to_string());
+    args.push(format!("temp:{}", staging.to_string_lossy()));
 
-    let mut args: Vec<String> = Vec::new();
-    // Extra ffmpeg args, keyed to the postprocessor they belong to. An unkeyed
-    // `--postprocessor-args` value is handed to *every* postprocessor, which
-    // can break thumbnail/metadata embedding; always name the target PP (e.g.
-    // "VideoConvertor:-crf 18"). Keyed options may safely be repeated.
-    let mut pp_args: Vec<String> = Vec::new();
-
-    let output_path = if config.output_path.is_empty() {
-        dirs_next::download_dir()
-            .map(|p| p.to_string_lossy().to_string())
-            .ok_or_else(|| "Could not determine a default download path. Please set one in settings.".to_string())?
-    } else {
-        config.output_path.clone()
-    };
-
-    // Output template. Use a sanitized custom file name when provided, else fall
-    // back to yt-dlp's title template (which yt-dlp also sanitizes).
-    let output_base = output_path.trim_end_matches('/').trim_end_matches('\\');
-    let name_template = config
-        .output_filename
-        .as_deref()
-        .map(sanitize_filename)
-        .filter(|s| !s.is_empty())
-        .unwrap_or_else(|| "%(title)s".to_string());
     args.push("-o".to_string());
-    args.push(format!("{}/{}.%(ext)s", output_base, name_template));
+    args.push(format!("{}.%(ext)s", name_template));
 
     // Restrict filenames to characters valid on Windows
     #[cfg(target_os = "windows")]
-    args.push("--windows-filenames".to_string());
+    {
+        args.push("--windows-filenames".to_string());
+    }
 
     // Progress output for parsing
     args.push("--newline".to_string());
@@ -124,8 +134,8 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
     // binary (not the exe path) so yt-dlp also discovers ffprobe sitting next
     // to it — several post-processors (thumbnail embed, format probing) need
     // ffprobe, and a missing ffprobe is a common cause of hand-off errors.
-    if let Some(ref ffmpeg) = ffmpeg_path {
-        let ffmpeg_location = std::path::Path::new(ffmpeg)
+    if let Some(ffmpeg) = ffmpeg_path {
+        let ffmpeg_location = Path::new(ffmpeg)
             .parent()
             .map(|p| p.to_string_lossy().to_string())
             .filter(|s| !s.is_empty())
@@ -134,7 +144,29 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
         args.push(ffmpeg_location);
     }
 
-    // Workflow-specific args
+    // Redownload actions overwrite whatever is already on disk.
+    if config.force.unwrap_or(false) {
+        args.push("--force-overwrites".to_string());
+    }
+
+    // Optional yt-dlp flags from settings
+    if config.use_impersonate_chrome.unwrap_or(true) {
+        args.push("--impersonate".to_string());
+        args.push("chrome".to_string());
+    }
+    if config.use_no_cookies.unwrap_or(true) {
+        args.push("--no-cookies".to_string());
+    }
+}
+
+/// The full-quality invocation: selection + merging/conversion/embedding.
+fn push_primary_args(args: &mut Vec<String>, config: &DownloadConfig) {
+    // Extra ffmpeg args, keyed to the postprocessor they belong to. An unkeyed
+    // `--postprocessor-args` value is handed to *every* postprocessor, which
+    // can break thumbnail/metadata embedding; always name the target PP (e.g.
+    // "VideoConvertor:-crf 18"). Keyed options may safely be repeated.
+    let mut pp_args: Vec<String> = Vec::new();
+
     match config.workflow.as_str() {
         "audio_only" => {
             args.push("-x".to_string());
@@ -217,24 +249,66 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
         args.push("--postprocessor-args".to_string());
         args.push(pp.clone());
     }
+}
 
-    // Optional yt-dlp flags from settings
-    if config.use_impersonate_chrome.unwrap_or(true) {
-        args.push("--impersonate".to_string());
-        args.push("chrome".to_string());
+/// The dependency-free fallback: request a format that needs no ffmpeg, and
+/// skip merging/transcoding/embedding entirely. Whatever yt-dlp can fetch as a
+/// single file is kept rather than failing the whole job.
+fn push_fallback_args(args: &mut Vec<String>, config: &DownloadConfig) {
+    match config.workflow.as_str() {
+        "audio_only" => {
+            // Best audio stream as-is; dropping `-x` avoids an ffmpeg
+            // extraction pass.
+            args.push("-f".to_string());
+            args.push("bestaudio/best".to_string());
+        }
+        _ => {
+            // Prefer a progressive file that already carries both streams so
+            // no merge is required.
+            args.push("-f".to_string());
+            args.push("best[acodec!=none][vcodec!=none]/best".to_string());
+        }
     }
-    if config.use_no_cookies.unwrap_or(true) {
-        args.push("--no-cookies".to_string());
-    }
+}
 
-    // The URL must be last
-    args.push(config.url.clone());
+/// Heuristic: does this stderr tail point at a broken optional dependency
+/// (ffmpeg/ffprobe/AtomicParsley/mutagen) rather than a problem with the URL?
+fn looks_like_postprocess_failure(tail: &str) -> bool {
+    let t = tail.to_lowercase();
+    const NEEDLES: [&str; 12] = [
+        "postprocessing",
+        "post-processing",
+        "ffmpeg",
+        "ffprobe",
+        "unable to merge",
+        "merging",
+        "conversion failed",
+        "error opening output files",
+        "invalid argument",
+        "atomicparsley",
+        "mutagen",
+        "could not find ffmpeg",
+    ];
+    NEEDLES.iter().any(|n| t.contains(n))
+}
 
-    let job_id = config.job_id.clone();
-    let source_label = config.url.clone();
-    let manager = ProcessManager::new(app.clone());
+struct AttemptResult {
+    success: bool,
+    code: Option<i32>,
+    stderr_tail: String,
+    process_error: Option<String>,
+}
 
-    let mut cmd = tokio::process::Command::new(&yt_dlp_path);
+/// Run one yt-dlp attempt to completion, streaming its output to the UI.
+async fn run_attempt(
+    manager: &ProcessManager,
+    yt_dlp_path: &str,
+    args: Vec<String>,
+    job_id: &str,
+    source_label: &str,
+    collect_logs: bool,
+) -> AttemptResult {
+    let mut cmd = tokio::process::Command::new(yt_dlp_path);
     cmd.args(&args);
     crate::process_env::apply_child_env_async(&mut cmd);
 
@@ -243,94 +317,248 @@ pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<()
         cmd.creation_flags(0x08000000);
     }
 
-    let (mut child, stderr_tail, logger) = manager
-        .spawn(job_id.clone(), cmd, Some(source_label), collect_logs)
+    let (mut child, stderr_tail, logger) = match manager
+        .spawn(
+            job_id.to_string(),
+            cmd,
+            Some(source_label.to_string()),
+            collect_logs,
+        )
         .await
-        .map_err(|e| format!("Failed to start download: {}", e))?;
+    {
+        Ok(v) => v,
+        Err(e) => {
+            return AttemptResult {
+                success: false,
+                code: None,
+                stderr_tail: String::new(),
+                process_error: Some(e),
+            };
+        }
+    };
 
-    // Wait for process to finish in background
+    let status = match child.wait().await {
+        Ok(s) => s,
+        Err(e) => {
+            return AttemptResult {
+                success: false,
+                code: None,
+                stderr_tail: String::new(),
+                process_error: Some(format!("Process error: {}", e)),
+            };
+        }
+    };
+
+    // Let the stderr reader task drain the final lines before we snapshot them.
+    tokio::time::sleep(std::time::Duration::from_millis(80)).await;
+
+    let tail = stderr_tail
+        .lock()
+        .ok()
+        .map(|b| {
+            b.iter()
+                .rev()
+                .take(20)
+                .rev()
+                .cloned()
+                .collect::<Vec<_>>()
+                .join("\n")
+        })
+        .unwrap_or_default();
+
+    if let Some(ref logger) = logger {
+        logger
+            .note(&format!(
+                "----- finished: {} -----",
+                Local::now().format("%Y-%m-%d %H:%M:%S")
+            ))
+            .await;
+        logger
+            .note(&format!(
+                "result: {} (exit code {})",
+                if status.success() {
+                    "success"
+                } else {
+                    "failure"
+                },
+                status.code().unwrap_or(-1)
+            ))
+            .await;
+    }
+
+    AttemptResult {
+        success: status.success(),
+        code: status.code(),
+        stderr_tail: tail,
+        process_error: None,
+    }
+}
+
+#[tauri::command]
+pub async fn start_download(app: AppHandle, config: DownloadConfig) -> Result<(), String> {
+    let status = check_binaries(app.clone());
+
+    let yt_dlp_path = status
+        .yt_dlp_path
+        .ok_or_else(|| "yt-dlp not found. Please install or configure it first.".to_string())?;
+
+    let ffmpeg_path = status.ffmpeg_path;
+    let collect_logs = config.collect_logs.unwrap_or(true);
+
+    let output_path = if config.output_path.is_empty() {
+        dirs_next::download_dir()
+            .map(|p| p.to_string_lossy().to_string())
+            .ok_or_else(|| {
+                "Could not determine a default download path. Please set one in settings."
+                    .to_string()
+            })?
+    } else {
+        config.output_path.clone()
+    };
+
+    // Output template. Use a sanitized custom file name when provided, else fall
+    // back to yt-dlp's title template (which yt-dlp also sanitizes).
+    let output_base = output_path.trim_end_matches(['/', '\\']).to_string();
+    let name_template = config
+        .output_filename
+        .as_deref()
+        .map(sanitize_filename)
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| "%(title)s".to_string());
+
+    let staging = staging_dir_for(&config.job_id);
+
+    // Primary attempt: full quality + post-processing.
+    let mut primary_args: Vec<String> = Vec::new();
+    push_common_args(
+        &mut primary_args,
+        &output_base,
+        &staging,
+        &name_template,
+        &config,
+        &ffmpeg_path,
+        collect_logs,
+    );
+    push_primary_args(&mut primary_args, &config);
+    primary_args.push(config.url.clone());
+
+    // Fallback attempt: no ffmpeg-backed post-processing.
+    let mut fallback_args: Vec<String> = Vec::new();
+    push_common_args(
+        &mut fallback_args,
+        &output_base,
+        &staging,
+        &name_template,
+        &config,
+        &ffmpeg_path,
+        collect_logs,
+    );
+    push_fallback_args(&mut fallback_args, &config);
+    fallback_args.push(config.url.clone());
+
+    let job_id = config.job_id.clone();
+    let source_label = config.url.clone();
+    let manager = ProcessManager::new(app.clone());
     let app_clone = app.clone();
-    let job_id_clone = job_id.clone();
+
     tokio::spawn(async move {
-        match child.wait().await {
-            Ok(exit_status) => {
-                let event_type = if exit_status.success() {
-                    "exit"
-                } else {
-                    "error"
-                };
-                let payload = if exit_status.success() {
-                    "0".to_string()
-                } else {
-                    let code = exit_status.code().unwrap_or(-1);
-                    // Include a generous tail of stderr so the real
-                    // yt-dlp/ffmpeg error reaches the UI instead of a bare
-                    // exit code. Verbose mode adds the failing command plus the
-                    // ffmpeg stderr block, so allow enough lines to keep them.
-                    let tail = stderr_tail
-                        .lock()
-                        .ok()
-                        .map(|b| {
-                            b.iter()
-                                .rev()
-                                .take(20)
-                                .rev()
-                                .cloned()
-                                .collect::<Vec<_>>()
-                                .join("\n")
-                        })
-                        .unwrap_or_default();
-                    if tail.trim().is_empty() {
-                        format!("Download failed with exit code {}", code)
-                    } else {
-                        format!("Download failed (exit code {}):\n{}", code, tail)
-                    }
-                };
+        let primary = run_attempt(
+            &manager,
+            &yt_dlp_path,
+            primary_args,
+            &job_id,
+            &source_label,
+            collect_logs,
+        )
+        .await;
 
-                if let Some(ref logger) = logger {
-                    logger
-                        .note(&format!(
-                            "----- finished: {} -----",
-                            Local::now().format("%Y-%m-%d %H:%M:%S")
-                        ))
-                        .await;
-                    logger
-                        .note(&format!(
-                            "result: {} (exit code {})",
-                            if exit_status.success() {
-                                "success"
-                            } else {
-                                "failure"
-                            },
-                            exit_status.code().unwrap_or(-1)
-                        ))
-                        .await;
-                }
+        if primary.success {
+            let _ = app_clone.emit(
+                &format!("process-event-{}", job_id),
+                ProcessEvent {
+                    job_id: job_id.clone(),
+                    event_type: "exit".to_string(),
+                    payload: "0".to_string(),
+                },
+            );
+            cleanup_staging(&staging).await;
+            return;
+        }
 
-                let _ = app_clone.emit(
-                    &format!("process-event-{}", job_id_clone),
-                    ProcessEvent {
-                        job_id: job_id_clone,
-                        event_type: event_type.to_string(),
-                        payload,
-                    },
+        // Retry without post-processing when the failure looks like a broken
+        // optional dependency, or when ffmpeg is missing entirely. URL/network
+        // failures are left alone so we don't re-download worthless jobs.
+        let ffmpeg_missing = ffmpeg_path.is_none();
+        let should_fallback = primary.process_error.is_none()
+            && (ffmpeg_missing || looks_like_postprocess_failure(&primary.stderr_tail));
+
+        let fallback = if should_fallback {
+            let _ = app_clone.emit(
+                &format!("process-event-{}", job_id),
+                ProcessEvent {
+                    job_id: job_id.clone(),
+                    event_type: "stdout".to_string(),
+                    payload:
+                        "[media-archiver] Post-processing failed; retrying with a simpler format (no ffmpeg)."
+                            .to_string(),
+                },
+            );
+            Some(
+                run_attempt(
+                    &manager,
+                    &yt_dlp_path,
+                    fallback_args,
+                    &job_id,
+                    &source_label,
+                    collect_logs,
+                )
+                .await,
+            )
+        } else {
+            None
+        };
+
+        // Nothing usable was produced — drop the staging assets so the target
+        // directory is left exactly as it was.
+        cleanup_staging(&staging).await;
+
+        let had_fallback = fallback.is_some();
+        let result = fallback.unwrap_or(primary);
+
+        if result.success {
+            let _ = app_clone.emit(
+                &format!("process-event-{}", job_id),
+                ProcessEvent {
+                    job_id: job_id.clone(),
+                    event_type: "exit".to_string(),
+                    payload: "0".to_string(),
+                },
+            );
+        } else {
+            let code = result.code.unwrap_or(-1);
+            let mut message = if let Some(err) = &result.process_error {
+                err.clone()
+            } else if result.stderr_tail.trim().is_empty() {
+                format!("Download failed with exit code {}", code)
+            } else {
+                format!(
+                    "Download failed (exit code {}):\n{}",
+                    code, result.stderr_tail
+                )
+            };
+            if had_fallback {
+                message.push_str(
+                    "\n\nFallback download without ffmpeg also failed; downloaded assets were cleaned up.",
                 );
             }
-            Err(e) => {
-                if let Some(ref logger) = logger {
-                    logger
-                        .note(&format!("result: failure (process error: {})", e))
-                        .await;
-                }
-                let _ = app_clone.emit(
-                    &format!("process-event-{}", job_id_clone),
-                    ProcessEvent {
-                        job_id: job_id_clone,
-                        event_type: "error".to_string(),
-                        payload: format!("Process error: {}", e),
-                    },
-                );
-            }
+            let _ = app_clone.emit(
+                &format!("process-event-{}", job_id),
+                ProcessEvent {
+                    job_id: job_id.clone(),
+                    event_type: "error".to_string(),
+                    payload: message,
+                },
+            );
         }
     });
 

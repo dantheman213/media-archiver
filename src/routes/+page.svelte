@@ -10,7 +10,7 @@
     updateJobStatus,
     updateJobMetadata,
     updateJobProgress,
-    updateJobConfig,
+    resetJobForRetry,
     defaultConfig,
   } from '../stores/queue';
   import { downloadDefaults } from '../stores/downloadDefaults';
@@ -19,6 +19,7 @@
   import { binaryCheckState, binaryStatus } from '../stores/binaries';
   import { addHistoryRecord, updateHistoryRecord, history } from '../stores/history';
   import { getCachedMetadata, cacheMetadata } from '../stores/metadataCache';
+  import { queueUrlWithDefaults } from '../lib/ingest';
   import type { MediaJob, MediaMetadata, HistoryRecord, JobStatus } from '../types';
   import MediaCard from '../components/MediaCard.svelte';
   import InspectorPanel from '../components/InspectorPanel.svelte';
@@ -275,41 +276,18 @@
    * (or a fresh default config on first run), fetching metadata in the
    * background so the card/history fill in without blocking the download.
    */
-  function queueUrlWithDefaults(url: string) {
-    const cfg = get(downloadDefaults) ?? defaultConfig();
-    // Add as 'inspecting' so the download waits for metadata: the selected
-    // thumbnail's format decides whether yt-dlp can safely embed it (see
-    // isThumbnailEmbeddable).
-    const id = addJob(url);
-    updateJobConfig(id, cfg);
-
-    const cached = getCachedMetadata(url);
-    if (cached) {
-      updateJobMetadata(id, cached);
-      updateJobStatus(id, 'queued');
-      return;
-    }
-
-    invoke('fetch_metadata', { url })
-      .then((metadata) => {
-        updateJobMetadata(id, metadata as MediaMetadata);
-        cacheMetadata(url, metadata as MediaMetadata);
-        const thumb = (metadata as MediaMetadata).thumbnailUrl;
-        if (thumb) {
-          invoke('cache_thumbnail', { url: thumb, jobId: id }).then((localPath) => {
-            cachedThumbnailPaths.set(id, localPath as string);
-          }).catch(() => { /* non-critical */ });
-        }
-      })
-      .catch(() => { /* non-critical; download still proceeds */ })
-      .finally(() => updateJobStatus(id, 'queued'));
+  function queueUrl(url: string, force = false) {
+    queueUrlWithDefaults(url, {
+      force,
+      onThumbnailCached: (jobId, localPath) => cachedThumbnailPaths.set(jobId, localPath),
+    });
   }
 
   /** Default Add: queue the current input with the remembered defaults. */
   function handleQuickAdd() {
     const url = takeUrlInput();
     if (!url) return;
-    queueUrlWithDefaults(url);
+    queueUrl(url);
   }
 
   /**
@@ -391,7 +369,7 @@
     const urls = pendingUrls;
     pendingUrls = null;
     urlInput = '';
-    for (const url of urls) queueUrlWithDefaults(url);
+    for (const url of urls) queueUrl(url);
   }
 
   function cancelBulkAdd() {
@@ -530,6 +508,31 @@
     contextMenu = null;
   }
 
+  /** Statuses where the job is already busy and cannot be restarted. */
+  function isBusy(status: JobStatus): boolean {
+    return status === 'downloading' || status === 'processing' || status === 'inspecting';
+  }
+
+  /**
+   * Re-run a job's download with its existing settings, forcing an overwrite of
+   * anything already on disk. Works for failed, queued and paused jobs.
+   */
+  function retryJob(job: MediaJob) {
+    if (isBusy(job.status)) return;
+    // Let the queue watcher pick this job up again.
+    prevStartedIds.delete(job.id);
+    resolvedFilePaths.delete(job.id);
+    cachedThumbnailPaths.delete(job.id);
+    sizeFetched.delete(job.id);
+    resetJobForRetry(job.id);
+  }
+
+  function retryFromContextMenu() {
+    if (!contextMenu) return;
+    retryJob(contextMenu.job);
+    closeContextMenu();
+  }
+
   async function copyYtDlpCommand() {
     if (!contextMenu) return;
     await navigator.clipboard.writeText(contextMenu.cmd);
@@ -602,6 +605,7 @@
           useImpersonateChrome: $settings.useImpersonateChrome,
           useNoCookies: $settings.useNoCookies,
           collectLogs: $settings.collectLogs,
+          force: job.forceRedownload ?? false,
         },
       });
     } catch (err) {
@@ -764,6 +768,11 @@
     onkeydown={(e) => e.key === 'Escape' && closeContextMenu()}
     role="menu"
   >
+    {#if !isBusy(contextMenu.job.status) && contextMenu.job.status !== 'configuring'}
+      <li class="context-menu-item" role="menuitem" onclick={retryFromContextMenu}>
+        {contextMenu.job.status === 'error' ? 'Retry download' : 'Redownload'}
+      </li>
+    {/if}
     <li class="context-menu-item" role="menuitem" onclick={copyYtDlpCommand}>
       Copy yt-dlp command
     </li>

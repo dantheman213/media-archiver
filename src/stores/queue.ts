@@ -101,6 +101,33 @@ export function updateJobConfig(id: string, config: Partial<JobConfig>): void {
   );
 }
 
+/** Mark a job so the next download overwrites any existing file on disk. */
+export function forceRedownload(id: string): void {
+  jobs.update((current) =>
+    current.map((job) => (job.id === id ? { ...job, forceRedownload: true } : job))
+  );
+}
+
+/**
+ * Reset a job so it can be downloaded again from scratch: back to `queued`,
+ * error cleared, progress zeroed and forced overwrite enabled.
+ */
+export function resetJobForRetry(id: string): void {
+  jobs.update((current) =>
+    current.map((job) =>
+      job.id === id
+        ? {
+            ...job,
+            status: 'queued',
+            errorMessage: undefined,
+            forceRedownload: true,
+            progress: defaultProgress(),
+          }
+        : job
+    )
+  );
+}
+
 /** Remove a job from the queue by id */
 export function removeJob(id: string): void {
   const job = get(jobs).find((j) => j.id === id);

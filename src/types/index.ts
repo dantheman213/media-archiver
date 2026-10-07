@@ -66,6 +66,8 @@ export interface MediaJob {
   config: JobConfig;
   progress: JobProgress;
   errorMessage?: string;
+  /** Set by Retry/Redownload so yt-dlp overwrites any existing file. */
+  forceRedownload?: boolean;
 }
 
 export interface GlobalSettings {
